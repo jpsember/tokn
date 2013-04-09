@@ -1,0 +1,16 @@
+#!/usr/local/bin/ruby
+
+# Compile a DFA from a token definition script,
+# then serialize that DFA to stdout
+#
+# Example usage (for Unix):
+#
+# tokncompile < sampletokens.txt > dfa.txt
+#
+
+
+require 'tokn'
+
+puts Tokn::DFA.from_script(ARGF.read).serialize()
+
+

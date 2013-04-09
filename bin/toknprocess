@@ -1,0 +1,32 @@
+#!/usr/local/bin/ruby
+
+# Given a compiled DFA file and a source file,
+# extract all tokens from the source file.
+#
+# Example usage (for Unix); assumes tokncompile.rb
+# has been run beforehand:
+#
+#
+# toknprocess dfa.txt sampletext.txt
+#
+
+require 'tokn'
+include Tokn
+
+if ARGV.size < 2 || ARGV.size > 3
+  puts "Usage: toknprocess <dfa file> <source file> [<skip token name>]"
+  abort
+end
+
+dfa = DFA.from_file(ARGV[0])
+skipName = nil
+if ARGV.size >= 3
+	skipName = ARGV[2]
+end
+
+tk = Tokenizer.new(dfa, readTextFile(ARGV[1]), skipName)
+
+while tk.hasNext()
+  t = tk.read
+  printf("%s %d %d %s\n",tk.nameOf(t),t.lineNumber,t.column,t.text)
+end

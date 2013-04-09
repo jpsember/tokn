@@ -1,0 +1,19 @@
+2013-03-07  
+  * Version 0.0.6 released
+
+2013-04-03
+  * Version 0.0.7 released
+  * Added CHANGELOG.txt
+  * Added link to sample_pdf.DFA 
+  
+  * Version 0.0.8
+  * Fixed problem with link URL's
+
+  * Version 0.0.9
+  * Fixed problem with README file
+
+2013-04-08
+	* Version 0.1.0
+	* Cleaned up test directory
+	
+	

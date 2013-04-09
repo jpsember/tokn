@@ -1,0 +1,32 @@
+# Sample token definitions 
+
+# Whitespace includes a comment, which starts with '//' and
+# extends to the end of the line:
+#
+WS: ( [\f\r\s\t\n]+ ) | ( // [^\n]* \n? )
+
+# An anonymous token, for convenience; a non-empty sequence of digits
+#
+_DIG: [0-9]+
+
+# Double has lower priority than int; we want ints to
+# be interpreted as ints, not as doubles
+DBL: \-?(({_DIG}(.{_DIG})?)|.{_DIG})
+
+INT: \-?{_DIG}
+
+LBL: '([^'\n]|\\')*'
+
+ID:  [_a-zA-Z][_a-zA-Z0-9]*
+
+ASSIGN: =
+
+EQUIV: ==
+
+IF: if
+DO: do
+
+BROP: \{
+
+BRCL: \}
+

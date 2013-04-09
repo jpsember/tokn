@@ -1,0 +1,16 @@
+// Example source file that can be tokenized 
+
+speed = 42   // speed of object
+gravity = -9.80
+
+{	color = green }
+
+title = 'This is a string with \' an escaped delimiter'
+
+if gravity == 12 {
+  do something
+}
+
+do something_else
+
+// End of 'sampletext.txt'
