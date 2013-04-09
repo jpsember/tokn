@@ -1,9 +1,10 @@
 tokn 
 =======
-A ruby gem for constructing DFAs and using them to tokenize text files.
+Tokn is a ruby gem that generates automatons from regular expressions to extract tokens from text files.
 
-Written and (c) by Jeff Sember, March 2013.
+Written by Jeff Sember, March 2013.
 
+[Source code documentation can be found here.](http://rubydoc.info/gems/tokn/frames)
 
 
 Description of the problem
