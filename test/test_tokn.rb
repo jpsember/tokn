@@ -3,8 +3,8 @@ require 'test/unit'
 require_relative '../lib/tokn/tools.rb'
 req('range_partition dfa dfa_builder tokenizer token_defn_parser')
 
+#SINGLETEST = "test_100_add"
 
-#SINGLETEST = "test_ps_output_multi"
 if defined? SINGLETEST
   if main?(__FILE__)
     ARGV.concat("-n  #{SINGLETEST}".split)
@@ -16,20 +16,26 @@ class TestTokn <  MyTestSuite
   include Tokn, ToknInternal
   
   def suite_setup
-
+    
     # Make current directory = the one containing this script
     main?(__FILE__)
 
-    if !File.directory?(out_dir)
-      Dir.mkdir(out_dir)
+    @@out_dir = File.absolute_path(File.join(Dir.pwd,"_misc_"))
+      
+    if !File.directory?(@@out_dir)
+      Dir.mkdir(@@out_dir)
     end
     
-    @@sampleText = readTextFile("sampletext.txt")
-    @@sampleTokens = readTextFile("sampletokens.txt")
+    @@sampleText = read_text_file("sampletext.txt")
+    @@sampleTokens = read_text_file("sampletokens.txt")
   end
 
+  def out_path(f)
+    File.join(@@out_dir,f)
+  end
+  
   def suite_teardown
-    remove_file_or_dir(out_dir)
+#    remove_file_or_dir(@@out_dir)
   end
 
   def method_setup
@@ -321,7 +327,7 @@ class TestTokn <  MyTestSuite
     addset(40,50)
     @par.prepare
 
-    @par.generatePDF(out_dir)
+    @par.generatePDF(@@out_dir)
 
     prep
     add 25,33
@@ -356,13 +362,13 @@ END
     s = x.startState
     x.endState.finalState = true
 
-    s.generatePDF(out_dir,"nfa")
+    s.generatePDF(@@out_dir,"nfa")
 
     r = s.reverseNFA()
-    r.generatePDF(out_dir,"reversed")
+    r.generatePDF(@@out_dir,"reversed")
 
     dfa = DFABuilder.nfa_to_dfa(s)
-    dfa.generatePDF(out_dir,"buildDFA")
+    dfa.generatePDF(@@out_dir,"buildDFA")
   end
 
   def test_180_cvt_NFA_to_DFA
@@ -371,14 +377,14 @@ END
     s = x.startState
     x.endState.finalState = true
 
-    s.generatePDF(out_dir,"nfa")
+    s.generatePDF(@@out_dir,"nfa")
 
     dfa = DFABuilder.nfa_to_dfa(s)
-    dfa.generatePDF(out_dir,"dfa")
+    dfa.generatePDF(@@out_dir,"dfa")
 
     oldToNewMap, maxId2 = dfa.duplicateNFA(42)
     dfa2 = oldToNewMap[dfa]
-    dfa2.generatePDF(out_dir,"dfa_duplicated")
+    dfa2.generatePDF(@@out_dir,"dfa_duplicated")
   end
 
   def test_190_TokenDefParser
@@ -388,7 +394,7 @@ END
     td = TokenDefParser.new(s)
 
     tokDFA = td.dfa
-    tokDFA.startState.generatePDF(out_dir,"TokenDFA")
+    tokDFA.startState.generatePDF(@@out_dir,"TokenDFA")
 
   end
 
@@ -517,7 +523,7 @@ END
     capture_begin
     
     dfa = DFA.from_script_file("sampletokens.txt")
-    t = Tokenizer.new(dfa,  readTextFile("sampletext.txt"), "WS")
+    t = Tokenizer.new(dfa,  read_text_file("sampletext.txt"), "WS")
 
     while t.hasNext do
       

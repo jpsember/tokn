@@ -20,7 +20,7 @@ module Tokn
     def self.from_script(script, persistPath = nil)
       
       if persistPath and File.exist?(persistPath)
-        return extractDFA(readTextFile(persistPath))
+        return extractDFA(read_text_file(persistPath))
       end
       
       req('token_defn_parser')
@@ -29,7 +29,7 @@ module Tokn
       dfa = td.dfa
       
       if persistPath
-        writeTextFile(persistPath, dfa.serialize())
+        write_text_file(persistPath, dfa.serialize())
       end
     
       dfa  
@@ -39,14 +39,14 @@ module Tokn
     # the file at scriptPath.
     #
     def self.from_script_file(scriptPath, persistPath = nil)
-      self.from_script(readTextFile(scriptPath), persistPath)  
+      self.from_script(read_text_file(scriptPath), persistPath)  
     end
     
     # Compile a Tokenizer DFA from a text file (that contains a
     # JSON string)
     #
     def self.from_file(path)
-      from_json(readTextFile(path))
+      from_json(read_text_file(path))
     end
     
     # Compile a Tokenizer DFA from a JSON string

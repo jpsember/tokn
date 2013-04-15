@@ -1,12 +1,23 @@
 require 'set'
 require 'fileutils'
 
+###############################################################
+#
 # Various utility and debug convenience functions.
 #
+###############################################################
+
+# Exception class for objects in illegal states
+#
+class IllegalStateException < Exception
+end
 
 # A string containing a single zero, with ASCII 8-bit encoding (i.e., plain old bytes)
 ZERO_CHAR = "\0".force_encoding("ASCII-8BIT")
 
+# Construct a string of zeros
+# @param count number of zeros
+#
 def zero_bytes(count)
   ZERO_CHAR * count
 end
@@ -27,10 +38,8 @@ def req(fileListStr,subdir = nil)
 end
 
 # Shorthand for printf(...)
-# @param args passed to printf
-def pr(*args)
-  printf(*args)
-end
+#
+alias :pr :printf
 
 # Convert an object to a human-readable string,
 # or <nil>; should be considered a debug-only feature
@@ -238,7 +247,7 @@ def warndb(val = true)
   if !val || val == 0
     return false
   end
-  one_time_alert("warning",1, "Debug printing enabled")
+  one_time_alert("warning",1,"Debug printing enabled")
   true
 end
 
@@ -273,21 +282,30 @@ def block
   yield
 end
 
-# Exception class for objects in illegal states
+# Construct hex representation of value
+# @param value integer value
+# @param num_digits number of hex digits
 #
-class IllegalStateException < Exception
-end
-
 def to_hex(value, num_digits=4) 
   s = sprintf("%x", value)
   s.rjust(num_digits,'0')
 end
 
+# Hex dump a string or byte array
+# @param byte_array_or_string
+# @param title
+# @param offset offset to first value within array
+# @param length number of values to dump
+# @param bytes_per_row 
+# @param with_text if true, displays ASCII values to right of hex dump
+#
 def hex_dump(byte_array_or_string, title=nil, offset=0, length= -1, bytes_per_row=16, with_text=true) 
   ss = hex_dump_to_string(byte_array_or_string, title, offset, length, bytes_per_row, with_text)
   puts ss
 end
 
+# Hex dump a string or byte array to a string; see hex_dump for parameter descriptions
+#
 def hex_dump_to_string(byte_array_or_string, title=nil, offset=0, length= -1, bytes_per_row=16, with_text=true)
   
   byte_array = byte_array_or_string
@@ -330,9 +348,7 @@ def hex_dump_to_string(byte_array_or_string, title=nil, offset=0, length= -1, by
       else
         ss << '   '
       end
-  
     end
-        
         
     if with_text 
       ss << '  |'
@@ -357,6 +373,7 @@ $prevTime = nil
 
 # Calculate time elapsed, in seconds, from last call to this function;
 # if it's never been called, returns zero
+#
 def elapsed 
   curr = Time.now.to_f
   elap = 0
@@ -369,6 +386,7 @@ end
 
 # Delete a file or directory, if it exists.
 # Caution!  If directory, deletes all files and subdirectories.
+#
 def remove_file_or_dir(pth)
   if File.directory?(pth)
     FileUtils.remove_dir(pth)
@@ -382,12 +400,17 @@ require 'stringio'
 $IODest = nil
 $OldStdOut = nil
 
+# Redirect standard output to an internal string
+#
 def capture_begin
     raise IllegalStateException if $IODest
     $IODest = StringIO.new
     $OldStdOut, $stdout = $stdout, $IODest
 end
 
+# Restore standard output; return captured text
+# @return text that was redirected
+#
 def capture_end
   raise IllegalStateException if !$IODest
   $stdout = $OldStdOut  
@@ -396,31 +419,69 @@ def capture_end
   ret
 end
 
+# Compare a string with disk file; abort if different.  Disk filename is derived
+# from caller function name; e.g., test_xxx produces filename _output_xxx
+#
+# @param str if not nil, string to compare; if nil, calls capture_end to get string
+#
 def match_expected_output(str = nil)
-  
+
   if !str
     str = capture_end
   end
-  
+
   cl_method = caller[0][/`.*'/][1..-2]
   if (cl_method.start_with?("test_"))
     cl_method = cl_method[5..-1]
   end
   path = "_output_" + cl_method + ".txt"
-#  path = File.absolute_path(path)
-  
+
   if !File.file?(path)
     printf("no such file #{path} exists, writing it...\n")
-    writeTextFile(path,str)
+    write_text_file(path,str)
   else
-    exp_cont = readTextFile(path)  
+    exp_cont = read_text_file(path)
     if str != exp_cont
       d1 = str
       d2 = exp_cont
-#      d1 = hex_dump_to_string(str,"Output")
-#      d2 = hex_dump_to_string(exp_cont,"Expected")
-            
-      raise IllegalStateException,"output did not match expected:\n#{d1}#{d2}"
+
+      # Find location where they differ
+      lines1 = d1.split("\n")
+      lines2 = d2.split("\n")
+      j = [lines1.size, lines2.size].max
+
+      s = "???"
+      found_diff = false
+      hist = []
+
+      found_count = 0
+      j.times do |i|
+        found_diff ||= (i >= lines1.size || i >= lines2.size || lines1[i] != lines2[i])
+        s = sprintf("%3d:",i)
+        if !found_diff
+          hist << "#{s}  #{lines1[i]}\n      #{lines2[i]}\n"
+        else
+          if found_count < 3
+            if i < lines1.size
+              s << "  #{lines1[i]}\n"
+            else
+              s << "  ---END---\n"
+            end
+            if i < lines2.size
+              s << "      #{lines2[i]}\n"
+            else
+              s << "      ---END---\n"
+            end
+            hist << s
+          end
+          found_count += 1
+        end
+        while hist.size > 6
+          hist.shift
+        end
+      end
+      dash = "-" * 95 + "\n"
+      raise IllegalStateException,"output did not match expected:\n#{dash}#{hist.join('')}#{dash}"
     end
   end
 end

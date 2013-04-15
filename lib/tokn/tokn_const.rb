@@ -43,7 +43,7 @@ def dotToPDF(dotFile, name = "", test_dir = nil)
   raise ArgumentError if !test_dir
   
   dotPath = File.join(test_dir,".__mygraph__.dot")
-  writeTextFile(dotPath,gr)
+  write_text_file(dotPath,gr)
   destName = File.join(test_dir,"__mygraph__"+name+".pdf")
   system("dot -Tpdf "+dotPath+" -o "+destName)
 end

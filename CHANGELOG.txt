@@ -16,4 +16,5 @@
 	* Version 0.1.0
 	* Cleaned up test directory
 	
-	
+2013-04-15
+  * No longer maintaining CHANGELOG.txt; see git commit comments instead.	
