@@ -32,3 +32,18 @@ module ToknInternal
     EPSILON-1-edgeLabel
   end
 end
+
+# Convert a .dot file (string) to a PDF file "__mygraph__nnn.pdf" 
+# 
+# It does this by making a system call to the 'dot' utility.
+#
+def dotToPDF(dotFile, name = "", test_dir = nil)
+  gr = dotFile
+  
+  raise ArgumentError if !test_dir
+  
+  dotPath = File.join(test_dir,".__mygraph__.dot")
+  writeTextFile(dotPath,gr)
+  destName = File.join(test_dir,"__mygraph__"+name+".pdf")
+  system("dot -Tpdf "+dotPath+" -o "+destName)
+end

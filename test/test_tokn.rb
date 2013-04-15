@@ -514,10 +514,11 @@ END
 
   def test_270_filter_ws
 
+    capture_begin
+    
     dfa = DFA.from_script_file("sampletokens.txt")
     t = Tokenizer.new(dfa,  readTextFile("sampletext.txt"), "WS")
 
-    s = ''
     while t.hasNext do
       
       tk = t.peek
@@ -525,48 +526,19 @@ END
       if t.nameOf(tk) == 'BROP'
         lst = t.readSequenceIf('BROP DO ID BRCL')
         if lst
-          s << " ...read BROP DO ID sequence...\n"  
-          lst.each{ |x| s << "   #{d(x)}\n"}
+          puts " ...read BROP DO ID sequence..."  
+          lst.each{ |x| puts "   #{d(x)}"}
           next
         else
-          s << " ...couldn't find sequence...\n"  
+          puts " ...couldn't find sequence..."  
         end
       end
       
       tk = t.read
-      s << d(tk) << "\n"
-      
+      puts d(tk)  
     end
-    exp =<<"EXP"
-(line 1, col 1)   : speed
-(line 1, col 6)   : =
-(line 1, col 7)   : 42
-(line 1, col 9)   : gravity
-(line 1, col 16)  : =
-(line 1, col 17)  : -9.80
- ...couldn't find sequence...
-(line 1, col 22)  : {
-(line 1, col 23)  : color
-(line 1, col 29)  : =
-(line 1, col 30)  : green
-(line 1, col 35)  : }
-(line 1, col 36)  : title
-(line 1, col 41)  : =
-(line 1, col 42)  : 'This is a string with \\' an escaped delimiter'
-(line 1, col 89)  : if
-(line 1, col 91)  : gravity
-(line 1, col 98)  : ==
-(line 1, col 100) : 12
- ...read BROP DO ID sequence...
-   (line 1, col 102) : {
-   (line 1, col 103) : do
-   (line 1, col 105) : something
-   (line 1, col 114) : }
-(line 1, col 115) : do
-(line 1, col 117) : something_else
-EXP
-
-   assert(s.strip == exp.strip)
+    
+    match_expected_output
   end
 
 end

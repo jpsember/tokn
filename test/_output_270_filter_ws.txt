@@ -1,0 +1,26 @@
+(line 1, col 1)   : speed
+(line 1, col 6)   : =
+(line 1, col 7)   : 42
+(line 1, col 9)   : gravity
+(line 1, col 16)  : =
+(line 1, col 17)  : -9.80
+ ...couldn't find sequence...
+(line 1, col 22)  : {
+(line 1, col 23)  : color
+(line 1, col 29)  : =
+(line 1, col 30)  : green
+(line 1, col 35)  : }
+(line 1, col 36)  : title
+(line 1, col 41)  : =
+(line 1, col 42)  : 'This is a string with \' an escaped delimiter'
+(line 1, col 89)  : if
+(line 1, col 91)  : gravity
+(line 1, col 98)  : ==
+(line 1, col 100) : 12
+ ...read BROP DO ID sequence...
+   (line 1, col 102) : {
+   (line 1, col 103) : do
+   (line 1, col 105) : something
+   (line 1, col 114) : }
+(line 1, col 115) : do
+(line 1, col 117) : something_else
