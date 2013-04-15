@@ -46,27 +46,6 @@ def myAssert(cond, *msg)
 end
 
 
-## Set test directory.  If nil, sets to home directory + "__test__"
-##
-#def setTestDir(d = nil)
-#  $testDir = d || File.join(Dir.home,"__test__")
-#end
- 
-## Get a path within the test directory;
-## create test directory if it doesn't exist.
-##
-## relPath : if nil, returns the test directory; else 
-##   returns the test directory joined to this one
-##
-#def withinTestDir(relPath = nil)
-#  if !$testDir
-#    raise IllegalStateException, "No test directory has been defined"
-#  end
-#  if !File.directory?($testDir)  
-#    Dir::mkdir($testDir)
-#  end
-#  relPath ? File.join($testDir,relPath) : $testDir
-#end
 
 # Convert a .dot file (string) to a PDF file "__mygraph__nnn.pdf" 
 # in the test directory.

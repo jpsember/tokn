@@ -3,9 +3,6 @@ require 'test/unit'
 require_relative '../lib/tokn/tools.rb'
 req('range_partition dfa dfa_builder tokenizer token_defn_parser')
 
-# Get access to Tokn namespace
-
-#setTestDir()
 
 #SINGLETEST = "test_ps_output_multi"
 if defined? SINGLETEST
@@ -18,11 +15,6 @@ class TestTokn <  MyTestSuite
 
   include Tokn, ToknInternal
   
-#  def data_file(f)
-#    File.join("data",f)
-#    #    File.dirname(__FILE__)+"/data/"+f
-#  end
-
   def suite_setup
 
     # Make current directory = the one containing this script
@@ -35,9 +27,6 @@ class TestTokn <  MyTestSuite
     @@sampleText = readTextFile("sampletext.txt")
     @@sampleTokens = readTextFile("sampletokens.txt")
   end
-
-  #  def withinTestDir(f)
-  #    File.join(@@testDir,"__source__")
 
   def suite_teardown
     remove_file_or_dir(out_dir)
