@@ -1,12 +1,12 @@
 digraph dfa {
  "" [shape=none]
  "S0" [shape=octagon]
- "S1" [shape=octagon]
- "S2" [shape=octagon]
- "S5" [shape=octagon]
- "S6" [shape=octagon]
- "S7" [shape=octagon]
- "S3" [shape=octagon]
+ "S1" [shape=doubleoctagon]
+ "S2" [shape=doubleoctagon]
+ "S5" [shape=doubleoctagon]
+ "S6" [shape=doubleoctagon]
+ "S7" [shape=doubleoctagon]
+ "S3" [shape=doubleoctagon]
  "S4" [shape=octagon]
 
  "" -> "S0"

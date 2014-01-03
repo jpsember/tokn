@@ -3,7 +3,7 @@
 require 'js_base/test'
 require 'tokn'
 
-class TestTokn <  Test::Unit::TestCase
+class TestTokn2 <  Test::Unit::TestCase
 
   include ToknInternal
 
