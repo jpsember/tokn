@@ -1,14 +1,13 @@
-require_relative 'tools'
-req('tokn_const code_set dfa_builder state reg_parse')
-
 module ToknInternal
- 
+
+req 'reg_parse dfa_builder'
+
   # Parses a token definition script, and generates an NFA that
   # is capable of recognizing and distinguishing between the various
   # tokens.
   #
   # Each line in the script is one of
-  #   
+  #
   #   # ...comment... (the # must appear as the first character in the line)
   #
   #   <tokenname> ':' <regex>
@@ -20,142 +19,129 @@ module ToknInternal
   # generated NFA.
   #
   class TokenDefParser
-    
+
     attr_reader :dfa
-    
+
     # Compile a token definition script into a DFA
-    #  
-    def initialize(script, createPDF = false)  
-      @script = script 
+    #
+    def initialize(script)
+      @script = script
       parseScript
-      if createPDF
-        dfa.startState.generatePDF("tokenizer_dfa")
-      end
-    end 
-    
+    end
+
     private
-    
+
     def parseScript
-      db = false
-      
       nextTokenId = 0
-      
+
       # List of tokens entries, including anonymous ones
       @tokenListBig = []
-      
+
       # List of tokens names, excluding anonymous ones
       tokenListSmall = []
-      
+
       # Maps token name to token entry
       @tokenNameMap = {}
-      
+
       @lines = @script.split("\n")
-      
+
       @lines.each_with_index do |line, lineNumber|
-        
+
         line.strip!
-        
+
         # If line is empty, or starts with '#', it's a comment
         if line.length == 0 || line[0] == '#'
           next
         end
-        
+
         if !(line =~ TOKENNAME_EXPR)
           raise ParseException, "Syntax error, line #"+lineNumber.to_s+": "+line
         end
-        
+
         pos = line.index(":")
-        
+
         tokenName = line[0,pos].strip()
-        
+
         expr = line[pos+1..-1].strip()
-  
+
         rex = RegParse.new(expr, @tokenNameMap)
-        
+
         # Give it the next available token id, if it's not an anonymous token
         tkId = nil
         if tokenName[0] != '_'
           tkId = nextTokenId
           nextTokenId += 1
         end
-        
+
         tkEntry = [tokenName, rex, @tokenListBig.size, tkId]
-        
-        !db || pr("token entry: %s\n",d(tkEntry))
-        
+
         if @tokenNameMap.has_key?(tokenName)
           raise ParseException, "Duplicate token name: "+line
         end
-        
-        
+
+
         @tokenListBig.push(tkEntry)
         @tokenNameMap[tkEntry[0]] = tkEntry
-        
+
         if tkId
           tokenListSmall.push(tokenName)
         end
-        
-        !db || pr(" added token name [%s] to map\n",d(tkEntry[0]))
-        
+
       end
-      
+
       combined = combineTokenNFAs()
-      !db || combined.generatePDF("combined")
-      
+
       dfa = DFABuilder.nfa_to_dfa(combined)
-      !db || dfa.generatePDF("combined_minimized")
-      
+
       @dfa = Tokn::DFA.new(tokenListSmall, dfa)
-    end 
-  
+    end
+
     # Combine the individual NFAs constructed for the token definitions into
     # one large NFA, each augmented with an edge labelled with the appropriate
     # token identifier to let the tokenizer see which token led to the final state.
     #
     def combineTokenNFAs
-    
-      
       baseId = 0
       startState = nil
-      
+
       @tokenListBig.each do |tokenName, regParse, index, tokenId|
-        
+
         # Skip anonymous token definitions
-        if !tokenId 
+        if !tokenId
           next
         end
-        
+
         oldToNewMap, baseId = regParse.startState.duplicateNFA( baseId)
-        
+
         dupStart = oldToNewMap[regParse.startState]
-        
+
         # Transition from the expression's end state (not a final state)
         # to a new final state, with the transitioning edge
         # labelled with the token id (actually, a transformed token id to distinguish
         # it from character codes)
         dupEnd = oldToNewMap[regParse.endState]
-        
+
         dupfinalState = State.new(baseId)
         baseId += 1
         dupfinalState.finalState = true
-        
+
         # Why do I need to add 'ToknInternal.' here?  Very confusing.
         dupEnd.addEdge(CodeSet.new(ToknInternal.tokenIdToEdgeLabel(tokenId)), dupfinalState)
-  
+
         if !startState
           startState = dupStart
         else
           # Add an e-transition from the start state to this expression's start
           startState.addEdge(CodeSet.new(EPSILON),dupStart)
         end
-      end  
+      end
       startState
     end
-  
+
     # Regex for token names preceding regular expressions
     #
     TOKENNAME_EXPR = Regexp.new("[_A-Za-z][_A-Za-z0-9]*\s*:\s*")
-    
+
   end
 
 end  # module ToknInternal

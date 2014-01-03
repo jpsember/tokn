@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/env ruby
 
 # Compile a DFA from a token definition script,
 # then serialize that DFA to stdout

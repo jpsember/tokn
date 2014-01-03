@@ -1,0 +1,27 @@
+digraph dfa {
+ "" [shape=none]
+ "S0" [shape=octagon]
+ "S1" [shape=octagon]
+ "S2" [shape=octagon]
+ "S5" [shape=octagon]
+ "S6" [shape=octagon]
+ "S7" [shape=octagon]
+ "S3" [shape=octagon]
+ "S4" [shape=octagon]
+
+ "" -> "S0"
+ "S0" -> "S1" [label=" 0..2 4..9"][fontname=Courier][fontsize=12]
+ "S0" -> "S2" [label=" 3"][fontname=Courier][fontsize=12]
+ "S0" -> "S3" [label=" A..Z _ a..z"][fontname=Courier][fontsize=12]
+ "S0" -> "S4" [label=" -"][fontname=Courier][fontsize=12]
+ "S1" -> "S1" [label=" 0..9"][fontname=Courier][fontsize=12]
+ "S2" -> "S1" [label=" 0..2 4..9"][fontname=Courier][fontsize=12]
+ "S2" -> "S5" [label=" 3"][fontname=Courier][fontsize=12]
+ "S5" -> "S1" [label=" 0..2 4..9"][fontname=Courier][fontsize=12]
+ "S5" -> "S6" [label=" 3"][fontname=Courier][fontsize=12]
+ "S6" -> "S1" [label=" 0..9"][fontname=Courier][fontsize=12]
+ "S6" -> "S7" [label=" q"][fontname=Courier][fontsize=12]
+ "S3" -> "S3" [label=" 0..9 A..Z _ a..z"][fontname=Courier][fontsize=12]
+ "S4" -> "S1" [label=" 0..9"][fontname=Courier][fontsize=12]
+
+}

@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/env ruby
 
 # Given a compiled DFA file and a source file,
 # extract all tokens from the source file.

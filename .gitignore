@@ -1,17 +1,4 @@
-__testdata__
-.__dfa__*
-*.gem
-.yardoc
+*/*.gem
 doc
-tokn.zip
-.DS_Store
-.project
-# Eclipse project information
-.metadata
-.classpath
-.settings
-.project
-.buildpath
-_OLD_*
-_SKIP_*
+tokn.sublime-*
 

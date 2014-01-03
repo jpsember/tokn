@@ -2,7 +2,7 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name        = 'tokn'
-  s.version     = '0.1.0'
+  s.version     = '0.2.0'
   s.date        = Time.now
   s.summary     = 'Extracts tokens from source files'
 
@@ -20,6 +20,10 @@ DESC
                       '[A-Z]*',
                       'test/**/*',
                       ]
+
+  s.add_dependency('js_base')
+  s.add_dependency('trollop')
+
   s.bindir = 'bin'
   s.executables   = FileList['bin/*'].map{|x| File.basename(x)}
   s.test_files = Dir.glob('test/*.rb')
