@@ -18,13 +18,13 @@ module ToknInternal
 
   # Convert a token id (>=0) to an edge label value ( < 0)
   #
-  def tokenIdToEdgeLabel(tokenId)
+  def token_id_to_edge_label(tokenId)
     EPSILON-1-tokenId
   end
 
   # Convert an edge label value ( < 0) to a token id (>=0)
   #
-  def edgeLabelToTokenId(edgeLabel)
+  def edge_label_to_token_id(edgeLabel)
     EPSILON-1-edgeLabel
   end
 end

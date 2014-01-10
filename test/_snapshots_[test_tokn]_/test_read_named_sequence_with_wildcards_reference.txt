@@ -1,0 +1,39 @@
+
+                 FOUND
+
+   (line 1, col 1)   : speed
+   (line 1, col 6)   : =
+   (line 1, col 7)   : 42
+
+                 FOUND
+
+   (line 1, col 9)   : gravity
+   (line 1, col 16)  : =
+   (line 1, col 17)  : -9.80
+(line 1, col 22)  : { id=9
+
+                 FOUND
+
+   (line 1, col 23)  : color
+   (line 1, col 28)  : =
+   (line 1, col 29)  : green
+(line 1, col 34)  : } id=10
+
+                 FOUND
+
+   (line 1, col 35)  : title
+   (line 1, col 40)  : =
+   (line 1, col 41)  : 'This is a string with \' an escaped delimiter'
+(line 1, col 88)  : if id=7
+ ...not found
+(line 1, col 90)  : gravity id=4
+(line 1, col 97)  : == id=6
+(line 1, col 106) : 12 id=2
+(line 1, col 108) : { id=9
+(line 1, col 109) : do id=8
+ ...not found
+(line 1, col 111) : something id=4
+(line 1, col 120) : } id=10
+(line 1, col 130) : do id=8
+ ...not found
+(line 1, col 132) : something_else id=4

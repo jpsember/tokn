@@ -37,16 +37,16 @@ class TestTokn2 <  Test::Unit::TestCase
       tok = build_tokenizer_from_script
 
       tokList = []
-      while tok.hasNext
+      while tok.has_next
         t = tok.read
         tokList.push(t)
-        puts " read: #{@dfa.tokenName(t.id)} '#{t}'"
+        puts " read: #{@dfa.token_name(t.id)} '#{t}'"
       end
 
       tok.unread(tokList.size)
 
       tokList.each do |t1|
-        tName = tok.nameOf(t1)
+        tName = tok.name_of(t1)
         tok.read(tName)
       end
     end

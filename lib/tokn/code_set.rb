@@ -14,6 +14,8 @@ module ToknInternal
   #
   class CodeSet
 
+    attr_accessor :elements
+
     # Construct a copy of this set
     #
     def makeCopy
@@ -25,7 +27,7 @@ module ToknInternal
     # Initialize set; optionally add an initial contiguous range
     #
     def initialize(lower = nil, upper = nil)
-      @elem = []
+      @elements = []
       if lower
         add(lower,upper)
       end
@@ -34,32 +36,19 @@ module ToknInternal
     # Replace this set with a copy of another
     #
     def setTo(otherSet)
-      @elem.replace(otherSet.array)
-    end
-
-    # Get the array containing the code set range pairs
-    #
-    def array
-      @elem
-    end
-
-    # Replace this set's array
-    # @param a array to point to (does not make a copy of it)
-    #
-    def setArray(a)
-      @elem = a
+      @elements.replace(otherSet.elements)
     end
 
     # Get hash code; just uses hash code of the contained array
     def hash
-      @elem.hash
+      @elements.hash
     end
 
     # Determine if this set is equivalent to another, by
     # comparing the contained arrays
     #
     def eql?(other)
-      @elem == other.array
+      @elements == other.elements
     end
 
     # Add a contiguous range of values to the set
@@ -71,35 +60,33 @@ module ToknInternal
         upper = lower + 1
       end
 
-      if lower >= upper
-        raise RangeError
-      end
+      raise RangeError if lower >= upper
 
       newSet = []
       i = 0
-      while i < @elem.size and @elem[i] < lower
-        newSet.push(@elem[i])
+      while i < @elements.size and @elements[i] < lower
+        newSet << @elements[i]
         i += 1
       end
 
       if (i & 1) == 0
-        newSet.push(lower)
+        newSet << lower
       end
 
-      while i < @elem.size and @elem[i] <= upper
+      while i < @elements.size and @elements[i] <= upper
         i += 1
       end
 
       if (i & 1) == 0
-        newSet.push(upper)
+        newSet << upper
       end
 
-      while i < @elem.size
-        newSet.push(@elem[i])
+      while i < @elements.size
+        newSet << @elements[i]
         i += 1
       end
 
-      @elem = newSet
+      @elements = newSet
 
     end
 
@@ -118,16 +105,16 @@ module ToknInternal
 
       newSet = []
       i = 0
-      while i < @elem.size and @elem[i] < lower
-        newSet << @elem[i]
+      while i < @elements.size and @elements[i] < lower
+        newSet << @elements[i]
         i += 1
       end
 
       if (i & 1) == 1
-        newSet.push(lower)
+        newSet << lower
       end
 
-      while i < @elem.size and @elem[i] <= upper
+      while i < @elements.size and @elements[i] <= upper
         i += 1
       end
 
@@ -135,13 +122,12 @@ module ToknInternal
         newSet << upper
       end
 
-      while i < @elem.size
-        newSet << @elem[i]
+      while i < @elements.size
+        newSet << @elements[i]
         i += 1
       end
 
-      setArray(newSet)
-
+      @elements = newSet
     end
 
     # Replace this set with itself minus another
@@ -160,7 +146,6 @@ module ToknInternal
       combineWith(s, 'i')
     end
 
-
     # Set this set equal to its intersection with another
     def intersect!(s)
       setTo(intersect(s))
@@ -168,28 +153,19 @@ module ToknInternal
 
     # Add every value from another CodeSet to this one
     def addSet(s)
-      sa = s.array
-
-      (0 ... sa.length).step(2) {
-        |i| add(sa[i],sa[i+1])
-      }
+      sa = s.elements
+      (0...sa.length).step(2){|i| add(sa[i],sa[i+1]) }
     end
 
     # Determine if this set contains a particular value
     def contains?(val)
-      ret = false
       i = 0
-      while i < @elem.size
-        if val < @elem[i]
-          break
-        end
-        if val < @elem[i+1]
-          ret = true
-          break
-        end
+      while i < @elements.size
+        return false if val < @elements[i]
+        return true if val < @elements[i+1]
         i += 2
       end
-      ret
+      false
     end
 
     # Get string representation of set, treating them (where
@@ -198,13 +174,13 @@ module ToknInternal
     def to_s
       s = ''
       i = 0
-      while i < @elem.size
+      while i < @elements.size
         if s.size
           s += ' '
         end
 
-        lower = @elem[i]
-        upper = @elem[i+1]
+        lower = @elements[i]
+        upper = @elements[i+1]
         s += CodeSet.dbStr(lower)
         if upper != 1+lower
           s += '..' + CodeSet.dbStr(upper-1)
@@ -213,29 +189,6 @@ module ToknInternal
       end
       return s
     end
-
-    # Get string representation of set, treating them
-    # as integers
-    #
-    def to_s_alt
-      s = ''
-      i = 0
-      while i < @elem.size
-        if s.length > 0
-          s << ' '
-        end
-        low = @elem[i]
-        upr = @elem[i+1]
-        s << low.to_s
-        if upr > low+1
-          s << '..'
-          s << (upr-1).to_s
-        end
-        i += 2
-      end
-      return s
-    end
-
 
     # Negate the inclusion of a contiguous range of values
     #
@@ -249,8 +202,8 @@ module ToknInternal
 
       newSet = []
       i = 0
-      while i < @elem.size and @elem[i] <= lower
-        newSet << @elem[i]
+      while i < @elements.size and @elements[i] <= lower
+        newSet << @elements[i]
         i += 1
       end
 
@@ -260,8 +213,8 @@ module ToknInternal
         newSet << lower
       end
 
-      while i < @elem.size and @elem[i] <= upper
-        newSet << @elem[i]
+      while i < @elements.size and @elements[i] <= upper
+        newSet << @elements[i]
         i += 1
       end
 
@@ -272,12 +225,12 @@ module ToknInternal
         newSet << upper
       end
 
-      while i < @elem.size
-        newSet << @elem[i]
+      while i < @elements.size
+        newSet << @elements[i]
         i += 1
       end
 
-      @elem = newSet
+      @elements = newSet
 
     end
 
@@ -285,8 +238,8 @@ module ToknInternal
     def cardinality
       c = 0
       i = 0
-      while i < @elem.length
-        c += @elem[i+1] - @elem[i]
+      while i < @elements.length
+        c += @elements[i+1] - @elements[i]
         i += 2
       end
       c
@@ -295,7 +248,7 @@ module ToknInternal
     # Determine if this set is empty
     #
     def empty?
-      @elem.empty?
+      @elements.empty?
     end
 
 
@@ -324,8 +277,8 @@ module ToknInternal
     #          'n': negation, (a & !b) | (!a & b)
     #
     def combineWith(s, oper)
-      sa = array
-      sb = s.array
+      sa = elements
+      sb = s.elements
 
       i = 0
       j = 0
@@ -365,7 +318,7 @@ module ToknInternal
         end
       end
       ret = CodeSet.new()
-      ret.setArray(c)
+      ret.elements = c
       ret
     end
 

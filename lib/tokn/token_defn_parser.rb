@@ -126,7 +126,7 @@ req 'reg_parse dfa_builder'
         dupfinalState.finalState = true
 
         # Why do I need to add 'ToknInternal.' here?  Very confusing.
-        dupEnd.addEdge(CodeSet.new(ToknInternal.tokenIdToEdgeLabel(tokenId)), dupfinalState)
+        dupEnd.addEdge(CodeSet.new(ToknInternal.token_id_to_edge_label(tokenId)), dupfinalState)
 
         if !startState
           startState = dupStart

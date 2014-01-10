@@ -6,7 +6,7 @@ module ToknInternal
   # A data structure that transforms a set of CodeSets to a
   # disjoint set of them, such that no two range sets overlap.
   #
-  # This is improve the efficiency of the NFA => DFA algorithm,
+  # This is to improve the efficiency of the NFA => DFA algorithm,
   # which involves gathering information about what states are
   # reachable on certain characters.  We can't afford to treat each
   # character as a singleton, since the ranges can be quite large.
@@ -91,7 +91,7 @@ module ToknInternal
       applyAux(@rootNode, s2, list)
 
       # Sort the list of subsets by their first elements
-      list.sort{ |x,y| x.array[0] <=> y.array[0] }
+      list.sort{ |x,y| x.elements[0] <=> y.elements[0] }
     end
 
 

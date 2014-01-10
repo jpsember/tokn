@@ -74,7 +74,7 @@ module Tokn
         edgeList.each do |edge|
           label,destState = edge
           cr = CodeSet.new()
-          cr.setArray(label)
+          cr.elements = label
           s.addEdge(cr, st[destState])
         end
       end
@@ -107,7 +107,7 @@ module Tokn
     # the tokenId is nil.  Otherwise, assumes tokenId is 0 ... n-1, where
     # n is the number of token names in the DFA.
     #
-    def tokenName(tokenId)
+    def token_name(tokenId)
       if !tokenId
         nm = "<EOF>"
       elsif tokenId == UNKNOWN_TOKEN
@@ -198,7 +198,7 @@ module Tokn
       list = [state.finalState?]
       ed = []
       state.edges.each do |lbl, dest|
-        edInfo = [lbl.array, dest.id]
+        edInfo = [lbl.elements, dest.id]
         ed.push(edInfo)
       end
       list.push(ed)

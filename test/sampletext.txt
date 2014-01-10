@@ -1,4 +1,4 @@
-// Example source file that can be tokenized 
+// Example source file that can be tokenized
 
 speed = 42   // speed of object
 gravity = -9.80

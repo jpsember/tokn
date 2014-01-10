@@ -47,7 +47,7 @@ module ToknInternal
       stSet, _, _ = dfa.reachableStates
       stSet.each do |s|
         s.edges.each do |lbl, dest|
-          a = lbl.array
+          a = lbl.elements
           if !a.size
             next
           end
@@ -110,7 +110,7 @@ module ToknInternal
         nfaIds.each do |nfaId|
           nfaState = @nfaStateMap[nfaId]
           nfaState.edges.each do |lbl,dest|
-            if lbl.array[0] == EPSILON
+            if lbl.elements[0] == EPSILON
               next
             end
 

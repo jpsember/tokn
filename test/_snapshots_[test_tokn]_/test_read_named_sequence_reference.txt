@@ -4,7 +4,7 @@
 (line 1, col 9)   : gravity
 (line 1, col 16)  : =
 (line 1, col 17)  : -9.80
- ...couldn't find sequence...
+ ...not found
 (line 1, col 22)  : {
 (line 1, col 23)  : color
 (line 1, col 29)  : =
@@ -17,7 +17,9 @@
 (line 1, col 91)  : gravity
 (line 1, col 98)  : ==
 (line 1, col 100) : 12
- ...read BROP DO ID sequence...
+
+                 FOUND
+
    (line 1, col 102) : {
    (line 1, col 103) : do
    (line 1, col 105) : something

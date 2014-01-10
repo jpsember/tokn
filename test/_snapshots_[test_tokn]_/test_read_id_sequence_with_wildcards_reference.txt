@@ -1,0 +1,39 @@
+
+                 FOUND
+
+   (line 1, col 1)   : speed
+   (line 1, col 6)   : =
+   (line 1, col 7)   : 42
+
+                 FOUND
+
+   (line 1, col 9)   : gravity
+   (line 1, col 16)  : =
+   (line 1, col 17)  : -9.80
+(line 1, col 22)  : {
+
+                 FOUND
+
+   (line 1, col 23)  : color
+   (line 1, col 28)  : =
+   (line 1, col 29)  : green
+(line 1, col 34)  : }
+
+                 FOUND
+
+   (line 1, col 35)  : title
+   (line 1, col 40)  : =
+   (line 1, col 41)  : 'This is a string with \' an escaped delimiter'
+(line 1, col 88)  : if
+ ...not found
+(line 1, col 90)  : gravity
+(line 1, col 97)  : ==
+(line 1, col 106) : 12
+(line 1, col 108) : {
+(line 1, col 109) : do
+ ...not found
+(line 1, col 111) : something
+(line 1, col 120) : }
+(line 1, col 130) : do
+ ...not found
+(line 1, col 132) : something_else

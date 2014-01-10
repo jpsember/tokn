@@ -1,222 +1,288 @@
 module Tokn
 
-  # Extracts tokens from a script, given a previously constructed DFA.
+# Extracts tokens from a script, given a previously constructed DFA.
+#
+class Tokenizer
+
+  # Construct a tokenizer
   #
-  class Tokenizer
+  # @param dfa the DFA to use
+  # @param string_or_io a string or file to extract tokens from
+  # @param skipName if not nil, tokens with this name will be skipped
+  # @param maximum_history_size the maximum number of tokens that can be unread
+  #
+  def initialize(dfa, string_or_io, skipName=nil, maximum_history_size=16)
+    @dfa = dfa
+    raise ArgumentError if !string_or_io
 
-    # Construct a tokenizer
-    #
-    # @param dfa the DFA to use
-    # @param text the text to extract tokens from
-    # @param skipName if not nil, tokens with this name will be skipped
-    #
-    def initialize(dfa, text, skipName = nil)
-      @dfa = dfa
-      @text = text
-      if !text
-        raise ArgumentError, "No text defined"
+    @skipTokenId = nil
+    if skipName
+      @skipTokenId = dfa.tokenId(skipName)
+      if !@skipTokenId
+        raise ArgumentError, "No token with name "+skipName+" found"
       end
-      @skipTokenId = nil
-      if skipName
-        @skipTokenId = dfa.tokenId(skipName)
-        if !@skipTokenId
-          raise ArgumentError, "No token with name "+skipName+" found"
-        end
-      end
-      @lineNumber = 0
-      @column = 0
-      @cursor = 0
-      @tokenHistory = []
-      @historyPointer = 0
     end
+    @lineNumber = 0
+    @column = 0
+    @token_history = []
+    @history_pointer = 0
+    @maximum_history_size = maximum_history_size
+    @history_slack = 100
 
-    # Determine next token (without reading it)
-    #
-    # Returns Token, or nil if end of input
-    #
-    def peek
-
-      if @historyPointer == @tokenHistory.size
-        while true # repeat until we find a non-skipped token, or run out of text
-          break if @cursor >= @text.length
-
-          bestLength = 0
-          bestId = ToknInternal::UNKNOWN_TOKEN
-
-          charOffset = 0
-          state = @dfa.startState
-          while @cursor + charOffset <= @text.length
-            ch = nil
-            if @cursor + charOffset < @text.length
-              ch = @text[@cursor + charOffset].ord()
-            end
-
-            nextState = nil
-
-            # Examine edges leaving this state.
-            # If one is labelled with a token id, we don't need to match the character with it;
-            # store as best token found if length is longer than previous, or equal to previous
-            # with higher id.
-
-            # If an edge is labelled with the current character, advance to that state.
-
-            edges = state.edges
-            edges.each do |lbl,dest|
-              a = lbl.array
-              if a[0] < ToknInternal::EPSILON
-                newTokenId = ToknInternal::edgeLabelToTokenId(a[0])
-
-                if (bestLength < charOffset || newTokenId > bestId)
-                  bestLength, bestId = charOffset, newTokenId
-                end
-              end
-
-              if ch && lbl.contains?(ch)
-                nextState = dest
-                break
-              end
-            end
-
-            if !nextState
-              break
-            end
-            state = nextState
-            charOffset += 1
-          end
-
-          if bestId == @skipTokenId
-            @cursor += bestLength
-            next
-          end
-
-          peekToken = Token.new(bestId, @text[@cursor, bestLength], 1 + @lineNumber, 1 + @column)
-
-          @tokenHistory.push(peekToken)
-          break # We found a token, so stop
-        end
-      end
-
-      ret = nil
-      if @historyPointer < @tokenHistory.size
-        ret = @tokenHistory[@historyPointer]
-      end
-
-      ret
-    end
-
-
-    # Read next token
-    #
-    # @param tokenName  if not nil, the (string) name of the token expected
-    #
-    # @raise TokenizerException if no more tokens,if unrecognized token, or
-    # if token has different than expected name
-    #
-    def read(tokenName = nil)
-      token = peek()
-      raise TokenizerException,"No more tokens" if !token
-      raise TokenizerException, "Unknown token #{token}" if token.id == ToknInternal::UNKNOWN_TOKEN
-      raise TokenizerException, "Unexpected token #{token}" if tokenName && tokenName != nameOf(token)
-
-      @historyPointer += 1
-
-      # Advance cursor, line number, column
-
-      tl = token.text.length
-      @cursor += tl
-      tl.times do |i|
-        c = token.text[i]
-        @column += 1
-        if c == "\n"
-          @lineNumber += 1
-          @column = 0
-        end
-      end
-      token
-    end
-
-    # Read next token if it has a particular name
-    #
-    # > tokenName : name to look for
-    # < token read, or nil
-    #
-    def readIf(tokenName)
-      ret = nil
-      token = peek()
-      if token && nameOf(token) == tokenName
-        ret = read()
-      end
-      ret
-    end
-
-    # Read a sequence of tokens
-    # @param seq string of space-delimited token names; if name is '_',
-    #   allows any token name in that position
-    # @return array of tokens read
-    #
-    def readSequence(seq)
-      seqNames = seq.split(' ')
-      ret = []
-      seqNames.each do |name|
-        tk = name != '_' ? read(name) : read
-        ret.push(tk)
-      end
-      ret
-    end
-
-    # Read a sequence of tokens, if they have particular names
-    # @param seq string of space-delimited token names; if name is '_',
-    #   allows any token name in that position
-    # @return array of tokens read, or nil if the tokens had different
-    #   names (or an end of input was encountered)
-    #
-    def readSequenceIf(seq)
-      ret = []
-      seqNames = seq.split(' ')
-      seqNames.each do |name|
-        tk = peek
-        break if !tk
-        if name != '_' && nameOf(tk) != name
-          break
-        end
-        ret.push(read)
-      end
-
-      if ret.size != seqNames.size
-        unread(ret.size)
-        ret = nil
-      end
-      ret
-    end
-
-
-    # Determine if another token exists
-    #
-    def hasNext
-      !peek().nil?
-    end
-
-    # Get the name of a token
-    # (i.e., the name of the token definition, not its text)
-    #
-    # > token read from this tokenizer
-    #
-    def nameOf(token)
-      @dfa.tokenName(token.id)
-    end
-
-    # Unread one (or more) previously read tokens
-    #
-    # @raise TokenizerException if attempt to unread token that was never read
-    #
-    def unread(count = 1)
-      if @historyPointer < count
-        raise TokenizerException, "Cannot unread before start"
-      end
-      @historyPointer -= count
-    end
-
+    prepare_input(string_or_io)
   end
 
+
+  # Determine next token (without reading it)
+  #
+  # Returns Token, or nil if end of input
+  #
+  def peek
+
+    if @history_pointer == @token_history.size
+      while true # repeat until we find a non-skipped token, or run out of text
+        break if !peek_char(0)
+
+        bestLength = 0
+        bestId = ToknInternal::UNKNOWN_TOKEN
+
+        charOffset = 0
+        state = @dfa.startState
+        while true
+          ch = peek_char(charOffset)
+          ch = ch.ord if ch
+
+          nextState = nil
+
+          # Examine edges leaving this state.
+          # If one is labelled with a token id, we don't need to match the character with it;
+          # store as best token found if length is longer than previous, or equal to previous
+          # with higher id.
+
+          # If an edge is labelled with the current character, advance to that state.
+
+          edges = state.edges
+          edges.each do |lbl,dest|
+            a = lbl.elements
+            if a[0] < ToknInternal::EPSILON
+              newTokenId = ToknInternal::edge_label_to_token_id(a[0])
+
+              if (bestLength < charOffset || newTokenId > bestId)
+                bestLength, bestId = charOffset, newTokenId
+              end
+            end
+
+            if ch && lbl.contains?(ch)
+              nextState = dest
+              break
+            end
+          end
+
+          if !nextState
+            break
+          end
+          break if !ch
+          state = nextState
+          charOffset += 1
+        end
+
+        best_text = skip_chars(bestLength)
+
+        next if bestId == @skipTokenId
+
+        peekToken = Token.new(bestId, best_text, 1 + @lineNumber, 1 + @column)
+
+        add_token_to_history(peekToken)
+         break # We found a token, so stop
+      end
+    end
+
+    ret = nil
+    if @history_pointer < @token_history.size
+      ret = @token_history[@history_pointer]
+    end
+
+    ret
+  end
+
+
+  # Read next token
+  #
+  # @param tokenName  if not nil, the (string) name of the token expected
+  #
+  # @raise TokenizerException if no more tokens,if unrecognized token, or
+  # if token has different than expected name
+  #
+  def read(token_name_or_id = nil)
+    token = peek()
+    raise TokenizerException,"No more tokens" if !token
+    raise TokenizerException, "Unknown token #{token}" if token.unknown?
+    if token_name_or_id
+      unexpected = false
+      if token_name_or_id.is_a? String
+        unexpected = token_name_or_id != name_of(token)
+      else
+        unexpected = token_name_or_id != token.id
+      end
+      raise TokenizerException, "Unexpected token #{token}" if unexpected
+    end
+
+    @history_pointer += 1
+
+    # Advance cursor, line number, column
+
+    tl = token.text.length
+    tl.times do |i|
+      c = token.text[i]
+      @column += 1
+      if c == "\n"
+        @lineNumber += 1
+        @column = 0
+      end
+    end
+    token
+  end
+
+  # Read next token if it has a particular name or id; return nil if otherwise
+  #
+  def read_if(token_name_or_id)
+    ret = nil
+    token = peek()
+    read_it = false
+    if token
+      if token_name_or_id.is_a? String
+        read_it = token_name_or_id == name_of(token)
+      else
+        read_it = token_name_or_id == token.id
+      end
+    end
+    if read_it
+      ret = read
+    end
+    ret
+  end
+
+  # Read a sequence of tokens
+  # @param seq array of ids, or a string of space-delimited token names;
+  #   if name is '_', or id is nil,
+  #   allows any token name in that position
+  # @return array of tokens read
+  #
+  def read_sequence(seq)
+    names = seq.is_a? String
+    if names
+      seq = seq.split(' ')
+    end
+    ret = []
+    seq.each do |name_or_id|
+      ret << read(name_or_id)
+    end
+    ret
+  end
+
+  # Read a sequence of tokens, if they have particular names or ids
+  # @param seq array of ids, or a string of space-delimited token names;
+  #   if name is '_', or id is nil,
+  #   allows any token name in that position
+  # @return array of tokens read, or nil if the tokens had different
+  #   names (or an end of input was encountered)
+  #
+  def read_sequence_if(seq)
+    ret = []
+    names = seq.is_a? String
+    if names
+      seq = seq.split(' ')
+    end
+    seq.each do |name_or_id|
+      # Accept any token if wildcard
+      if name_or_id == '_' || !name_or_id
+        tk = nil
+        if peek
+          tk = read
+        end
+      else
+        tk = read_if(name_or_id)
+      end
+      break if !tk
+      ret << tk
+    end
+
+    if ret.size != seq.size
+      unread(ret.size)
+      ret = nil
+    end
+    ret
+  end
+
+
+  # Determine if another token exists
+  #
+  def has_next
+    !peek().nil?
+  end
+
+  # Get the name of a token
+  # (i.e., the name of the token definition, not its text)
+  #
+  # > token read from this tokenizer
+  #
+  def name_of(token)
+    @dfa.token_name(token.id)
+  end
+
+  # Unread one (or more) previously read tokens
+  #
+  # @raise TokenizerException if token is no longer in the history
+  #
+  def unread(count = 1)
+    if @history_pointer < count
+      raise TokenizerException, "Token unavailable"
+    end
+    @history_pointer -= count
+  end
+
+
+  private
+
+
+  def prepare_input(string_or_io)
+    if string_or_io.is_a? String
+      require 'stringio'
+      @input = StringIO.new(string_or_io)
+    else
+      @input = string_or_io
+    end
+    @char_buffer = ''
+  end
+
+  def peek_char(index)
+    ret = nil
+    if index < @char_buffer.size
+      ret = @char_buffer[index]
+    else
+      # Attempt to read more chars into buffer
+      str = @input.read(256)
+      @char_buffer << str if str
+      if index < @char_buffer.size
+        ret = @char_buffer[index]
+      end
+    end
+    ret
+  end
+
+  def skip_chars(count)
+    raise ArgumentError if count > @char_buffer.size
+    @char_buffer.slice!(0...count)
+  end
+
+  def add_token_to_history(token)
+    @token_history << token
+    if @token_history.size > @maximum_history_size + @history_slack
+      @token_history.slice!(0...@history_slack)
+      @history_pointer -= @history_slack
+    end
+  end
+
+end # class
 
 end # module Tokn

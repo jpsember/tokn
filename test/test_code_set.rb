@@ -29,7 +29,7 @@ class TestCodeSet <  Test::Unit::TestCase
   end
 
   def equ(s, arr = nil)
-    arr ||= @cs.array
+    arr ||= @cs.elements
     ia = s.split.map{|n| n.to_i}
     assert_equal(ia,arr)
   end
@@ -275,7 +275,7 @@ class TestCodeSet <  Test::Unit::TestCase
     list = @par.apply(@cs)
     res = []
     list.each do |x|
-      res.concat x.array
+      res.concat(x.elements)
     end
     @parResult = res
   end
