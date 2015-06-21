@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
-require 'js_base/test'
+require 'js_base/js_test'
 require 'tokn'
 
-class TestTokn <  Test::Unit::TestCase
+class TestTokn < JSTest
 
   include ToknInternal
 
@@ -58,7 +58,7 @@ END
     x.endState.finalState = true
     s.reverseNFA()
     s_dfa = DFABuilder.nfa_to_dfa(s)
-    IORecorder.new.perform do
+    TestSnapshot.new.perform do
       puts s_dfa.build_dot_file("dfa")
     end
   end
@@ -67,7 +67,7 @@ END
     x = RegParse.new(REGEX_SCRIPT)
     s = x.startState
     x.endState.finalState = true
-    IORecorder.new.perform do
+    TestSnapshot.new.perform do
       puts s.build_dot_file("nfa")
     end
     dfa = DFABuilder.nfa_to_dfa(s)
@@ -181,7 +181,7 @@ END
   end
 
   def test_read_named_sequence
-    IORecorder.new.perform do
+    TestSnapshot.new.perform do
       dfa = Tokn::DFA.from_script_file("../sampletokens.txt")
       t = Tokn::Tokenizer.new(dfa, FileUtils.read_text_file("../sampletext.txt"), "WS")
 
@@ -198,7 +198,7 @@ END
   end
 
   def test_read_id_sequence
-    IORecorder.new.perform do
+    TestSnapshot.new.perform do
       dfa = Tokn::DFA.from_script_file("../sampletokens.txt")
       t = Tokn::Tokenizer.new(dfa, FileUtils.read_text_file("../sampletext.txt"), "WS")
 
@@ -217,7 +217,7 @@ END
   end
 
   def test_read_named_sequence_with_wildcards
-    IORecorder.new.perform do
+    TestSnapshot.new.perform do
       dfa = Tokn::DFA.from_script_file("../sampletokens.txt")
       t = Tokn::Tokenizer.new(dfa, FileUtils.read_text_file("../sampletext.txt"), "WS")
 
@@ -235,7 +235,7 @@ END
   end
 
   def test_read_id_sequence_with_wildcards
-    IORecorder.new.perform do
+    TestSnapshot.new.perform do
       dfa = Tokn::DFA.from_script_file("../sampletokens.txt")
       t = Tokn::Tokenizer.new(dfa, FileUtils.read_text_file("../sampletext.txt"), "WS")
 

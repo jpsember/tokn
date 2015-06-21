@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
-require 'js_base/test'
+require 'js_base/js_test'
 require 'tokn'
 
-class TestTokn2 <  Test::Unit::TestCase
+class TestTokn2 < JSTest
 
   include ToknInternal
 
@@ -32,7 +32,7 @@ class TestTokn2 <  Test::Unit::TestCase
   end
 
   def test_Tokenizer
-    IORecorder.new.perform do
+    TestSnapshot.new.perform do
 
       tok = build_tokenizer_from_script
 

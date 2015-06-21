@@ -21,7 +21,7 @@ DESC
                       'test/**/*',
                       ]
 
-  s.add_dependency('js_base')
+  s.add_dependency('js_base','~> 1.0')
   s.add_dependency('trollop')
 
   s.bindir = 'bin'

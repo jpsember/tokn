@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
-require 'js_base/test'
+require 'js_base/js_test'
 require 'tokn'
 
-class TestCodeSet <  Test::Unit::TestCase
+class TestCodeSet < JSTest
 
   include ToknInternal
 
