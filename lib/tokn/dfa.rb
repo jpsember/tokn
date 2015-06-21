@@ -108,7 +108,7 @@ module Tokn
     # n is the number of token names in the DFA.
     #
     def token_name(tokenId)
-      if !tokenId
+      if tokenId.nil?
         nm = "<EOF>"
       elsif tokenId == UNKNOWN_TOKEN
         nm = "<UNKNOWN>"

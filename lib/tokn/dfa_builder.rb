@@ -48,7 +48,7 @@ module ToknInternal
       stSet.each do |s|
         s.edges.each do |lbl, dest|
           a = lbl.elements
-          if !a.size
+          if a.size == 0
             next
           end
 
@@ -115,7 +115,7 @@ module ToknInternal
             end
 
             nfaStates = moveMap[lbl]
-            if !nfaStates
+            if nfaStates.nil?
               nfaStates = Set.new
               moveMap[lbl] = nfaStates
             end
@@ -163,6 +163,7 @@ module ToknInternal
         newState.finalState = nfaStateList.any?{|id| @nfaStateMap[id].finalState?}
 
         if false
+          warning "setting labels..."
           # Set label of DFA state to show which NFA states produced it
           # (useful for debugging)
           newState.label = lst.map {|x| x.to_s}.join(' ')

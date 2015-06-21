@@ -83,7 +83,7 @@ req 'reg_parse dfa_builder'
         @tokenListBig.push(tkEntry)
         @tokenNameMap[tkEntry[0]] = tkEntry
 
-        if tkId
+        if !tkId.nil?
           tokenListSmall.push(tokenName)
         end
 
@@ -101,17 +101,18 @@ req 'reg_parse dfa_builder'
     # token identifier to let the tokenizer see which token led to the final state.
     #
     def combineTokenNFAs
-      baseId = 0
-      startState = nil
+
+      # Create a new distinguished start state
+
+      startState = State.new(0)
+      baseId = 1
 
       @tokenListBig.each do |tokenName, regParse, index, tokenId|
 
         # Skip anonymous token definitions
-        if !tokenId
-          next
-        end
+        next if tokenId.nil?
 
-        oldToNewMap, baseId = regParse.startState.duplicateNFA( baseId)
+        oldToNewMap, baseId = regParse.startState.duplicateNFA(baseId)
 
         dupStart = oldToNewMap[regParse.startState]
 
@@ -128,12 +129,8 @@ req 'reg_parse dfa_builder'
         # Why do I need to add 'ToknInternal.' here?  Very confusing.
         dupEnd.addEdge(CodeSet.new(ToknInternal.token_id_to_edge_label(tokenId)), dupfinalState)
 
-        if !startState
-          startState = dupStart
-        else
-          # Add an e-transition from the start state to this expression's start
-          startState.addEdge(CodeSet.new(EPSILON),dupStart)
-        end
+        # Add an e-transition from the start state to this expression's start
+        startState.addEdge(CodeSet.new(EPSILON),dupStart)
       end
       startState
     end

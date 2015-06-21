@@ -18,9 +18,7 @@ module Tokn
 
     def to_s
       s = "(line #{lineNumber}, col #{column})"
-      if !unknown?
-        s = s.ljust(17) << ' : ' << text
-      end
+      s = s.ljust(17) << ' : ' << text
       s
     end
 

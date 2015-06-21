@@ -4,6 +4,8 @@ module Tokn
 #
 class Tokenizer
 
+  attr_accessor :accept_unknown_tokens
+
   # Construct a tokenizer
   #
   # @param dfa the DFA to use
@@ -28,6 +30,7 @@ class Tokenizer
     @history_pointer = 0
     @maximum_history_size = maximum_history_size
     @history_slack = 100
+    @accept_unknown_tokens = false
 
     prepare_input(string_or_io)
   end
@@ -43,7 +46,7 @@ class Tokenizer
       while true # repeat until we find a non-skipped token, or run out of text
         break if !peek_char(0)
 
-        bestLength = 0
+        bestLength = 1
         bestId = ToknInternal::UNKNOWN_TOKEN
 
         charOffset = 0
@@ -93,7 +96,7 @@ class Tokenizer
         peekToken = Token.new(bestId, best_text, 1 + @lineNumber, 1 + @column)
 
         add_token_to_history(peekToken)
-         break # We found a token, so stop
+        break # We found a token, so stop
       end
     end
 
@@ -116,7 +119,7 @@ class Tokenizer
   def read(token_name_or_id = nil)
     token = peek()
     raise TokenizerException,"No more tokens" if !token
-    raise TokenizerException, "Unknown token #{token}" if token.unknown?
+    raise TokenizerException,"Unknown token #{token}" if !accept_unknown_tokens && token.unknown?
     if token_name_or_id
       unexpected = false
       if token_name_or_id.is_a? String
