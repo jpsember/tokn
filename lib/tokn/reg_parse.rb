@@ -38,6 +38,10 @@ module ToknInternal
   #      | '{' TOKENNAME '}'
   #      | '[^' SETSEQ ']'     A code not appearing in the set
   #      | '[' SETSEQ ']'
+  #      | CHARCLASS
+  #
+  #   CHARCLASS -> '\d'
+  #      | '\w'
   #      | CHARCODE
   #
   #   SETSEQ -> SET SETSEQ
@@ -52,6 +56,8 @@ module ToknInternal
   #        |  \uhhhh                hex value from 0000...ffff (e.g., unicode)
   #        |  \f | \n | \r | \t     formfeed, linefeed, return, tab
   #        |  \s                    a space (' ')
+  #        |  \d                    digit: [0-9]
+  #        |  \w                    word character: [0-9a-zA-Z_]
   #        |  \*                    where * is some other non-alphabetic
   #                                  character that needs to be escaped
   #
@@ -73,6 +79,7 @@ module ToknInternal
       @script = script.strip
       @nextStateId = 0
       @tokenDefMap = tokenDefMap
+      @char_buffer = []
       parseScript
     end
 
@@ -159,7 +166,8 @@ module ToknInternal
     end
 
 
-    def parseCharNFA
+    def parseCharClass
+
       val = parseChar
 
       # Construct a pair of states with an edge between them
@@ -265,7 +273,7 @@ module ToknInternal
       elsif ch == '['
         e1 = parseSETSEQ
       else
-        e1 = parseCharNFA
+        e1 = parseCharClass
       end
       e1
     end
@@ -318,16 +326,19 @@ module ToknInternal
     end
 
 
-    def peek(mustExist = false)
-      # skip over any non-linefeed whitespace
-      while @cursor < @script.size && " \t".index(@script[@cursor])
-        @cursor += 1
+    def peek(position = 0)
+      while @char_buffer.length <= position
+        # skip over any non-linefeed whitespace
+        while @cursor < @script.size && " \t".index(@script[@cursor])
+          @cursor += 1
+        end
+        ch = nil
+        if @cursor < @script.size
+          ch = @script[@cursor]
+        end
+        @char_buffer << ch
       end
-      if mustExist or @cursor < @script.size
-        @script[@cursor]
-      else
-        nil
-      end
+      @char_buffer[position]
     end
 
     def readIf(expChar)
@@ -339,7 +350,8 @@ module ToknInternal
     end
 
     def read(expChar = nil)
-      ch = peek
+      peek
+      ch = @char_buffer.shift
       if ch and ((not expChar) or ch == expChar)
         @cursor += 1
         ch
