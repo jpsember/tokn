@@ -1,25 +1,29 @@
-# Tokn
+tokn
+=======
 Tokn is a ruby gem that generates automatons from regular expressions to extract tokens from text files.
+
+Written by Jeff Sember, March 2013.
 
 [Source code documentation can be found here.](http://rubydoc.info/gems/tokn/frames)
 
 
-## Description of the problem
+Description of the problem
+------
 
 For a simple example, suppose a particular text file is designed to have
 tokens of the following three types:
 
-    'a' followed by any number of 'a' or 'b'
-    'b' followed by either 'aa' or zero or more 'b'
-    'bbb'
+		'a' followed by any number of 'a' or 'b'
+		'b' followed by either 'aa' or zero or more 'b'
+		'bbb'
 
 We will also allow an additional token, one or more spaces, to separate them.
 These four token types can be written using regular expressions as:
 
-    sep:  \s
-    tku:  a(a|b)*
-    tkv:  b(aa|b*)
-    tkw:  bbb
+		sep:  \s
+		tku:  a(a|b)*
+		tkv:  b(aa|b*)
+		tkw:  bbb
 
 We've given each token definition a name (to the left of the colon).
 
@@ -45,47 +49,8 @@ it also can construct, from a set of token definitions, the DFA to be used in th
 Such DFAs are very useful, and can be used by non-Ruby programs as well.
 
 
-## FAQ
-
-* Why can't I just use Ruby's regular expressions for tokenizing text?
-
-You could construct a regular expression describing each possible token, and use that
-to extract a token from the start of a string; you could then remove that token from the
-string, and repeat.  The trouble is that the regular expression has no easy way to indicate
-which individual token's expression was matched.  You would then (presumably) have to match
-the returned token with each individual regular expression to identify the token type.
-
-Another reason why standard regular expressions can be troublesome is that their
-implementations actually 'recognize' a richer class of tokens than the ones described
-here.  This extra power can come at a cost; in some pathological cases, the running time
-can become exponential.
-
-* Is tokn compatible with Unicode?
-
-The tokn tool is capable of extracting tokens made up of characters that have
-codes in the entire Unicode range: 0 through 0x10ffff (hex).  In fact, the labels
-on the DFA edges can be viewed as sets of any nonnegative integers (negative
-values are reserved for the token identifiers).  Note however that the current implementation
-only reads Ruby characters from the input, which I believe are only 8 bits wide.
-
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'tokn'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install tokn
-
-## Using the tokn module in a Ruby program
+Using the tokn module in a Ruby program
+------
 
 There are three object classes of interest: DFA, Tokenizer, and Token.  A DFA is
 compiled once from a script containing token definitions (e.g, "tku:  b(aa|b*) ..."),
@@ -99,23 +64,24 @@ Here's some example Ruby code showing how a text file "sampletext.txt" can be sp
 tokens.  We'll assume there's a text file "sampletokens.txt" that contains the
 definitions shown earlier.
 
-        require 'tokn'
+				require 'tokn'
 
-        dfa = Tokn::DFA.from_script(FileUtils.read_text_file("sampletokens.txt"))
-        t = Tokn::Tokenizer.new(dfa,FileUtils.read_text_file("sampletext.txt"))
+				dfa = Tokn::DFA.from_script(FileUtils.read_text_file("sampletokens.txt"))
+				t = Tokn::Tokenizer.new(dfa,FileUtils.read_text_file("sampletext.txt"))
 
-        while t.has_next
-          k = t.read                     # read token
-          next if t.name_of(k) == 'sep'  # skip 'whitespace'
-          puts k
+				while t.has_next
+				  k = t.read                     # read token
+				  next if t.name_of(k) == 'sep'  # skip 'whitespace'
+				  puts k
 
-        end
+				end
 
 If later, another file needs to be tokenized, a new Tokenizer object can be
 constructed and given the same dfa object as earlier.
 
 
-## Using the tokn command line utilities
+Using the tokn command line utilities
+------
 
 The module has two utility scripts: tokncompile, and toknprocess.  These can be
 found in the bin/ directory.
@@ -137,70 +103,79 @@ of tokens from the source file to the standard output:
 
 This will produce the following output:
 
-    WS 1 1 // Example source file that can be tokenized
+		WS 1 1 // Example source file that can be tokenized
 
-    WS 2 1
+		WS 2 1
 
-    ID 3 1 speed
-    WS 3 6
-    ASSIGN 3 7 =
-    WS 3 8
-    INT 3 9 42
-    WS 3 11
-    WS 3 14 // speed of object
+		ID 3 1 speed
+		WS 3 6
+		ASSIGN 3 7 =
+		WS 3 8
+		INT 3 9 42
+		WS 3 11
+		WS 3 14 // speed of object
 
-    WS 4 1
+		WS 4 1
 
-    ID 5 1 gravity
-    WS 5 8
-    ASSIGN 5 9 =
-    WS 5 10
-    DBL 5 11 -9.80
-    WS 5 16
-
-
-    ID 7 1 title
-    WS 7 6
-    ASSIGN 7 7 =
-    WS 7 8
-    LBL 7 9 'This is a string with \' an escaped delimiter'
-    WS 7 56
+		ID 5 1 gravity
+		WS 5 8
+		ASSIGN 5 9 =
+		WS 5 10
+		DBL 5 11 -9.80
+		WS 5 16
 
 
-    IF 9 1 if
-    WS 9 3
-    ID 9 4 gravity
-    WS 9 11
-    EQUIV 9 12 ==
-    WS 9 14
-    INT 9 15 12
-    WS 9 17
-    BROP 9 18 {
-    WS 9 19
+		ID 7 1 title
+		WS 7 6
+		ASSIGN 7 7 =
+		WS 7 8
+		LBL 7 9 'This is a string with \' an escaped delimiter'
+		WS 7 56
 
-    DO 10 3 do
-    WS 10 5
-    ID 10 6 something
-    WS 10 15
 
-    BRCL 11 1 }
-    WS 11 2
+		IF 9 1 if
+		WS 9 3
+		ID 9 4 gravity
+		WS 9 11
+		EQUIV 9 12 ==
+		WS 9 14
+		INT 9 15 12
+		WS 9 17
+		BROP 9 18 {
+		WS 9 19
+
+		DO 10 3 do
+		WS 10 5
+		ID 10 6 something
+		WS 10 15
+
+		BRCL 11 1 }
+		WS 11 2
 
 The extra linefeeds are the result of a token containing a linefeed.
 
 
-## Development
+FAQ
+--------
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+* Why can't I just use Ruby's regular expressions for tokenizing text?
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+You could construct a regular expression describing each possible token, and use that
+to extract a token from the start of a string; you could then remove that token from the
+string, and repeat.  The trouble is that the regular expression has no easy way to indicate
+which individual token's expression was matched.  You would then (presumably) have to match
+the returned token with each individual regular expression to identify the token type.
 
-## Contributing
+Another reason why standard regular expressions can be troublesome is that their
+implementations actually 'recognize' a richer class of tokens than the ones described
+here.  This extra power can come at a cost; in some pathological cases, the running time
+can become exponential.
 
-Bug reports and pull requests are welcome on GitHub at `https://github.com/jpsember/tokn`.
+* Is tokn compatible with Unicode?
 
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+The tokn tool is capable of extracting tokens made up of characters that have
+codes in the entire Unicode range: 0 through 0x10ffff (hex).  In fact, the labels
+on the DFA edges can be viewed as sets of any nonnegative integers (negative
+values are reserved for the token identifiers).  Note however that the current implementation
+only reads Ruby characters from the input, which I believe are only 8 bits wide.
 
