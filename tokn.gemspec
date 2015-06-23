@@ -2,7 +2,7 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name        = 'tokn'
-  s.version     = '1.0.0'
+  s.version     = '2.0.0'
   s.date        = Time.now
   s.summary     = 'Extracts tokens from source files'
 
