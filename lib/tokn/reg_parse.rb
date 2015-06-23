@@ -54,8 +54,6 @@ module ToknInternal
   #      |  \uhhhh                hex value from 0000...ffff (e.g., unicode)
   #      |  \f | \n | \r | \t     formfeed, linefeed, return, tab
   #      |  \s                    a space (' ')
-  #      |  \d                    digit: [0-9]
-  #      |  \w                    word character: [0-9a-zA-Z_]
   #      |  \*                    where * is some other non-alphabetic
   #                                character that needs to be escaped
   #
@@ -217,46 +215,39 @@ module ToknInternal
       @@wordchar_code_set
     end
 
-    def parseDigitClass
+    def parse_digit_code_set
       read
       read
-      sA = newState
-      sB = newState
-      sA.addEdge(RegParse.digit_code_set, sB)
-      [sA,sB]
+      RegParse.digit_code_set
     end
 
-    def parseWordCharClass
+    def parse_word_code_set
       read
       read
-      sA = newState
-      sB = newState
-      sA.addEdge(RegParse.wordchar_code_set, sB)
-      [sA,sB]
+      RegParse.wordchar_code_set
     end
 
-    def parseCharClass
-
+    def parse_code_set
       if peek(0) == '\\'
         c2 = peek(1)
         if c2 == 'd'
-          return parseDigitClass
+          return parse_digit_code_set
         elsif c2 == 'w'
-          return parseWordCharClass
+          return parse_word_code_set
         end
       end
-
       val = parseChar
+      CodeSet.new(val)
+    end
 
+    def parseCharClass
+      range = parse_code_set
       # Construct a pair of states with an edge between them
-      # labelled with this character code
-
+      # labelled with this range
       sA = newState
       sB = newState
-      cset = CodeSet.new
-      cset.add(val)
-      sA.addEdge(cset, sB)
-      return [sA,sB]
+      sA.addEdge(range, sB)
+      [sA,sB]
     end
 
     def parseScript
