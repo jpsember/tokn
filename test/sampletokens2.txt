@@ -1,4 +1,0 @@
-UNKNOWN: [\u0000-\uffff]
-WS: [\f\r\s\t\n]+
-WORD: [a-zA-Z]+('[a-zA-Z]+)*
-

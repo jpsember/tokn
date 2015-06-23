@@ -1,17 +1,7 @@
-#!/usr/bin/env ruby
-
 require 'js_base/js_test'
 require 'tokn'
 
 class TestTokn2 < JSTest
-
-  include ToknInternal
-
-  def setup
-    enter_test_directory
-    @sampleText = FileUtils.read_text_file("../sampletext2.txt")
-    @sampleTokens = FileUtils.read_text_file("../sampletokens2.txt")
-  end
 
   def teardown
     leave_test_directory(true)
@@ -51,5 +41,23 @@ class TestTokn2 < JSTest
       end
     end
   end
+
+  def setup
+    enter_test_directory
+    @sampleText =<<-'eos'
+the time has come 42
+the Walrus said
+
+
+eos
+
+    @sampleTokens =<<-'eos'
+UNKNOWN: [\u0000-\uffff]
+WS: [\f\r\s\t\n]+
+WORD: [a-zA-Z]+('[a-zA-Z]+)*
+eos
+
+  end
+
 
 end
