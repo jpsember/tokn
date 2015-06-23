@@ -99,6 +99,38 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
+  def test_bracketexpr_dec
+    tok =<<-'eos'
+      C: [\d]
+    eos
+    script = "abc09defg"
+    verify(tok,script,nil)
+  end
+
+  def test_bracketexpr_word
+    tok =<<-'eos'
+      C: [\w]
+    eos
+    script = "./_?01_w#"
+    verify(tok,script,nil)
+  end
+
+  def test_bracketexpr_dec_neg
+    tok =<<-'eos'
+      C: [^\d]
+    eos
+    script = "abc09defg"
+    verify(tok,script,nil)
+  end
+
+  def test_bracketexpr_word_neg
+    tok =<<-'eos'
+      C: [^\w]
+    eos
+    script = "./_?01_w#"
+    verify(tok,script,nil)
+  end
+
   def test_negated_bracketexpr_range
     tok =<<-'eos'
       C: [^b-d]
