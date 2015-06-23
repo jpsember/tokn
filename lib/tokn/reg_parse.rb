@@ -36,30 +36,28 @@ module ToknInternal
   #
   #   P -> '(' E ')'
   #      | '{' TOKENNAME '}'
-  #      | '[^' SETSEQ ']'     A code not appearing in the set
-  #      | '[' SETSEQ ']'
+  #      | BRACKETEXPR
   #      | CHARCLASS
   #
   #   CHARCLASS -> '\d'
   #      | '\w'
   #      | CHARCODE
   #
-  #   SETSEQ -> SET SETSEQ
-  #           | SET
+  #   BRACKETEXPR -> '[' '^'?  SET+ ']'
   #
   #   SET -> CHARCODE
-  #           | CHARCODE '-' CHARCODE
+  #      | CHARCODE '-' CHARCODE
   #
   #   CHARCODE ->
-  #            a |  b |  c  ...   any printable except {,},[, etc.
-  #        |  \xhh                  hex value from 00...ff
-  #        |  \uhhhh                hex value from 0000...ffff (e.g., unicode)
-  #        |  \f | \n | \r | \t     formfeed, linefeed, return, tab
-  #        |  \s                    a space (' ')
-  #        |  \d                    digit: [0-9]
-  #        |  \w                    word character: [0-9a-zA-Z_]
-  #        |  \*                    where * is some other non-alphabetic
-  #                                  character that needs to be escaped
+  #         a |  b |  c  ...   any printable except {,},[, etc.
+  #      |  \xhh                  hex value from 00...ff
+  #      |  \uhhhh                hex value from 0000...ffff (e.g., unicode)
+  #      |  \f | \n | \r | \t     formfeed, linefeed, return, tab
+  #      |  \s                    a space (' ')
+  #      |  \d                    digit: [0-9]
+  #      |  \w                    word character: [0-9a-zA-Z_]
+  #      |  \*                    where * is some other non-alphabetic
+  #                                character that needs to be escaped
   #
   # The parser performs recursive descent parsing;
   # each method returns an NFA represented by
@@ -289,7 +287,7 @@ module ToknInternal
       return u,v
     end
 
-    def parseSETSEQ
+    def parseBRACKETEXPR
       read('[')
       negated = readIf('^')
       rs = CodeSet.new
@@ -352,7 +350,7 @@ module ToknInternal
       elsif ch == '{'
         e1 = parseTokenDef
       elsif ch == '['
-        e1 = parseSETSEQ
+        e1 = parseBRACKETEXPR
       else
         e1 = parseCharClass
       end
