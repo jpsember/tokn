@@ -1,5 +1,4 @@
-tokn
-=======
+# tokn
 Tokn is a ruby gem that generates automatons from regular expressions to extract tokens from text files.
 
 Written by Jeff Sember, March 2013.
@@ -7,23 +6,25 @@ Written by Jeff Sember, March 2013.
 [Source code documentation can be found here.](http://rubydoc.info/gems/tokn/frames)
 
 
-Description of the problem
-------
+## Description of the problem
 
 For a simple example, suppose a particular text file is designed to have
 tokens of the following three types:
 
-		'a' followed by any number of 'a' or 'b'
-		'b' followed by either 'aa' or zero or more 'b'
-		'bbb'
+```
+'a' followed by any number of 'a' or 'b'
+'b' followed by either 'aa' or zero or more 'b'
+'bbb'
+```
 
 We will also allow an additional token, one or more spaces, to separate them.
 These four token types can be written using regular expressions as:
-
-		sep:  \s
-		tku:  a(a|b)*
-		tkv:  b(aa|b*)
-		tkw:  bbb
+```
+sep:  \s
+tku:  a(a|b)*
+tkv:  b(aa|b*)
+tkw:  bbb
+```
 
 We've given each token definition a name (to the left of the colon).
 
@@ -49,8 +50,7 @@ it also can construct, from a set of token definitions, the DFA to be used in th
 Such DFAs are very useful, and can be used by non-Ruby programs as well.
 
 
-Using the tokn module in a Ruby program
-------
+## Using the tokn module in a Ruby program
 
 There are three object classes of interest: DFA, Tokenizer, and Token.  A DFA is
 compiled once from a script containing token definitions (e.g, "tku:  b(aa|b*) ..."),
@@ -64,24 +64,25 @@ Here's some example Ruby code showing how a text file "sampletext.txt" can be sp
 tokens.  We'll assume there's a text file "sampletokens.txt" that contains the
 definitions shown earlier.
 
-				require 'tokn'
+```
+require 'tokn'
 
-				dfa = Tokn::DFA.from_script(FileUtils.read_text_file("sampletokens.txt"))
-				t = Tokn::Tokenizer.new(dfa,FileUtils.read_text_file("sampletext.txt"))
+dfa = Tokn::DFA.from_script(FileUtils.read_text_file("sampletokens.txt"))
+t = Tokn::Tokenizer.new(dfa,FileUtils.read_text_file("sampletext.txt"))
 
-				while t.has_next
-				  k = t.read                     # read token
-				  next if t.name_of(k) == 'sep'  # skip 'whitespace'
-				  puts k
+while t.has_next
+  k = t.read                     # read token
+  next if t.name_of(k) == 'sep'  # skip 'whitespace'
+  puts k
 
-				end
+end
+```
 
 If later, another file needs to be tokenized, a new Tokenizer object can be
 constructed and given the same dfa object as earlier.
 
 
-Using the tokn command line utilities
-------
+## Using the tokn command line utilities
 
 The module has two utility scripts: tokncompile, and toknprocess.  These can be
 found in the bin/ directory.
@@ -90,7 +91,9 @@ The tokncompile script reads a token definition script from standard input, and
 compiles it to a DFA.  For example, if you are in the tokn/test/data directory, you can
 type:
 
-  tokncompile < sampletokens.txt > compileddfa.txt
+```
+tokncompile < sampletokens.txt > compileddfa.txt
+```
 
 It will produce the JSON encoding of the appropriate DFA.  For a description of how
 this JSON string represents the DFA, see Dfa.rb.
@@ -99,64 +102,66 @@ The toknprocess script takes two arguments: the name of a file containing a
 previously compiled DFA, and the name of a source file.  It extracts the sequence
 of tokens from the source file to the standard output:
 
-  toknprocess compileddfa.txt sampletext.txt
+```
+toknprocess compileddfa.txt sampletext.txt
+```
 
 This will produce the following output:
+```
+WS 1 1 // Example source file that can be tokenized
 
-		WS 1 1 // Example source file that can be tokenized
+WS 2 1
 
-		WS 2 1
+ID 3 1 speed
+WS 3 6
+ASSIGN 3 7 =
+WS 3 8
+INT 3 9 42
+WS 3 11
+WS 3 14 // speed of object
 
-		ID 3 1 speed
-		WS 3 6
-		ASSIGN 3 7 =
-		WS 3 8
-		INT 3 9 42
-		WS 3 11
-		WS 3 14 // speed of object
+WS 4 1
 
-		WS 4 1
-
-		ID 5 1 gravity
-		WS 5 8
-		ASSIGN 5 9 =
-		WS 5 10
-		DBL 5 11 -9.80
-		WS 5 16
-
-
-		ID 7 1 title
-		WS 7 6
-		ASSIGN 7 7 =
-		WS 7 8
-		LBL 7 9 'This is a string with \' an escaped delimiter'
-		WS 7 56
+ID 5 1 gravity
+WS 5 8
+ASSIGN 5 9 =
+WS 5 10
+DBL 5 11 -9.80
+WS 5 16
 
 
-		IF 9 1 if
-		WS 9 3
-		ID 9 4 gravity
-		WS 9 11
-		EQUIV 9 12 ==
-		WS 9 14
-		INT 9 15 12
-		WS 9 17
-		BROP 9 18 {
-		WS 9 19
+ID 7 1 title
+WS 7 6
+ASSIGN 7 7 =
+WS 7 8
+LBL 7 9 'This is a string with \' an escaped delimiter'
+WS 7 56
 
-		DO 10 3 do
-		WS 10 5
-		ID 10 6 something
-		WS 10 15
 
-		BRCL 11 1 }
-		WS 11 2
+IF 9 1 if
+WS 9 3
+ID 9 4 gravity
+WS 9 11
+EQUIV 9 12 ==
+WS 9 14
+INT 9 15 12
+WS 9 17
+BROP 9 18 {
+WS 9 19
+
+DO 10 3 do
+WS 10 5
+ID 10 6 something
+WS 10 15
+
+BRCL 11 1 }
+WS 11 2
+```
 
 The extra linefeeds are the result of a token containing a linefeed.
 
 
-FAQ
---------
+## FAQ
 
 * Why can't I just use Ruby's regular expressions for tokenizing text?
 
