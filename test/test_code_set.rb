@@ -305,4 +305,32 @@ class TestCodeSet < JSTest
     equ('40 50', @parResult)
   end
 
+  def test_single_value_1
+    prep
+    add(5)
+    assert_false(@cs.single_value.nil?)
+  end
+
+  def test_single_value_2
+    prep
+    add(5)
+    @cs.negate
+    assert_true(@cs.single_value.nil?)
+  end
+
+  def test_single_value_3
+    prep
+    add(5)
+    add(6)
+    assert_true(@cs.single_value.nil?)
+  end
+
+  def test_single_value_4
+    prep
+    add(5)
+    add(8)
+    assert_true(@cs.single_value.nil?)
+  end
+
+
 end

@@ -165,16 +165,6 @@ class TestTokn4 < JSTest
     end
   end
 
-  def test_illegal_bracketexpr_negation
-    assert_raise ToknInternal::ParseException do
-      tok =<<-'eos'
-        C: [8a-b^wx]
-      eos
-      script = "abcde"
-      verify(tok,script,nil)
-    end
-  end
-
   def test_bracketexpr_escaped_chars
     tok =<<-'eos'
       C: [a\nc-df]

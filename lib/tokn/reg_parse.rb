@@ -150,24 +150,61 @@ module ToknInternal
       end
     end
 
-
     NO_ESCAPE_CHARS = Regexp.new("[A-Za-z0-9]")
 
-    # Parse character definition (CHARCODE) from input
-    #
-    def parseChar
-
-      c = read
-
-      val = c.ord
-
-      if "{}[]*?+|-^()".include?(c) or val < 0x20
-        abort "Unexpected or unescaped character '#{c}' (\##{val})"
+    def self.digit_code_set
+      if @@digit_code_set == nil
+        cset = CodeSet.new
+        cset.add('0'.ord,1 + '9'.ord)
+        cset.freeze
+        @@digit_code_set = cset
       end
+      @@digit_code_set
+    end
 
-      if c == '\\'
+    def self.wordchar_code_set
+      if @@wordchar_code_set == nil
+        cset = CodeSet.new
+        cset.addSet(RegParse.digit_code_set)
+        cset.add('a'.ord,1 + 'z'.ord)
+        cset.add('A'.ord,1 + 'Z'.ord)
+        cset.add('_'.ord)
+        cset.freeze
+        @@wordchar_code_set = cset
+      end
+      @@wordchar_code_set
+    end
+
+    def parse_digit_code_set
+      read
+      read
+      RegParse.digit_code_set
+    end
+
+    def parse_word_code_set
+      read
+      read
+      RegParse.wordchar_code_set
+    end
+
+    def parse_code_set
+
+      # If starts with \, special parsing required
+      if peek(0) != '\\'
+        c = read
+        val = c.ord
+      else
+        c2 = peek(1)
+        if c2 == 'd'
+          return parse_digit_code_set
+        elsif c2 == 'w'
+          return parse_word_code_set
+        end
+
+        read
 
         c = read
+        val = c.ord
 
         if "xX".include? c
           val = (readHex() << 4) | readHex()
@@ -192,53 +229,6 @@ module ToknInternal
           end
         end
       end
-
-      return val
-    end
-
-    def self.digit_code_set
-      if @@digit_code_set == nil
-        cset = CodeSet.new
-        cset.add('0'.ord,1 + '9'.ord)
-        @@digit_code_set = cset
-      end
-      @@digit_code_set
-    end
-
-    def self.wordchar_code_set
-      if @@wordchar_code_set == nil
-        cset = CodeSet.new
-        cset.addSet(RegParse.digit_code_set)
-        cset.add('a'.ord,1 + 'z'.ord)
-        cset.add('A'.ord,1 + 'Z'.ord)
-        cset.add('_'.ord)
-        @@wordchar_code_set = cset
-      end
-      @@wordchar_code_set
-    end
-
-    def parse_digit_code_set
-      read
-      read
-      RegParse.digit_code_set
-    end
-
-    def parse_word_code_set
-      read
-      read
-      RegParse.wordchar_code_set
-    end
-
-    def parse_code_set
-      if peek(0) == '\\'
-        c2 = peek(1)
-        if c2 == 'd'
-          return parse_digit_code_set
-        elsif c2 == 'w'
-          return parse_word_code_set
-        end
-      end
-      val = parseChar
       CodeSet.new(val)
     end
 
@@ -259,30 +249,33 @@ module ToknInternal
     end
 
     def parseSET
-      u = parseChar
-      v = u+1
+      code_set = parse_code_set
       if readIf('-')
-        v = parseChar() + 1
-        if v <= u
+        u = code_set.single_value
+        abort "Illegal bracket argument" if u.nil?
+        v = parse_code_set.single_value
+        abort "Illegal bracket argument" if v.nil?
+        if v < u
           abort "Illegal range"
         end
+        code_set = CodeSet.new(u,v+1)
       end
-      return u,v
+      code_set
     end
 
     def parseBRACKETEXPR
       read('[')
       negated = readIf('^')
-      rs = CodeSet.new
-
-      u,v = parseSET
-      rs.add(u,v)
+      rs = parseSET
 
       while not readIf(']')
-        u,v = parseSET
-        rs.add(u,v)
+        code_set2 = parseSET
+        rs = rs.makeCopy if rs.frozen?
+        rs.addSet(code_set2)
       end
+
       if negated
+        rs = rs.makeCopy if rs.frozen?
         rs.negate
       end
 
