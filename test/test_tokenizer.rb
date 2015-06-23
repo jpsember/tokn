@@ -59,6 +59,90 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
+  def test_character_class
+    tok =<<-'eos'
+      C: [bcd]
+    eos
+    script = "abcde"
+    verify(tok,script,nil)
+  end
+
+  def test_negated_character_class
+    tok =<<-'eos'
+      C: [^bcd]
+    eos
+    script = "abcde"
+    verify(tok,script,nil)
+  end
+
+  def test_character_class_range
+    tok =<<-'eos'
+      C: [b-d]
+    eos
+    script = "abcde"
+    verify(tok,script,nil)
+  end
+
+  def test_character_class_range2
+    tok =<<-'eos'
+      C: [b-b]
+    eos
+    script = "abcde"
+    verify(tok,script,nil)
+  end
+
+  def test_character_class_range3
+    tok =<<-'eos'
+      C: [ac-df]
+    eos
+    script = "abcdefg"
+    verify(tok,script,nil)
+  end
+
+  def test_negated_character_class_rage
+    tok =<<-'eos'
+      C: [^b-d]
+    eos
+    script = "abcde"
+    verify(tok,script,nil)
+  end
+
+  def test_negated_character_class_range2
+    tok =<<-'eos'
+      C: [b-b]
+    eos
+    script = "abcde"
+    verify(tok,script,nil)
+  end
+
+  def test_negated_character_class_range3
+    tok =<<-'eos'
+      C: [ac-df]
+    eos
+    script = "abcdefg"
+    verify(tok,script,nil)
+  end
+
+  def test_illegal_character_class_range
+    assert_raise ToknInternal::ParseException do
+      tok =<<-'eos'
+        C: [b-a]
+      eos
+      script = "abcde"
+      verify(tok,script,nil)
+    end
+  end
+
+  def test_illegal_character_class_negation
+    assert_raise ToknInternal::ParseException do
+      tok =<<-'eos'
+        C: [8a-b^wx]
+      eos
+      script = "abcde"
+      verify(tok,script,nil)
+    end
+  end
+
 
   # Extract tokens from script
   #

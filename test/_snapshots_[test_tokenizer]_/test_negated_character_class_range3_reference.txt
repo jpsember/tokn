@@ -1,0 +1,7 @@
+C         'a'
+<UNKNOWN> 'b'
+C         'c'
+C         'd'
+<UNKNOWN> 'e'
+C         'f'
+<UNKNOWN> 'g'
