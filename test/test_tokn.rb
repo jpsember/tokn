@@ -18,75 +18,11 @@ class TestTokn < JSTest
   end
 
   def sampleText
-    @sampleText ||=<<-'eos'
-// Example source file that can be tokenized
-
-speed = 42   // speed of object
-gravity = -9.80
-
-{ color = green }
-
-title = 'This is a string with \' an escaped delimiter'
-
-if gravity == 12 {
-  do something
-}
-
-do something_else
-
-// End of 'sampletext.txt'
-eos
+    @sampleText ||= FileUtils.read_text_file("../sampletext.txt")
   end
 
   def sampleTokens
-    @sampleTokens ||=<<-'eos'
-# Sample token definitions
-
-# Whitespace includes a comment, which starts with '//' and
-# extends to the end of the line:
-#
-# 0
-WS: ( [\f\r\s\t\n]+ ) | ( // [^\n]* \n? )
-
-# An anonymous token, for convenience; a non-empty sequence of digits
-#
-_DIG: [0-9]+
-
-# Double has lower priority than int; we want ints to
-# be interpreted as ints, not as doubles
-#
-# 1
-#
-DBL: \-?(({_DIG}(.{_DIG})?)|.{_DIG})
-
-# 2
-INT: \-?{_DIG}
-
-# 3
-LBL: '([^'\n]|\\')*'
-
-# 4
-ID:  [_a-zA-Z][_a-zA-Z0-9]*
-
-# 5
-ASSIGN: =
-
-# 6
-EQUIV: ==
-
-# 7
-IF: if
-
-# 8
-DO: do
-
-# 9
-BROP: \{
-
-# 10
-BRCL: \}
-
-eos
+    @sampleTokens ||= FileUtils.read_text_file("../sampletokens.txt")
   end
 
   REGEX_SCRIPT = "(\\-?[0-9]+)|[_a-zA-Z][_a-zA-Z0-9]*|333q"

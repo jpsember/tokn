@@ -24,9 +24,9 @@ if ARGV.size >= 3
 	skipName = ARGV[2]
 end
 
-tk = Tokenizer.new(dfa, readTextFile(ARGV[1]), skipName)
+tk = Tokenizer.new(dfa, FileUtils.read_text_file(ARGV[1]), skipName)
 
-while tk.hasNext()
+while tk.has_next
   t = tk.read
-  printf("%s %d %d %s\n",tk.nameOf(t),t.lineNumber,t.column,t.text)
+  printf("%s %d %d %s\n",tk.name_of(t),t.lineNumber,t.column,t.text)
 end
