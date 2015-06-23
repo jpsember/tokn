@@ -266,6 +266,8 @@ module ToknInternal
         s = "(e)"
       elsif (charCode > 32 && charCode < 0x7f && !"'\"\\[]{}()".index(charCode.chr))
         s = charCode.chr
+      elsif charCode == CODEMAX-1
+        s = "MAX"
       end
       s
     end

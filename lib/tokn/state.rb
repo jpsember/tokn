@@ -84,9 +84,14 @@ class State
     startState = self
     genAux( stateList, startState)
 
+    # Display long labels in an external label box
+    #
+    box_labels = []
+    box_label_map = {}
+
     g = ''
     g << "digraph #{title} {\n"
-    # g << " size=\"8,10.5\"\n"
+    g << " size=\"8,10.5\"\n"
     g << " \"\" [shape=none]\n"
 
     stateList.each_value do |s|
@@ -102,8 +107,38 @@ class State
     g << "\n \"\" -> \"#{startState.name}\"\n"
     stateList.each_value do |s|
       s.edges.each do |crs, s2|
-        g << " \"#{s.name}\" -> \"#{s2.name}\" [label=\"#{crs.to_s}\"][fontname=Courier][fontsize=12]\n"
+        crs_text = crs.to_s
+        displayed_text = crs_text
+
+        # Put label into external label box if it's long
+        #
+        use_external_label = crs_text.length > 4
+        if use_external_label
+          index = box_label_map[crs_text]
+          if index.nil?
+            index = 1 + box_labels.size
+            box_labels << crs_text
+            box_label_map[crs_text] = index
+          end
+          displayed_text = "\##{index}"
+        end
+
+        g << " \"#{s.name}\" -> \"#{s2.name}\" [label=\"#{displayed_text}\"][fontsize=12]"
+        if !use_external_label
+          g << "[fontname=Courier]"
+        end
+        g << "\n"
       end
+    end
+
+    # Plot the label box if it's not empty
+    #
+    if !box_labels.empty?
+      text = "LABELS\n\n"
+      box_labels.each_with_index do |label,index|
+        text << "#" << (1+index).to_s << ": " << label << "\\l"
+      end
+      g << "\"Legend\" [shape=note,label=\"#{text}\",fontname=Courier,fontsize=12]\n"
     end
 
     g << "\n}\n"
