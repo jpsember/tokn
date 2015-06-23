@@ -45,15 +45,17 @@ module ToknInternal
   #
   #   BRACKETEXPR -> '[' '^'?  SET+ ']'
   #
-  #   SET -> CHARCODE
-  #      | CHARCODE '-' CHARCODE
+  #   SET -> CODE_SET
+  #      | CODE_SET '-' CODE_SET
   #
-  #   CHARCODE ->
+  #   CODE_SET ->
   #         a |  b |  c  ...   any printable except {,},[, etc.
   #      |  \xhh                  hex value from 00...ff
   #      |  \uhhhh                hex value from 0000...ffff (e.g., unicode)
   #      |  \f | \n | \r | \t     formfeed, linefeed, return, tab
   #      |  \s                    a space (' ')
+  #      |  \d
+  #      |  \w
   #      |  \*                    where * is some other non-alphabetic
   #                                character that needs to be escaped
   #
@@ -240,16 +242,6 @@ module ToknInternal
       CodeSet.new(val)
     end
 
-    def parseCharClass
-      range = parse_code_set
-      # Construct a pair of states with an edge between them
-      # labelled with this range
-      sA = newState
-      sB = newState
-      sA.addEdge(range, sB)
-      [sA,sB]
-    end
-
     def parseScript
       # Set up the input scanner
       @char_buffer = []
@@ -343,7 +335,13 @@ module ToknInternal
       elsif ch == '['
         e1 = parseBRACKETEXPR
       else
-        e1 = parseCharClass
+        code_set = parse_code_set
+        # Construct a pair of states with an edge between them
+        # labelled with this code set
+        sA = newState
+        sB = newState
+        sA.addEdge(code_set, sB)
+        e1 = [sA,sB]
       end
       e1
     end
