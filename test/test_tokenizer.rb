@@ -143,6 +143,22 @@ class TestTokn4 < JSTest
     end
   end
 
+  def test_character_class_escaped_chars
+    tok =<<-'eos'
+      C: [a\nc-df]
+    eos
+    script = "abc\ndefg"
+    verify(tok,script,nil)
+  end
+
+  def test_character_class_negated_escaped_chars
+    tok =<<-'eos'
+      C: [^\nb]
+    eos
+    script = "abc\ndefg"
+    verify(tok,script,nil)
+  end
+
 
   # Extract tokens from script
   #
