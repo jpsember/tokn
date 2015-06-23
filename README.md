@@ -96,7 +96,7 @@ tokncompile < sampletokens.txt > compileddfa.txt
 ```
 
 It will produce the JSON encoding of the appropriate DFA.  For a description of how
-this JSON string represents the DFA, see Dfa.rb.
+this JSON string represents the DFA, see `lib/dfa.rb`.
 
 The toknprocess script takes two arguments: the name of a file containing a
 previously compiled DFA, and the name of a source file.  It extracts the sequence
