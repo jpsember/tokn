@@ -87,12 +87,11 @@ module ToknInternal
 
     private
 
-    # Filter out all spaces and tabs that are not within strings ("...")
+    # Filter out all spaces and tabs
     #
     def filter_ws(s)
       result = ''
 
-      within_string = false
       escaped = false
 
       prev_ch = nil
@@ -103,17 +102,11 @@ module ToknInternal
         when ' ','\t'
           if escaped
             escaped = false
-          elsif !within_string
+          else
             ch = nil
           end
         when '\\'
           escaped = !escaped
-        when '"'
-          if escaped
-            escaped = false
-          else
-            within_string = !within_string
-          end
         else
           escaped = false
         end
@@ -142,6 +135,7 @@ module ToknInternal
       if i + 3 < @script.size
         s += '...'
       end
+      s << "\n Expression being parsed: " << @script
       raise ParseException, msg + ": "+s
     end
 
@@ -169,8 +163,8 @@ module ToknInternal
 
       val = c.ord
 
-      if "{}[]*?+|-^()".include?(c) or val <= 0x20
-        abort "Unexpected or unescaped character"
+      if "{}[]*?+|-^()".include?(c) or val < 0x20
+        abort "Unexpected or unescaped character '#{c}' (\##{val})"
       end
 
       if c == '\\'

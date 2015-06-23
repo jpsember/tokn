@@ -159,11 +159,17 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-
   # Extract tokens from script
   #
   def verify(tokens_defn_string,script,skip_token_name='WS')
+    # return if @allow.nil?
     dfa = Tokn::DFA.from_script(tokens_defn_string)
+    if false
+      dotfile = dfa.startState.build_dot_file("dfa")
+      path = "_t.dot"
+      warning "writing dot file to #{path}"
+      FileUtils.write_text_file(path,dotfile)
+    end
 
     TestSnapshot.new.perform do
 
@@ -178,4 +184,19 @@ class TestTokn4 < JSTest
     end
   end
 
+  # Determine path to a file relative to this files's directory
+  #
+  def path_to_resources(file)
+    File.join(File.dirname(File.expand_path(__FILE__)), file)
+  end
+
+  def test_string_expr
+    tok =<<-'eos'
+    STRING: ( " ([^\n"] | (\\") )* " | ' ([^\n']|(\\'))* ' )
+    eos
+    script = FileUtils.read_text_file(path_to_resources('_string_expr.txt')).strip!
+    verify(tok,script,nil)
+  end
+
 end
+
