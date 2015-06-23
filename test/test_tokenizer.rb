@@ -59,7 +59,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_character_class
+  def test_bracketexpr
     tok =<<-'eos'
       C: [bcd]
     eos
@@ -67,7 +67,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_negated_character_class
+  def test_negated_bracketexpr
     tok =<<-'eos'
       C: [^bcd]
     eos
@@ -75,7 +75,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_character_class_range
+  def test_bracketexpr_range
     tok =<<-'eos'
       C: [b-d]
     eos
@@ -83,7 +83,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_character_class_range2
+  def test_bracketexpr_range2
     tok =<<-'eos'
       C: [b-b]
     eos
@@ -91,7 +91,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_character_class_range3
+  def test_bracketexpr_range3
     tok =<<-'eos'
       C: [ac-df]
     eos
@@ -99,7 +99,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_negated_character_class_rage
+  def test_negated_bracketexpr_range
     tok =<<-'eos'
       C: [^b-d]
     eos
@@ -107,7 +107,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_negated_character_class_range2
+  def test_negated_bracketexpr_range2
     tok =<<-'eos'
       C: [b-b]
     eos
@@ -115,7 +115,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_negated_character_class_range3
+  def test_negated_bracketexpr_range3
     tok =<<-'eos'
       C: [ac-df]
     eos
@@ -123,7 +123,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_illegal_character_class_range
+  def test_illegal_bracketexpr_range
     assert_raise ToknInternal::ParseException do
       tok =<<-'eos'
         C: [b-a]
@@ -133,7 +133,7 @@ class TestTokn4 < JSTest
     end
   end
 
-  def test_illegal_character_class_negation
+  def test_illegal_bracketexpr_negation
     assert_raise ToknInternal::ParseException do
       tok =<<-'eos'
         C: [8a-b^wx]
@@ -143,7 +143,7 @@ class TestTokn4 < JSTest
     end
   end
 
-  def test_character_class_escaped_chars
+  def test_bracketexpr_escaped_chars
     tok =<<-'eos'
       C: [a\nc-df]
     eos
@@ -151,7 +151,7 @@ class TestTokn4 < JSTest
     verify(tok,script,nil)
   end
 
-  def test_character_class_negated_escaped_chars
+  def test_bracketexpr_negated_escaped_chars
     tok =<<-'eos'
       C: [^\nb]
     eos
