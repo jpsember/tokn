@@ -62,7 +62,7 @@ req 'reg_parse dfa_builder'
 
         tokenName = line[0,pos].strip()
 
-        expr = line[pos+1..-1].strip()
+        expr = line[pos+1..-1]
 
         rex = RegParse.new(expr, @tokenNameMap)
 

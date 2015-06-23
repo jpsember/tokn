@@ -67,6 +67,9 @@ module ToknInternal
   #
   class RegParse
 
+    @@digit_code_set = nil
+    @@wordchar_code_set = nil
+
     attr_reader :startState, :endState
 
     # Construct a parser and perform the parsing
@@ -76,23 +79,59 @@ module ToknInternal
     #     in the script
     #
     def initialize(script, tokenDefMap = nil)
-      @script = script.strip
+      @script = filter_ws(script)
       @nextStateId = 0
       @tokenDefMap = tokenDefMap
-      @char_buffer = []
       parseScript
     end
 
-
     private
 
+    # Filter out all spaces and tabs that are not within strings ("...")
+    #
+    def filter_ws(s)
+      result = ''
+
+      within_string = false
+      escaped = false
+
+      prev_ch = nil
+      for pos in 0..s.length - 1
+        ch = s[pos]
+
+        case ch
+        when ' ','\t'
+          if escaped
+            escaped = false
+          elsif !within_string
+            ch = nil
+          end
+        when '\\'
+          escaped = !escaped
+        when '"'
+          if escaped
+            escaped = false
+          else
+            within_string = !within_string
+          end
+        else
+          escaped = false
+        end
+
+        if !ch.nil?
+          result << ch
+        end
+      end
+      result
+    end
 
     # Raise a ParseException, with a helpful message indicating
     # the parser's current location within the string
     #
     def abort(msg)
       # Assume we've already read the problem character
-      i = @cursor - 1
+      # TODO Test this code
+      i = @cursor - 1 - @char_buffer.length
       s = ''
       if i > 4
         s += '...'
@@ -165,8 +204,55 @@ module ToknInternal
       return val
     end
 
+    def self.digit_code_set
+      if @@digit_code_set == nil
+        cset = CodeSet.new
+        cset.add('0'.ord,1 + '9'.ord)
+        @@digit_code_set = cset
+      end
+      @@digit_code_set
+    end
+
+    def self.wordchar_code_set
+      if @@wordchar_code_set == nil
+        cset = CodeSet.new
+        cset.addSet(RegParse.digit_code_set)
+        cset.add('a'.ord,1 + 'z'.ord)
+        cset.add('A'.ord,1 + 'Z'.ord)
+        cset.add('_'.ord)
+        @@wordchar_code_set = cset
+      end
+      @@wordchar_code_set
+    end
+
+    def parseDigitClass
+      read
+      read
+      sA = newState
+      sB = newState
+      sA.addEdge(RegParse.digit_code_set, sB)
+      [sA,sB]
+    end
+
+    def parseWordCharClass
+      read
+      read
+      sA = newState
+      sB = newState
+      sA.addEdge(RegParse.wordchar_code_set, sB)
+      [sA,sB]
+    end
 
     def parseCharClass
+
+      if peek(0) == '\\'
+        c2 = peek(1)
+        if c2 == 'd'
+          return parseDigitClass
+        elsif c2 == 'w'
+          return parseWordCharClass
+        end
+      end
 
       val = parseChar
 
@@ -183,6 +269,7 @@ module ToknInternal
 
     def parseScript
       # Set up the input scanner
+      @char_buffer = []
       @cursor = 0
 
       exp = parseE
@@ -263,7 +350,7 @@ module ToknInternal
     end
 
     def parseP
-      ch = peek
+      ch = peek(0)
       if ch == '('
         read
         e1 = parseE
@@ -277,7 +364,6 @@ module ToknInternal
       end
       e1
     end
-
 
     def parseE
       e1 = parseJ
@@ -297,7 +383,7 @@ module ToknInternal
 
     def parseJ
       e1 = parseQ
-      p = peek
+      p = peek(0)
       if p and not "|)".include? p
         e2 = parseJ
         e1[1].addEps(e2[0])
@@ -309,7 +395,7 @@ module ToknInternal
 
     def parseQ
       e1 = parseP
-      p = peek
+      p = peek(0)
 
       if p == '*'
         read
@@ -325,16 +411,12 @@ module ToknInternal
       e1
     end
 
-
-    def peek(position = 0)
+    def peek(position)
       while @char_buffer.length <= position
-        # skip over any non-linefeed whitespace
-        while @cursor < @script.size && " \t".index(@script[@cursor])
-          @cursor += 1
-        end
         ch = nil
         if @cursor < @script.size
           ch = @script[@cursor]
+          @cursor += 1
         end
         @char_buffer << ch
       end
@@ -342,18 +424,17 @@ module ToknInternal
     end
 
     def readIf(expChar)
-      r = (peek == expChar)
-      if r
+      found = (peek(0) == expChar)
+      if found
         read
       end
-      r
+      found
     end
 
     def read(expChar = nil)
-      peek
-      ch = @char_buffer.shift
+      ch = peek(0)
+      @char_buffer.shift
       if ch and ((not expChar) or ch == expChar)
-        @cursor += 1
         ch
       else
         abort 'Unexpected end of input'

@@ -1,2 +1,4 @@
 samplescript.rb
+*.dot
+*.ps
 

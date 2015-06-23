@@ -85,7 +85,9 @@ class State
     genAux( stateList, startState)
 
     g = ''
-    g << "digraph #{title} {\n \"\" [shape=none]\n"
+    g << "digraph #{title} {\n"
+    # g << " size=\"8,10.5\"\n"
+    g << " \"\" [shape=none]\n"
 
     stateList.each_value do |s|
       g << " \"#{s.name}\" [shape="

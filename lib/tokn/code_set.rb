@@ -95,7 +95,7 @@ module ToknInternal
     # @param upper one plus max value in range
     #
     def remove(lower, upper = nil)
-      if not upper
+      if upper.nil?
         upper = lower + 1
       end
 

@@ -35,7 +35,11 @@ class TestTokn < JSTest
 END
 
   def build_dfa_from_script
-    Tokn::DFA.from_script(sampleTokens)
+    dfa = Tokn::DFA.from_script(sampleTokens)
+    if true
+      FileUtils.write_text_file("../_test_tokn.dot",dfa.startState.build_dot_file("dfa"))
+    end
+    dfa
   end
 
   def build_tokenizer_from_dfa
