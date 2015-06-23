@@ -37,11 +37,7 @@ module ToknInternal
   #   P -> '(' E ')'
   #      | '{' TOKENNAME '}'
   #      | BRACKETEXPR
-  #      | CHARCLASS
-  #
-  #   CHARCLASS -> '\d'
-  #      | '\w'
-  #      | CHARCODE
+  #      | CODE_SET
   #
   #   BRACKETEXPR -> '[' '^'?  SET+ ']'
   #
@@ -54,8 +50,8 @@ module ToknInternal
   #      |  \uhhhh                hex value from 0000...ffff (e.g., unicode)
   #      |  \f | \n | \r | \t     formfeed, linefeed, return, tab
   #      |  \s                    a space (' ')
-  #      |  \d
-  #      |  \w
+  #      |  \d                    digit
+  #      |  \w                    word character
   #      |  \*                    where * is some other non-alphabetic
   #                                character that needs to be escaped
   #
