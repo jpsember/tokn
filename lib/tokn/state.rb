@@ -78,6 +78,9 @@ class State
 
   # Generate a .dot file of the state machine
   #
+  # You can convert the resulting .dot file <XXX.dot> to a PostScript file
+  # by typing 'dot -OTps <XXX.dot>'
+  #
   def build_dot_file(title = "nfa")
     stateList = {}
 
