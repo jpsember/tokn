@@ -1,5 +1,6 @@
-
-req 'code_set state tokn_const'
+require 'tokn/code_set'
+require 'tokn/state'
+require 'tokn/tokn_const'
 
 module ToknInternal
 

@@ -1,0 +1,68 @@
+WS 1 1 // Example source file that can be tokenized
+
+WS 2 1 
+
+ID 3 1 speed
+WS 3 6  
+ASSIGN 3 7 =
+WS 3 8  
+INT 3 9 42
+WS 3 11    
+WS 3 14 // speed of object
+
+ID 4 1 gravity
+WS 4 8  
+ASSIGN 4 9 =
+WS 4 10  
+DBL 4 11 -9.80
+WS 4 16 
+
+
+BROP 6 1 {
+WS 6 2  
+ID 6 3 color
+WS 6 8  
+ASSIGN 6 9 =
+WS 6 10  
+ID 6 11 green
+WS 6 16  
+BRCL 6 17 }
+WS 6 18 
+
+
+ID 8 1 title
+WS 8 6  
+ASSIGN 8 7 =
+WS 8 8  
+LBL 8 9 'This is a string with \' an escaped delimiter'
+WS 8 56 
+
+
+IF 10 1 if
+WS 10 3  
+ID 10 4 gravity
+WS 10 11  
+EQUIV 10 12 ==
+WS 10 14  
+INT 10 15 12
+WS 10 17  
+BROP 10 18 {
+WS 10 19 
+  
+DO 11 3 do
+WS 11 5  
+ID 11 6 something
+WS 11 15 
+
+BRCL 12 1 }
+WS 12 2 
+
+
+DO 14 1 do
+WS 14 3  
+ID 14 4 something_else
+WS 14 18 
+
+
+WS 16 1 // End of 'sampletext.txt'
+

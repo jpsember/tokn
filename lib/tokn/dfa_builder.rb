@@ -1,5 +1,4 @@
-require_relative('range_partition')
-require_relative('reg_parse')
+require 'tokn/range_partition'
 
 module ToknInternal
 

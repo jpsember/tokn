@@ -1,2 +1,4 @@
-require 'js_base'
-req('dfa token tokenizer tokenizer_exception','tokn')
+require 'tokn/dfa'
+require 'tokn/token'
+require 'tokn/tokenizer'
+require 'tokn/tokenizer_exception'

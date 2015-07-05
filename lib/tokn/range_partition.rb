@@ -1,6 +1,3 @@
-require_relative 'tokn_const'
-require_relative 'code_set'
-
 module ToknInternal
 
   # A data structure that transforms a set of CodeSets to a

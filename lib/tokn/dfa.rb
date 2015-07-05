@@ -1,6 +1,5 @@
 require 'json'
-
-req 'code_set state token_defn_parser'
+require 'tokn/token_defn_parser'
 
 module Tokn
 

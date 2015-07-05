@@ -14,6 +14,8 @@ module ToknInternal
 #
 class State
 
+  require 'set'
+
   attr_accessor :id
   attr_accessor :finalState
   alias_method :finalState?, :finalState

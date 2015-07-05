@@ -11,6 +11,8 @@
 #
 
 require 'tokn'
+require 'js_base'
+
 include Tokn
 
 if ARGV.size < 2 || ARGV.size > 3

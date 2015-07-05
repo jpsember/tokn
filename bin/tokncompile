@@ -8,9 +8,6 @@
 # tokncompile < sampletokens.txt > dfa.txt
 #
 
-
 require 'tokn'
 
 puts Tokn::DFA.from_script(ARGF.read).serialize()
-
-

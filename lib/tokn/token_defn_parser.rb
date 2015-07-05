@@ -1,6 +1,7 @@
-module ToknInternal
+require 'tokn/reg_parse'
+require 'tokn/dfa_builder'
 
-req 'reg_parse dfa_builder'
+module ToknInternal
 
   # Parses a token definition script, and generates an NFA that
   # is capable of recognizing and distinguishing between the various
