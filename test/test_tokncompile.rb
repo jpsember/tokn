@@ -5,7 +5,7 @@ class TestToknCompile < JSTest
 
   def test_ToknCompile
     TestSnapshot.new.perform do
-      output,_ = scall("ruby -I./lib bin/tokncompile < test/sampletokens.txt")
+      output,_ = scall("ruby bin/tokncompile < test/sampletokens.txt")
       puts output
       # Write dfa for use by toknprocess test
       # FileUtils.write_text_file("test/compileddfa.txt",output,true)

@@ -1,7 +1,4 @@
-samplescript.rb
 *.dot
 *.ps
 _dfa_.txt
 temporary_*
-
-

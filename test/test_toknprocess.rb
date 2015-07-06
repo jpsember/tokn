@@ -4,7 +4,7 @@ class TestToknProcess < JSTest
 
   def test_ToknProcess
     TestSnapshot.new.perform do
-      output,_ = scall("ruby -I./lib bin/toknprocess test/compileddfa.txt test/sampletext.txt")
+      output,_ = scall("ruby bin/toknprocess test/compileddfa.txt test/sampletext.txt")
       puts output
     end
   end
