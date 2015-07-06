@@ -61,8 +61,6 @@ module ToknInternal
       dfa
     end
 
-
-
     # Constructs a builder object
     #
     def initialize(nfaStartState)

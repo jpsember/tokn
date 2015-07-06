@@ -201,6 +201,65 @@ END
     end
   end
 
+  def test_read_named_sequence_unconditionally
+    TestSnapshot.new.perform do
+      dfa = Tokn::DFA.from_script(sampleTokens)
+      t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
+
+      while t.has_next do
+        tk = t.read
+        if tk.text == 'speed'
+          tokens = t.read_sequence('ASSIGN INT ID')
+          report_seq(tokens)
+        end
+      end
+    end
+  end
+
+  def test_read_named_sequence_unconditionally_fails
+    assert_raise Tokn::TokenizerException do
+      dfa = Tokn::DFA.from_script(sampleTokens)
+      t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
+
+      while t.has_next do
+        tk = t.read
+        if tk.text == 'speed'
+          tokens = t.read_sequence('ASSIGN INT INT')
+        end
+      end
+    end
+  end
+
+  def test_read_id_sequence_unconditionally
+    TestSnapshot.new.perform do
+      dfa = Tokn::DFA.from_script(sampleTokens)
+      t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
+
+      while t.has_next do
+        tk = t.read
+        if tk.text == 'speed'
+          tokens = t.read_sequence([5,2,4])
+          report_seq(tokens)
+        end
+      end
+    end
+  end
+
+  def test_read_id_sequence_unconditionally_fails
+    assert_raise Tokn::TokenizerException do
+      dfa = Tokn::DFA.from_script(sampleTokens)
+      t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
+
+      while t.has_next do
+        tk = t.read
+        if tk.text == 'speed'
+          tokens = t.read_sequence([5,2,2])
+        end
+      end
+    end
+  end
+
+
   def test_read_id_sequence
     TestSnapshot.new.perform do
       dfa = Tokn::DFA.from_script(sampleTokens)

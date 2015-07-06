@@ -28,4 +28,3 @@ module ToknInternal
     EPSILON-1-edgeLabel
   end
 end
-
