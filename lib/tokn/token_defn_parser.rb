@@ -47,16 +47,20 @@ module ToknInternal
       @lines = @script.split("\n")
 
       # Join lines that have been ended with '\' to their following lines;
-      # only do this if there's at least some whitespace before the '\'
+      # only do this if there's an odd number of '\' at the end
       joined_lines = []
       accum = nil
       @lines.each do |line|
-        stripped = line.rstrip
-        if stripped.length >= 2 && stripped[-1] == '\\' && stripped[-2] <= ' '
+        # puts "examining line: '#{line}'"
+        trailing_backslash_count = 0
+        while line.length > trailing_backslash_count && line[-1-trailing_backslash_count] == '\\'
+          trailing_backslash_count += 1
+        end
+        if (trailing_backslash_count % 2 == 1)
           if !accum
             accum = ''
           end
-          accum << stripped[0...-1]
+          accum << line[0...-1]
         else
           if accum
             accum << line
@@ -71,9 +75,15 @@ module ToknInternal
       end
       @lines = joined_lines
 
+      # Now that we've stitched together lines where there were trailing \ characters,
+      # process each line as a complete token definition
+
       @lines.each_with_index do |line, lineNumber|
 
-        line.strip!
+        # Strip whitespace only from the left side (which will strip all of
+        # it, if the entire line is whitespace).  We want to preserve any
+        # special escaped whitespace on the right side. 
+        line.lstrip!
 
         # If line is empty, or starts with '#', it's a comment
         if line.length == 0 || line[0] == '#'

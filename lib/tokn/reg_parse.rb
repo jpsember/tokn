@@ -130,7 +130,7 @@ module ToknInternal
       if i + 3 < @script.size
         s += '...'
       end
-      s << "\n Expression being parsed: " << @script
+      s << "\n Expression being parsed: '" << @script << "'"
       raise ParseException, msg + ": "+s
     end
 

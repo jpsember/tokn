@@ -1,7 +1,7 @@
 require 'js_base/js_test'
 require 'tokn'
 
-class TestTokn4 < JSTest
+class TestTokenizer < JSTest
 
   def test_ExpressionPrecedence
 

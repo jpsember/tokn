@@ -21,6 +21,40 @@ class TestTokn3 < JSTest
     Tokn::Tokenizer.new(dfa, @sampleText)
   end
 
+  def test_continue_line_with_backslash
+    # There are no characters between the backslash and the linefeed; this will be interpreted
+    # as a 'line stitch' command
+    script = "A: ab\\\nab"
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"abababababab")
+    tok.read
+    tok.read
+    tok.read
+    assert(!tok.has_next)
+  end
+
+  def test_continue_line_with_backslash_not_at_end
+    # Note there's a space between the backslash and the linefeed; this will be interpreted
+    # as an escaped space, not as a 'line stitch' command
+    script = "A: ab\\ \nB: ab"
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"abab ab")
+    tok.read(1)
+    tok.read(0)
+    tok.read(1)
+    assert(!tok.has_next)
+  end
+
+  def test_continue_line_with_multiple_backslash
+    script = "A: ab\\\\\\\\\\\nab\nB: ab"
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"abab\\\\abab")
+    tok.read(1)
+    tok.read(0)
+    tok.read(1)
+    assert(!tok.has_next)
+  end
+
   def test_Tokenizer
     TestSnapshot.new.perform do
 
