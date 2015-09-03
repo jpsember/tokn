@@ -76,6 +76,30 @@ class TestTokn3 < JSTest
     end
   end
 
+  def test_comment_problem
+    script = ""
+    script << 'WS: (   [\\x00-\\x20]+ | \\# [\\x00-\\x09\\x0b-\\x7f]* \\n? )'
+    script << "\n"
+    script << 'ID: \\d+'
+    script << "\n"
+
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"   14  \n   # white space 42 \n  19 83  ")
+    [0,1,0,0,0,1,0,1,0].each do |id|
+      tok.read(id)
+    end
+    assert !tok.has_next
+  end
+
+  def test_bracket_expr_disallowed
+    script = ""
+    script << 'WS: (   [\\x00-\\x20^\\n]+ )'
+
+    assert_raise ToknInternal::ParseException do
+      Tokn::DFA.from_script(script)
+    end
+  end
+
   def setup
     enter_test_directory
     @sampleText =<<-'EOS'

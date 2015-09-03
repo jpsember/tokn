@@ -184,12 +184,15 @@ module ToknInternal
       RegParse.wordchar_code_set
     end
 
-    def parse_code_set
+    def parse_code_set(within_bracket_expr = false)
 
       # If starts with \, special parsing required
       if peek(0) != '\\'
         c = read
         val = c.ord
+        if within_bracket_expr && c == '^'
+          abort "Illegal character within [ ] expression: #{c}"
+        end
       else
         c2 = peek(1)
         if c2 == 'd'
@@ -246,11 +249,11 @@ module ToknInternal
     end
 
     def parseSET
-      code_set = parse_code_set
+      code_set = parse_code_set(true)
       if readIf('-')
         u = code_set.single_value
         abort "Illegal bracket argument" if u.nil?
-        v = parse_code_set.single_value
+        v = parse_code_set(true).single_value
         abort "Illegal bracket argument" if v.nil?
         if v < u
           abort "Illegal range"
