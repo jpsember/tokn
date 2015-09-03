@@ -46,6 +46,31 @@ module ToknInternal
 
       @lines = @script.split("\n")
 
+      # Join lines that have been ended with '\' to their following lines;
+      # only do this if there's at least some whitespace before the '\'
+      joined_lines = []
+      accum = nil
+      @lines.each do |line|
+        stripped = line.rstrip
+        if stripped.length >= 2 && stripped[-1] == '\\' && stripped[-2] <= ' '
+          if !accum
+            accum = ''
+          end
+          accum << stripped[0...-1]
+        else
+          if accum
+            accum << line
+            line = accum
+            accum = nil
+          end
+          joined_lines << line
+        end
+      end
+      if accum
+         raise ParseException, "Incomplete final line: "+@script
+      end
+      @lines = joined_lines
+
       @lines.each_with_index do |line, lineNumber|
 
         line.strip!
