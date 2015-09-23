@@ -91,15 +91,6 @@ class TestTokn3 < JSTest
     assert !tok.has_next
   end
 
-  def test_bracket_expr_disallowed
-    script = ""
-    script << 'WS: (   [\\x00-\\x20^\\n]+ )'
-
-    assert_raise ToknInternal::ParseException do
-      Tokn::DFA.from_script(script)
-    end
-  end
-
   def setup
     enter_test_directory
     @sampleText =<<-'EOS'

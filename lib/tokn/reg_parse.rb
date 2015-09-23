@@ -40,7 +40,10 @@ module ToknInternal
   #      | BRACKETEXPR
   #      | CODE_SET
   #
-  #   BRACKETEXPR -> '[' '^'?  SET+ ']'
+  #   BRACKETEXPR -> '[' SET_OPTNEG ']'
+  #
+  #   SET_OPTNEG -> SET+
+  #      |  SET* '^' SET+
   #
   #   SET -> CODE_SET
   #      | CODE_SET '-' CODE_SET
@@ -175,13 +178,13 @@ module ToknInternal
     def parse_digit_code_set
       read
       read
-      RegParse.digit_code_set
+      RegParse.digit_code_set.makeCopy
     end
 
     def parse_word_code_set
       read
       read
-      RegParse.wordchar_code_set
+      RegParse.wordchar_code_set.makeCopy
     end
 
     def parse_code_set(within_bracket_expr = false)
@@ -265,17 +268,34 @@ module ToknInternal
 
     def parseBRACKETEXPR
       read('[')
-      negated = readIf('^')
-      rs = parseSET
+      rs = CodeSet.new
+      expecting_set = true
+      negated = false
+      had_initial_set = false
+      while true
+        if !negated && readIf('^')
+          negated = true
+          expecting_set = true
+        end
 
-      while not readIf(']')
-        code_set2 = parseSET
-        rs = rs.makeCopy if rs.frozen?
-        rs.addSet(code_set2)
+        if !expecting_set && readIf(']')
+          break
+        end
+
+        set = parseSET
+        expecting_set = false
+        if negated
+          if had_initial_set
+            rs = rs.difference(set)
+          else
+            rs.addSet(set)
+          end
+        else
+          rs.addSet(set)
+          had_initial_set = true
+        end
       end
-
-      if negated
-        rs = rs.makeCopy if rs.frozen?
+      if negated && !had_initial_set
         rs.negate
       end
 

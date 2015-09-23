@@ -67,6 +67,30 @@ class TestTokenizer < JSTest
     verify(tok,script,nil)
   end
 
+  def test_bracketexpr_with_omitted_single_char
+    tok =<<-'eos'
+      C: [\x00-\x20^\n]
+    eos
+    script = "   \t  \n \t a b"
+    verify(tok,script,nil)
+  end
+
+  def test_bracketexpr_with_some_omitted
+    tok =<<-'eos'
+      C: [\x00-\x20^\n\t]
+    eos
+    script = "   \t  \n \t a b"
+    verify(tok,script,nil)
+  end
+
+  def test_bracketexpr_with_omitted_range
+    tok =<<-'eos'
+      C: [a-h^g-m]
+    eos
+    script = "abcdefghijklmnop"
+    verify(tok,script,nil)
+  end
+
   def test_negated_bracketexpr
     tok =<<-'eos'
       C: [^bcd]
@@ -180,6 +204,28 @@ class TestTokenizer < JSTest
     script = "abc\ndefg"
     verify(tok,script,nil)
   end
+
+  def test_bracket_expr_disallowed
+    script = 'C: [a-z^e^f]'
+    assert_raise ToknInternal::ParseException do
+      Tokn::DFA.from_script(script)
+    end
+  end
+
+  def test_bracket_expr_disallowed2
+    script = 'C: [a-z^]'
+    assert_raise ToknInternal::ParseException do
+      Tokn::DFA.from_script(script)
+    end
+  end
+
+  def test_bracket_expr_disallowed3
+    script = 'C: [^]'
+    assert_raise ToknInternal::ParseException do
+      Tokn::DFA.from_script(script)
+    end
+  end
+
 
   # Extract tokens from script
   #
