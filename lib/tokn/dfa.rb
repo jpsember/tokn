@@ -11,33 +11,38 @@ module Tokn
     include ToknInternal
 
     # Compile a Tokenizer DFA from a token definition script.
-    # If persistPath is not null, it first checks if the file exists and
+    # Uses persist_path to first check if the file exists and
     # if so, assumes it contains (in JSON form) a previously compiled
     # DFA matching this script, and reads the DFA from it.
     # Second, if no such file exists, it writes the DFA to it after compilation.
     #
-    def self.from_script(script, persistPath = nil)
+    # If no persist_path argument is given, uses path derived from
+    # hash of script, and stored in hidden subdirectory of the home directory.
+    #
+    def self.from_script(script, persist_path = nil)
 
-      if persistPath and File.exist?(persistPath)
-        return self.from_file(persistPath)
+      if persist_path.nil?
+        require 'digest/sha1'
+        persist_dir = File.join(Dir.home,'.compiled_dfa')
+        FileUtils.mkdir_p(persist_dir)
+        persist_path = File.join(persist_dir,Digest::SHA1.hexdigest(script))
       end
 
+      if File.exist?(persist_path)
+        return self.from_file(persist_path)
+      end
 
       td = TokenDefParser.new(script)
       dfa = td.dfa
-
-      if persistPath
-        FileUtils.write_text_file(persistPath, dfa.serialize())
-      end
-
+      FileUtils.write_text_file(persist_path, dfa.serialize())
       dfa
     end
 
     # Similar to from_script, but reads the script into memory from
     # the file at scriptPath.
     #
-    def self.from_script_file(scriptPath, persistPath = nil)
-      self.from_script(FileUtils.read_text_file(scriptPath), persistPath)
+    def self.from_script_file(scriptPath, persist_path = nil)
+      self.from_script(FileUtils.read_text_file(scriptPath), persist_path)
     end
 
     # Compile a Tokenizer DFA from a text file (that contains a
