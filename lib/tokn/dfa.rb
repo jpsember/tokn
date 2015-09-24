@@ -29,7 +29,7 @@ module Tokn
       end
 
       if File.exist?(persist_path)
-        return self.from_file(persist_path)
+        from_json(FileUtils.read_text_file(persist_path))
       end
 
       td = TokenDefParser.new(script)
@@ -43,13 +43,6 @@ module Tokn
     #
     def self.from_script_file(scriptPath, persist_path = nil)
       self.from_script(FileUtils.read_text_file(scriptPath), persist_path)
-    end
-
-    # Compile a Tokenizer DFA from a text file (that contains a
-    # JSON string)
-    #
-    def self.from_file(path)
-      from_json(FileUtils.read_text_file(path))
     end
 
     # Compile a Tokenizer DFA from a JSON string

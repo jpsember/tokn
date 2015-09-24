@@ -7,18 +7,9 @@ class TestTokn3 < JSTest
     leave_test_directory(true)
   end
 
-  def build_dfa_from_script
-    @dfa = Tokn::DFA.from_script(@sampleTokens)
-  end
-
   def build_tokenizer_from_script
-    Tokn::Tokenizer.new(build_dfa_from_script, @sampleText)
-  end
-
-  def test_CompileDFA
-    FileUtils.write_text_file("_dfa_.txt", build_dfa_from_script.serialize())
-    dfa = Tokn::DFA.from_file("_dfa_.txt")
-    Tokn::Tokenizer.new(dfa, @sampleText)
+    @dfa = Tokn::DFA.from_script(@sampleTokens)
+    Tokn::Tokenizer.new(@dfa, @sampleText)
   end
 
   def test_continue_line_with_backslash

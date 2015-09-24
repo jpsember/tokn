@@ -42,18 +42,12 @@ END
     dfa
   end
 
-  def build_tokenizer_from_dfa
-    FileUtils.write_text_file("_dfa_.txt", build_dfa_from_script.serialize())
-    dfa = Tokn::DFA.from_file("_dfa_.txt")
-    Tokn::Tokenizer.new(dfa, sampleText)
-  end
-
   def build_tokenizer_from_script
     Tokn::Tokenizer.new(build_dfa_from_script, sampleText)
   end
 
   def test_CompileDFA
-    build_tokenizer_from_dfa
+    build_tokenizer_from_script
   end
 
   def test_build_DFA
@@ -118,7 +112,7 @@ END
   end
 
   def test_readAndUnread
-    tok = build_tokenizer_from_dfa
+    tok = build_tokenizer_from_script
     unread = false
     while tok.has_next
       t = tok.read
@@ -131,7 +125,7 @@ END
 
   def test_UnrecognizedToken
     assert_raise Tokn::TokenizerException do
-      tok = build_tokenizer_from_dfa
+      tok = build_tokenizer_from_script
       while tok.has_next
         t = tok.read
         if tok.name_of(t) == "DO"
@@ -143,7 +137,7 @@ END
 
   def test_ReadPastEnd
     assert_raise Tokn::TokenizerException do
-      tok = build_tokenizer_from_dfa
+      tok = build_tokenizer_from_script
       while tok.has_next
         tok.read
       end
@@ -154,7 +148,7 @@ END
   def test_UnreadBeforeStart
 
     assert_raise Tokn::TokenizerException do
-      tok = build_tokenizer_from_dfa
+      tok = build_tokenizer_from_script
       k = 0
       while tok.has_next
         tok.read
@@ -359,12 +353,12 @@ END
   end
 
   def test_read_if_name
-    tok = build_tokenizer_from_dfa
+    tok = build_tokenizer_from_script
     assert(tok.read_if('WS') != nil)
   end
 
   def test_read_if_id
-    tok = build_tokenizer_from_dfa
+    tok = build_tokenizer_from_script
     assert(tok.read_if(0) != nil)
   end
 
