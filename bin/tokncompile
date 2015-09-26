@@ -9,5 +9,6 @@
 #
 
 require 'tokn'
+require 'js_base'
 
 puts Tokn::DFA.from_script(ARGF.read).serialize()
