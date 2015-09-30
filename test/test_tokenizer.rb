@@ -83,6 +83,14 @@ class TestTokenizer < JSTest
     verify(tok,script,nil)
   end
 
+  def test_alternate_hex_value_syntax
+    tok =<<-'eos'
+      C: [\0x00-\0x20^\n\t]
+    eos
+    script = "   \t  \n \t a b"
+    verify(tok,script,nil)
+  end
+
   def test_bracketexpr_with_omitted_range
     tok =<<-'eos'
       C: [a-h^g-m]

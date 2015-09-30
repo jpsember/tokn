@@ -2,7 +2,7 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name        = 'tokn'
-  s.version     = '2.2.1'
+  s.version     = '2.2.2'
   s.executables = FileList['bin/*'].map{|x| File.basename(x)}
   s.summary     = 'Extracts tokens from source files'
   s.description = <<-"EOS"

@@ -51,6 +51,7 @@ module ToknInternal
   #   CODE_SET ->
   #         a |  b |  c  ...   any printable except {,},[, etc.
   #      |  \xhh                  hex value from 00...ff
+  #      |  \0xhh                 hex value from 00...ff
   #      |  \uhhhh                hex value from 0000...ffff (e.g., unicode)
   #      |  \f | \n | \r | \t     formfeed, linefeed, return, tab
   #      |  \s                    a space (' ')
@@ -209,7 +210,11 @@ module ToknInternal
         c = read
         val = c.ord
 
-        if "xX".include? c
+        if c == '0'
+          c = read
+          abort "Unsupported escape sequence (#{c})" if !"xX".include? c
+          val = (readHex() << 4) | readHex()
+        elsif "xX".include? c
           val = (readHex() << 4) | readHex()
         elsif "uU".include? c
           val = (readHex() << 12) | (readHex() << 8) | (readHex() << 4) | readHex()

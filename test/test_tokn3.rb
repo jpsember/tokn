@@ -82,6 +82,21 @@ class TestTokn3 < JSTest
     assert !tok.has_next
   end
 
+  def test_altern_problem
+    script = ""
+    script << 'WS: (   [\\x00-\\x20]+ | \\# [\\x00-\\x09\\x0b-\\x7f]* \\n? )'
+    script << "\n"
+    script << 'TAGEND:   (  (/ [a-zA-Z]*) | \? )? >'
+    script << "\n"
+
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"/abc>  >  ?>  ")
+    [1,0,1,0,1,0].each do |id|
+      tok.read(id)
+    end
+    assert !tok.has_next
+  end
+
   def setup
     enter_test_directory
     @sampleText =<<-'EOS'

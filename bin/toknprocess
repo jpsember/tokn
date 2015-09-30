@@ -20,7 +20,9 @@ if ARGV.size < 2 || ARGV.size > 3
   abort
 end
 
-dfa = DFA.from_file(ARGV[0])
+
+compiled_dfa = FileUtils.read_text_file(ARGV[0])
+dfa = DFA.from_json(compiled_dfa)
 skipName = nil
 if ARGV.size >= 3
 	skipName = ARGV[2]
