@@ -1,0 +1,26 @@
+(line 1, col 1)   : // c-style comments:
+(line 2, col 1)   : 
+(line 3, col 1)   : /**/
+(line 3, col 5)   : 
+(line 4, col 1)   : a
+(line 4, col 2)   : 
+(line 5, col 1)   : /***/
+(line 5, col 6)   : 
+(line 6, col 1)   : b
+(line 6, col 2)   : 
+(line 7, col 1)   : /****/
+(line 7, col 7)   : 
+(line 8, col 1)   : c
+(line 8, col 2)   : 
+(line 9, col 1)   : /*
+x
+*/
+(line 11, col 3)  : 
+(line 12, col 1)  : /* x   /* x */
+(line 12, col 15) : 
+(line 13, col 1)  : d
+(line 13, col 2)  : 
+(line 14, col 1)  : /*    /*/
+(line 14, col 10) : 
+(line 15, col 1)  : e
+(line 15, col 2)  : 

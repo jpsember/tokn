@@ -309,6 +309,19 @@ END
     end
   end
 
+  def test_c_style_comments
+    TestSnapshot.new.perform do
+      dfa = Tokn::DFA.from_script(sampleTokens)
+      text = FileUtils.read_text_file("../sampletext2.txt")
+      t = Tokn::Tokenizer.new(dfa, text)
+
+      while t.has_next do
+        tk = t.read
+        puts tk
+      end
+    end
+  end
+
   def build_file
     f = File.new('diskfile.txt','w')
     1000.times{f.write("aa baa bbb ")}

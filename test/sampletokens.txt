@@ -1,10 +1,22 @@
 # Sample token definitions
 
 # Whitespace includes a comment, which starts with '//' and
-# extends to the end of the line:
+# extends to the end of the line; or, c-style comments /* ... */
 #
 # 0
-WS: ( [\f\r\s\t\n]+ ) | ( // [^\n]* \n? )
+WS:   ( [\f\r\s\t\n]+ ) \
+    | ( // [^\n]* \n? ) \
+    | ( /\*  ((\** [^*/] ) | [^*])*  \*+ / )
+
+# c-style comment can be described as:
+#
+# '/*'
+# followed by any number of either
+#      any number of * followed by something other than * or /
+#   or any number of something other than *
+# followed by one or more *
+# followed by /
+#
 
 # An anonymous token, for convenience; a non-empty sequence of digits
 #
