@@ -13,7 +13,7 @@ WS:   ( [\f\r\s\t\n]+ ) \
 # '/*'
 # followed by any number of either
 #      any number of * followed by something other than * or /
-#   or any number of something other than *
+#   or something other than *
 # followed by one or more *
 # followed by /
 #
