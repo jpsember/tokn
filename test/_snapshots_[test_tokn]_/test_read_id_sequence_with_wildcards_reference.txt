@@ -1,39 +1,39 @@
 
                  FOUND
 
-   (line 1, col 1)   : speed
-   (line 1, col 6)   : =
-   (line 1, col 7)   : 42
+   (line 3, col 1)   : speed
+   (line 3, col 7)   : =
+   (line 3, col 9)   : 42
 
                  FOUND
 
-   (line 1, col 9)   : gravity
-   (line 1, col 16)  : =
-   (line 1, col 17)  : -9.80
-(line 1, col 22)  : {
+   (line 4, col 1)   : gravity
+   (line 4, col 9)   : =
+   (line 4, col 11)  : -9.80
+(line 6, col 1)   : {
 
                  FOUND
 
-   (line 1, col 23)  : color
-   (line 1, col 28)  : =
-   (line 1, col 29)  : green
-(line 1, col 34)  : }
+   (line 6, col 3)   : color
+   (line 6, col 9)   : =
+   (line 6, col 11)  : green
+(line 6, col 17)  : }
 
                  FOUND
 
-   (line 1, col 35)  : title
-   (line 1, col 40)  : =
-   (line 1, col 41)  : 'This is a string with \' an escaped delimiter'
-(line 1, col 88)  : if
+   (line 8, col 1)   : title
+   (line 8, col 7)   : =
+   (line 8, col 9)   : 'This is a string with \' an escaped delimiter'
+(line 10, col 1)  : if
  ...not found
-(line 1, col 90)  : gravity
-(line 1, col 97)  : ==
-(line 1, col 106) : 12
-(line 1, col 108) : {
-(line 1, col 109) : do
+(line 10, col 4)  : gravity
+(line 10, col 12) : ==
+(line 10, col 22) : 12
+(line 10, col 25) : {
+(line 11, col 3)  : do
  ...not found
-(line 1, col 111) : something
-(line 1, col 120) : }
-(line 1, col 130) : do
+(line 11, col 6)  : something
+(line 12, col 1)  : }
+(line 14, col 1)  : do
  ...not found
-(line 1, col 132) : something_else
+(line 14, col 4)  : something_else

@@ -91,7 +91,10 @@ class Tokenizer
 
         best_text = skip_chars(bestLength)
 
-        next if bestId == @skipTokenId
+        if bestId == @skipTokenId
+          advance_cursor_for_token_text(best_text)
+          next
+        end
 
         peekToken = Token.new(bestId, best_text, 1 + @lineNumber, 1 + @column)
 
@@ -108,6 +111,16 @@ class Tokenizer
     ret
   end
 
+  def advance_cursor_for_token_text(text)
+    text.length.times do |i|
+      c = text[i]
+      @column += 1
+      if c == "\n"
+        @lineNumber += 1
+        @column = 0
+      end
+    end
+  end
 
   # Read next token
   #
@@ -132,17 +145,7 @@ class Tokenizer
 
     @history_pointer += 1
 
-    # Advance cursor, line number, column
-
-    tl = token.text.length
-    tl.times do |i|
-      c = token.text[i]
-      @column += 1
-      if c == "\n"
-        @lineNumber += 1
-        @column = 0
-      end
-    end
+    advance_cursor_for_token_text(token.text)
     token
   end
 
