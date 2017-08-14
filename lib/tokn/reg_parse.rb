@@ -328,6 +328,8 @@ module ToknInternal
       tokInfo = nil
       if @tokenDefMap
         tokInfo = @tokenDefMap[name]
+        # Leading underscore is optional in this instance, as a convenience
+        tokInfo ||= @tokenDefMap["_#{name}"]
       end
       if !tokInfo
         abort "Undefined token"
