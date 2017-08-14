@@ -30,7 +30,7 @@ _DIG: \d+
 DBL: \-?(({DIG}(.{DIG})?)|.{DIG})
 
 # 2
-INT: \-?{DIG}
+INT: \-?$DIG
 
 # 3
 LBL: '([^'\n]|\\')*'
