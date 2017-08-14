@@ -37,6 +37,7 @@ module ToknInternal
   #
   #   P -> '(' E ')'
   #      | '{' TOKENNAME '}'
+  #      | '$' TOKENNAME
   #      | BRACKETEXPR
   #      | CODE_SET
   #
@@ -315,12 +316,23 @@ module ToknInternal
     end
 
     TOKENREF_EXPR = Regexp.new('^[_A-Za-z][_A-Za-z0-9]*$')
+    TOKENCHAR_EXPR = Regexp.new('[_A-Za-z0-9]')
 
     def parseTokenDef
-      read('{')
+      delim = read
       name = ''
-      while !readIf('}')
-        name += read
+      if delim == '$'
+        while true
+          q = peek(0)
+          break if q !~ TOKENCHAR_EXPR
+          name += read
+        end
+      else
+        while true
+          q = read
+          break if q == '}'
+          name += q
+        end
       end
       if name  !~ TOKENREF_EXPR
         abort "Problem with token name"
@@ -350,7 +362,7 @@ module ToknInternal
         read
         e1 = parseE
         read ')'
-      elsif ch == '{'
+      elsif ch == '{' || ch == '$'
         e1 = parseTokenDef
       elsif ch == '['
         e1 = parseBRACKETEXPR
