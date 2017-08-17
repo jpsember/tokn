@@ -459,9 +459,30 @@ module ToknInternal
       end
     end
 
-    def construct_complement(e1)
-      puts "...not implemented: constructed complement of NFA"
-      e1
+    def construct_complement(states)
+      nfa_start, nfa_end = states
+      puts "\n\nconstruct_complement\n"
+
+      puts dump_states(nfa_start)
+
+      nfa_end.finalState = true
+
+      dfa_start_state = DFABuilder.nfa_to_dfa(nfa_start)
+
+      puts "dfa start state: #{dfa_start_state}"
+      puts "\nDFA states:"
+      puts dump_states(dfa_start_state)
+
+      [dfa_start_state,dfa_start_state]
+    end
+
+    def dump_states(s)
+      stateSet,_,_ = s.reachableStates
+      str = ""
+      stateSet.each do |x|
+        str << x.to_s << "\n"
+      end
+      str
     end
 
   end

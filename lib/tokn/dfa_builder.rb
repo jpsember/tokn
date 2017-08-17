@@ -38,7 +38,7 @@ module ToknInternal
       # Don't regenerate the partition; it is still valid
       # for this second build process
       #
-      dfa = bld.build(false, true) # don't partition, but do normalize
+      dfa_start_state = bld.build(false, true) # don't partition, but do normalize
 
       # If there are edges that contain more than one token identifier,
       # remove all but the first (i.e. the one with the highest token id)
@@ -58,7 +58,7 @@ module ToknInternal
           lbl.difference!(CodeSet.new(primeId+1, EPSILON))
         end
       end
-      dfa
+      dfa_start_state
     end
 
     # Constructs a builder object

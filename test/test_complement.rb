@@ -34,7 +34,7 @@ class TestComplement < JSTest
     Tokn::Tokenizer.new(build_dfa_from_script, sampleText, 'WS')
   end
 
-  def test_Tokenizer
+  def test_Complement
     tok = build_tokenizer_from_script
 
     while tok.has_next
