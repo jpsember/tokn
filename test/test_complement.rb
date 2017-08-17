@@ -31,25 +31,17 @@ class TestComplement < JSTest
   end
 
   def build_tokenizer_from_script
-    Tokn::Tokenizer.new(build_dfa_from_script, sampleText)
+    Tokn::Tokenizer.new(build_dfa_from_script, sampleText, 'WS')
   end
 
   def test_Tokenizer
-
     tok = build_tokenizer_from_script
 
-    tokList = []
     while tok.has_next
       t = tok.read
-      tokList.push(t)
+      puts "#{tok.name_of(t)}: '#{t.text}'"
     end
 
-    tok.unread(tokList.size)
-
-    tokList.each do |t1|
-      tName = tok.name_of(t1)
-      tok.read(tName)
-    end
   end
 
 end

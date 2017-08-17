@@ -1,5 +1,9 @@
 # Sample token definitions
 
+# Unknown tokens should have lowest priority, so they are declared first
+#
+UNKNOWN: [\u0000-\uffff]
+
 WS:   ( [\f\r\s\t\n]+ ) \
     | ( \# [^\n]* \n? )
 
@@ -7,3 +11,4 @@ WS:   ( [\f\r\s\t\n]+ ) \
 NOTBC: ^( B | C)
 
 A: A
+
