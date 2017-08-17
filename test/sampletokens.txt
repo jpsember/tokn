@@ -27,7 +27,7 @@ _DIG: \d+
 #
 # 1
 #
-DBL: \-?(({DIG}(.{DIG})?)|.{DIG})
+DBL: \-?(($DIG(.$DIG)?)|.$DIG)
 
 # 2
 INT: \-?$DIG
