@@ -461,28 +461,16 @@ module ToknInternal
 
     def construct_complement(states)
       nfa_start, nfa_end = states
-      puts "\n\nconstruct_complement\n"
-
-      puts dump_states(nfa_start)
+      puts "\n\nconstruct_complement of:\n"
+      puts nfa_start.describe_state_machine
 
       nfa_end.finalState = true
 
       dfa_start_state = DFABuilder.nfa_to_dfa(nfa_start)
 
-      puts "dfa start state: #{dfa_start_state}"
       puts "\nDFA states:"
-      puts dump_states(dfa_start_state)
-
+      puts dfa_start_state.describe_state_machine
       [dfa_start_state,dfa_start_state]
-    end
-
-    def dump_states(s)
-      stateSet,_,_ = s.reachableStates
-      str = ""
-      stateSet.each do |x|
-        str << x.to_s << "\n"
-      end
-      str
     end
 
   end

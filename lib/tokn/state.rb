@@ -306,6 +306,17 @@ class State
     to_s
   end
 
+  # Construct string representation of the state machine reachable from this state
+  #
+  def describe_state_machine
+    state_set,_,_ = self.reachableStates
+    str = ""
+    state_set.sort{|x,y| x.id <=> y.id}.each do |x|
+      str << x.to_s << "\n"
+    end
+    str
+  end
+
 
   private
 
