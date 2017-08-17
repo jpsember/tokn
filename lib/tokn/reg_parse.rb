@@ -141,7 +141,7 @@ module ToknInternal
 
     # Read next character as a hex digit
     #
-    def readHex
+    def read_hex
       v = read.upcase.ord
       if v >= 48 and v < 58
         return v - 48
@@ -214,11 +214,11 @@ module ToknInternal
         if c == '0'
           c = read
           abort "Unsupported escape sequence (#{c})" if !"xX".include? c
-          val = (readHex() << 4) | readHex()
+          val = (read_hex << 4) | read_hex
         elsif "xX".include? c
-          val = (readHex() << 4) | readHex()
+          val = (read_hex << 4) | read_hex
         elsif "uU".include? c
-          val = (readHex() << 12) | (readHex() << 8) | (readHex() << 4) | readHex()
+          val = (read_hex << 12) | (read_hex << 8) | (read_hex << 4) | read_hex
         else
           if c == 'f'
             val = "\f".ord
@@ -259,7 +259,7 @@ module ToknInternal
 
     def parseSET
       code_set = parse_code_set(true)
-      if readIf('-')
+      if read_if('-')
         u = code_set.single_value
         abort "Illegal bracket argument" if u.nil?
         v = parse_code_set(true).single_value
@@ -279,12 +279,12 @@ module ToknInternal
       negated = false
       had_initial_set = false
       while true
-        if !negated && readIf('^')
+        if !negated && read_if('^')
           negated = true
           expecting_set = true
         end
 
-        if !expecting_set && readIf(']')
+        if !expecting_set && read_if(']')
           break
         end
 
@@ -380,7 +380,7 @@ module ToknInternal
 
     def parseE
       e1 = parseJ
-      if readIf('|')
+      if read_if('|')
         e2 = parseE
 
         u = newState
@@ -436,7 +436,7 @@ module ToknInternal
       @char_buffer[position]
     end
 
-    def readIf(expChar)
+    def read_if(expChar)
       found = (peek(0) == expChar)
       if found
         read
