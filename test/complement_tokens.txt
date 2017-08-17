@@ -1,0 +1,9 @@
+# Sample token definitions
+
+WS:   ( [\f\r\s\t\n]+ ) \
+    | ( \# [^\n]* \n? )
+
+
+NOTBC: ^( B | C)
+
+A: A

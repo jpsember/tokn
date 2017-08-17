@@ -38,6 +38,7 @@ module ToknInternal
   #   P -> '(' E ')'
   #      | '{' TOKENNAME '}'
   #      | '$' TOKENNAME
+  #      | '^' P
   #      | BRACKETEXPR
   #      | CODE_SET
   #
@@ -362,6 +363,10 @@ module ToknInternal
         read
         e1 = parseE
         read ')'
+      elsif ch == '^'
+        read
+        e1 = parseP
+        e1 = construct_complement(e1)
       elsif ch == '{' || ch == '$'
         e1 = parseTokenDef
       elsif ch == '['
@@ -453,6 +458,12 @@ module ToknInternal
         abort 'Unexpected end of input'
       end
     end
+
+    def construct_complement(e1)
+      puts "...not implemented: constructed complement of NFA"
+      e1
+    end
+
   end
 
 end  # module ToknInternal
