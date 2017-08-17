@@ -460,17 +460,95 @@ module ToknInternal
     end
 
     def construct_complement(states)
+      v = false
+
       nfa_start, nfa_end = states
-      puts "\n\nconstruct_complement of:\n"
-      puts nfa_start.describe_state_machine
+
+      if v
+        puts "\n\nconstruct_complement of:\n"
+        puts nfa_start.describe_state_machine
+      end
 
       nfa_end.finalState = true
 
       dfa_start_state = DFABuilder.nfa_to_dfa(nfa_start)
 
-      puts "\nDFA states:"
-      puts dfa_start_state.describe_state_machine
-      [dfa_start_state,dfa_start_state]
+      states, _, _ = dfa_start_state.reachableStates
+      if v
+        puts "\nDFA states:"
+        puts dfa_start_state.describe_state_machine
+      end
+
+      f = State.new(states.size)
+      puts "built new final state: #{f.id}" if v
+
+      # + Let S be the DFA's start state
+      # + Create F, a new state to be the final state
+      # + for each state X in the DFA:
+      #     i) construct C, a set of labels that is the complement of the union of any existing edge labels from X
+      #     ii) if C is nonempty, and there were at least some edges, add transition on C from X to F
+      # + if X is not a final state, add e-transition from X to F
+      # + clear all final state flags from the DFA
+      # + return [S, F]
+      #
+      # Actually, we want to construct a mapping from the DFA to new states within
+      # the current reg exp, and return [S', F']
+      #
+
+      states.add(f)
+
+      states.each do |x|
+        puts "processing state: #{x}" if v
+        next if x == f
+
+        codeset = CodeSet.new(0,CODEMAX)
+        if !x.edges.empty?
+          x.edges.each do |crs, s|
+            puts "  edge to #{s}: #{crs}" if v
+            codeset.difference!(crs)
+          end
+          puts " complement of code sets: #{codeset}" if v
+
+          if !codeset.empty?
+            x.addEdge(codeset, f)
+            puts " adding edge to #{f.id} for #{codeset}" if v
+          end
+        end
+
+        if !x.finalState
+          puts " adding e-transition to #{f.id}" if v
+          x.addEps(f)
+        end
+
+      end
+
+      # states.each do |x|
+      #   x.finalState = false
+      # end
+
+      new_state_map = {}
+      states.each do |x|
+        x2 = newState
+        new_state_map[x.id] = x2
+        puts "...mapping #{x.id} --> #{x2.id}" if v
+      end
+
+      states.each do |x|
+        x2 = new_state_map[x.id]
+        x.edges.each do |crs, s|
+          x2.addEdge(crs, new_state_map[s.id])
+        end
+      end
+
+      new_start = new_state_map[dfa_start_state.id]
+      new_end = new_state_map[f.id]
+
+      if v
+        puts "returning new start #{new_start.id}, end #{new_end.id}"
+        puts new_start.describe_state_machine
+      end
+
+      [new_start,new_end]
     end
 
   end
