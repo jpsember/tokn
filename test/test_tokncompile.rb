@@ -4,9 +4,13 @@ require 'js_base/js_test'
 class TestToknCompile < JSTest
 
   def test_ToknCompile
-    TestSnapshot.new.perform do
-      output,_ = scall("ruby bin/tokncompile < test/sampletokens.txt")
-      puts output
+    begin
+      TestSnapshot.new.perform do
+        output,_ = scall("ruby bin/tokncompile < test/sampletokens.txt")
+        puts output
+      end
+    rescue Exception => e
+      raise "*** there was a problem with the test... perhaps try makegem . first?  See Issue #18."
     end
   end
 
