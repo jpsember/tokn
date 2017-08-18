@@ -5,6 +5,8 @@ require 'tokn'
 
 class TestComplement < JSTest
 
+  @@dfa = nil
+
   include ToknInternal
 
   def setup
@@ -26,16 +28,23 @@ class TestComplement < JSTest
   end
 
   def build_dfa_from_script
-    dfa = Tokn::DFA.from_script(sampleTokens)
-    dfa
+    if @@dfa.nil?
+      dfa = Tokn::DFA.from_script(sampleTokens)
+      if true
+        dfa.generate_pdf("../../_SKIP_.pdf")
+      end
+      @@dfa = dfa
+    end
+    @@dfa
   end
 
   def build_tokenizer_from_script
-    Tokn::Tokenizer.new(build_dfa_from_script, sampleText, 'WS')
+    Tokn::Tokenizer.new(build_dfa_from_script, sampleText)
   end
 
   def test_Complement
     tok = build_tokenizer_from_script
+    tok.accept_unknown_tokens = true
 
     while tok.has_next
       t = tok.read

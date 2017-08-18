@@ -188,6 +188,15 @@ module Tokn
       JSON.generate(h)
     end
 
+    def generate_pdf(path)
+      require "tempfile"
+
+      dot_file = Tempfile.new('dotfile')
+      FileUtils.write_text_file(dot_file.path, self.startState.build_dot_file("dfa"))
+      system("dot -o#{path} -Tpdf #{dot_file.path}")
+      dot_file.unlink
+    end
+
 
     private
 
