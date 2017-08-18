@@ -294,10 +294,15 @@ module ToknInternal
     end
 
     def to_s
-      s = self.name
-      s << '(F)' if self.finalState
+      s = ""
+      if self.finalState
+        s << "*"
+      else
+        s << " "
+      end
+      s << self.name
       self.edges.each do |crs, s2|
-        s << "    ->(#{s2.name}|#{crs.to_s})"
+        s << " -> (#{s2.name} | #{crs.to_s})"
       end
       s
     end

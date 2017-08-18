@@ -460,9 +460,20 @@ module ToknInternal
     end
 
     def construct_complement(states)
-      v = false
+      v = true
 
       nfa_start, nfa_end = states
+
+      # Add an e-transition from start to end state,
+      # so that the input NFA accepts e;
+      # this is how we ensure its complement does not.
+      #
+
+      nfa_start.addEps(nfa_end)
+      # ... I think this is getting us in trouble.
+
+
+
 
       if v
         puts "\n\nconstruct_complement of:\n"
@@ -472,42 +483,39 @@ module ToknInternal
       nfa_end.finalState = true
 
       dfa_start_state = DFABuilder.nfa_to_dfa(nfa_start)
-
-      states, _, _ = dfa_start_state.reachableStates
       if v
-        puts "\nDFA states:"
+        puts "\n\nconverted to DFA:\n"
         puts dfa_start_state.describe_state_machine
       end
 
+      states, _, _ = dfa_start_state.reachableStates
+
       f = State.new(states.size)
-      puts "built new final state: #{f.id}" if v
+      f.finalState = true
 
       # + Let S be the DFA's start state
-      # + Create F, a new state to be the final state
-      # + for each state X in the DFA:
-      #     i) construct C, a set of labels that is the complement of the union of any existing edge labels from X
-      #     ii) if C is nonempty, and there were at least some edges, add transition on C from X to F
-      # + if X is not a final state, add e-transition from X to F
-      # + clear all final state flags from the DFA
+      # + Create F, a new final state
+      # + for each state X in the DFA (excluding F):
+      #     + construct C, a set of labels that is the complement of the union of any existing edge labels from X
+      #     + if C is nonempty, add transition on C from X to F
+      #     + if X is not a final state, add e-transition from X to F
+      #     + otherwise, clear X's final state flag
       # + return [S, F]
       #
       # Actually, we want to construct a mapping from the DFA to new states within
       # the current reg exp, and return [S', F']
       #
 
-      states.add(f)
-
       states.each do |x|
         puts "processing state: #{x}" if v
-        next if x == f
 
-        codeset = CodeSet.new(0,CODEMAX)
-        if !x.edges.empty?
+        if !x.finalState
+          codeset = CodeSet.new(0,CODEMAX)
           x.edges.each do |crs, s|
             puts "  edge to #{s}: #{crs}" if v
             codeset.difference!(crs)
           end
-          puts " complement of code sets: #{codeset}" if v
+          puts " complement of edge code sets: #{codeset}" if v
 
           if !codeset.empty?
             x.addEdge(codeset, f)
@@ -518,9 +526,14 @@ module ToknInternal
         if !x.finalState
           puts " adding e-transition to #{f.id}" if v
           x.addEps(f)
+        # else
+        #   x.finalState = false
         end
 
       end
+
+      states.add(f)
+
 
       # states.each do |x|
       #   x.finalState = false
