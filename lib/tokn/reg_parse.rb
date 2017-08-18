@@ -460,20 +460,9 @@ module ToknInternal
     end
 
     def construct_complement(states)
-      v = true
+      v = false
 
       nfa_start, nfa_end = states
-
-      # Add an e-transition from start to end state,
-      # so that the input NFA accepts e;
-      # this is how we ensure its complement does not.
-      #
-
-      nfa_start.addEps(nfa_end)
-      # ... I think this is getting us in trouble.
-
-
-
 
       if v
         puts "\n\nconstruct_complement of:\n"
@@ -495,61 +484,59 @@ module ToknInternal
 
       # + Let S be the DFA's start state
       # + Create F, a new final state
-      # + for each state X in the DFA (excluding F):
+      # + for each state X in the DFA (excluding F), that is not a final state:
       #     + construct C, a set of labels that is the complement of the union of any existing edge labels from X
       #     + if C is nonempty, add transition on C from X to F
-      #     + if X is not a final state, add e-transition from X to F
-      #     + otherwise, clear X's final state flag
-      # + return [S, F]
+      #     + if X is not the start state, add e-transition from X to F
+      # + augment original NFA by copying each state X to a state X' (clearing final state flags)
+      # + return [S', F']
       #
-      # Actually, we want to construct a mapping from the DFA to new states within
-      # the current reg exp, and return [S', F']
-      #
+
+      # We don't process any final states in the above loop, because
+      # we've sort of "lost" once we reach a final state no matter what
+      # edges leave that state.  This is because we're looking for
+      # substrings of the input string to find matches, instead of
+      # just answering a yes/no recognition question for an (entire)
+      # input string.
 
       states.each do |x|
         puts "processing state: #{x}" if v
+        next if x.finalState
+        puts "...not a final state"
 
-        if !x.finalState
-          codeset = CodeSet.new(0,CODEMAX)
-          x.edges.each do |crs, s|
-            puts "  edge to #{s}: #{crs}" if v
-            codeset.difference!(crs)
-          end
-          puts " complement of edge code sets: #{codeset}" if v
+        codeset = CodeSet.new(0,CODEMAX)
+        x.edges.each do |crs, s|
+          puts "  edge to #{s}: #{crs}" if v
+          codeset.difference!(crs)
+        end
+        puts " complement of edge code sets: #{codeset}" if v
 
-          if !codeset.empty?
-            x.addEdge(codeset, f)
-            puts " adding edge to #{f.id} for #{codeset}" if v
-          end
+        if !codeset.empty?
+          x.addEdge(codeset, f)
+          puts " adding edge to #{f.id} for #{codeset}" if v
         end
 
-        if !x.finalState
+        if x != dfa_start_state
           puts " adding e-transition to #{f.id}" if v
           x.addEps(f)
-        # else
-        #   x.finalState = false
         end
-
       end
 
       states.add(f)
 
-
-      # states.each do |x|
-      #   x.finalState = false
-      # end
-
+      # Build a map from the DFA state ids to new states within the NFA we're constructing
+      #
       new_state_map = {}
       states.each do |x|
-        x2 = newState
-        new_state_map[x.id] = x2
-        puts "...mapping #{x.id} --> #{x2.id}" if v
+        x_new = newState
+        new_state_map[x.id] = x_new
+        puts "...mapping #{x.id} --> #{x_new.id}" if v
       end
 
       states.each do |x|
-        x2 = new_state_map[x.id]
-        x.edges.each do |crs, s|
-          x2.addEdge(crs, new_state_map[s.id])
+        x_new = new_state_map[x.id]
+        x.edges.each do |code_set, dest_state|
+          x_new.addEdge(code_set, new_state_map[dest_state.id])
         end
       end
 
