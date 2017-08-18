@@ -8,7 +8,7 @@ WS:   ( [\f\r\s\t\n]+ ) \
     | ( \# [^\n]* \n? )
 
 
-NOTBC: ^( B | C)
+NOTZULU: ^(ZULU)
 
 A: A
 
