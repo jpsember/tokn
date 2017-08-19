@@ -1,6 +1,5 @@
-WS: (\n | \r | \t \s)+
+WS: (\n | \r | \t | \s)+
 
-# Why does \s not produce space?
 _TX: [^\n\r\t\s]+
 
 _KEYWORD: abc
