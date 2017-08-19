@@ -30,7 +30,7 @@ class TestComplement < JSTest
   def build_dfa_from_script
     if @@dfa.nil?
       dfa = Tokn::DFA.from_script(sampleTokens)
-      if true
+      if false
         dfa.startState.generate_pdf("../../_SKIP_.pdf")
       end
       @@dfa = dfa
@@ -43,14 +43,19 @@ class TestComplement < JSTest
   end
 
   def test_Complement
-    tok = build_tokenizer_from_script
-    tok.accept_unknown_tokens = true
+    begin
+      TestSnapshot.new.perform do
+        tok = build_tokenizer_from_script
+        tok.accept_unknown_tokens = true
 
-    while tok.has_next
-      t = tok.read
-      puts "#{tok.name_of(t)}: '#{t.text}'"
+        while tok.has_next
+          t = tok.read
+          puts "#{tok.name_of(t)}: '#{t.text}'"
+        end
+      end
+    rescue Exception => e
+      raise "*** there was a problem with the test... perhaps try makegem . first?  See Issue #18."
     end
-
   end
 
 end

@@ -460,7 +460,7 @@ module ToknInternal
     end
 
     def construct_complement(states)
-      v = true
+      v = false
 
       nfa_start, nfa_end = states
 
@@ -483,11 +483,12 @@ module ToknInternal
       states, _, _ = dfa_start_state.reachableStates
 
       f = State.new(states.size)
-      #f.finalState = true
 
       # + Let S be the DFA's start state
       # + Create F, a new final state
-      # + for each state X in the DFA (excluding F), that is not a final state:
+      # + for each state X in the DFA (excluding F):
+      #   + if X is a final state, clear its final state flag;
+      #   + otherwise:
       #     + construct C, a set of labels that is the complement of the union of any existing edge labels from X
       #     + if C is nonempty, add transition on C from X to F
       #     + if X is not the start state, add e-transition from X to F
@@ -506,7 +507,7 @@ module ToknInternal
         puts "processing state: #{x}" if v
 
         if x.finalState
-          puts "...a final state"
+          puts "...a final state" if v
           x.finalState = false
           next
         end
@@ -523,23 +524,16 @@ module ToknInternal
           puts " adding edge to #{f.id} for #{codeset}" if v
         end
 
-        # if x != dfa_start_state
-          puts " adding e-transition to #{f.id}" if v
-          x.addEps(f)
-        # end
-
-        #x.finalState = false
+        puts " adding e-transition to #{f.id}" if v
+        x.addEps(f)
       end
       f.finalState = true
-
 
       if v
         puts "\n\ncomplemented:\n"
         puts dfa_start_state.describe_state_machine
         dfa_start_state.generate_pdf("../../_SKIP_dfa_complemented.pdf")
       end
-
-
 
       states.add(f)
 

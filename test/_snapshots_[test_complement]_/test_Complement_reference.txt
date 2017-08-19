@@ -1,0 +1,5 @@
+NONSPECIAL: 'xyz '
+NONSPECIAL: 'abc '
+SPECIAL: '123abcdef '
+NONSPECIAL: '789ab012
+'
