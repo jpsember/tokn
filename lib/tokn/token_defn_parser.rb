@@ -1,5 +1,5 @@
-require 'tokn/reg_parse'
-require 'tokn/dfa_builder'
+require_relative 'reg_parse'
+require_relative 'dfa_builder'
 
 module ToknInternal
 
@@ -82,7 +82,7 @@ module ToknInternal
 
         # Strip whitespace only from the left side (which will strip all of
         # it, if the entire line is whitespace).  We want to preserve any
-        # special escaped whitespace on the right side. 
+        # special escaped whitespace on the right side.
         line.lstrip!
 
         # If line is empty, or starts with '#', it's a comment

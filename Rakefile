@@ -6,3 +6,7 @@ Rake::TestTask.new do |t|
   t.verbose = false
 end
 
+desc "Quick experiment"
+task :exp do
+  system("ruby lib/tokn/experiment.rb < test/exptokens.txt")
+end

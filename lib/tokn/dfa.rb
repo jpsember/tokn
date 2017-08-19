@@ -1,5 +1,5 @@
 require 'json'
-require 'tokn/token_defn_parser'
+require_relative 'token_defn_parser'
 
 module Tokn
 

@@ -1,4 +1,4 @@
-require 'tokn/range_partition'
+require_relative 'range_partition'
 
 module ToknInternal
 
@@ -43,6 +43,7 @@ module ToknInternal
       # If there are edges that contain more than one token identifier,
       # remove all but the first (i.e. the one with the highest token id)
 
+      filtered_edges_found = false
       stSet, _, _ = dfa.reachableStates
       stSet.each do |s|
         s.edges.each do |lbl, dest|
@@ -54,10 +55,27 @@ module ToknInternal
           primeId = a[0]
 
           next if primeId >= EPSILON-1
+          filtered_edges_found = true
 
           lbl.difference!(CodeSet.new(primeId+1, EPSILON))
         end
       end
+
+      puts "filtered edges found: #{filtered_edges_found}"
+      if filtered_edges_found
+        puts "minimizing again"
+        dfa_start_state.generate_pdf("_SKIP_experiment_0.pdf")
+        rev = dfa_start_state.reverseNFA
+        bld = DFABuilder.new(rev)
+        dfa_start_state = bld.build(true, false)  # partition, but don't normalize
+        dfa_start_state.generate_pdf("_SKIP_experiment_1.pdf")
+
+        rev2 = dfa_start_state.reverseNFA()
+        bld = DFABuilder.new(rev2)
+        dfa_start_state = bld.build(false, true) # don't partition, but do normalize
+        dfa_start_state.generate_pdf("_SKIP_experiment_2.pdf")
+      end
+
       dfa_start_state
     end
 

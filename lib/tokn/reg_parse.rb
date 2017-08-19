@@ -1,6 +1,6 @@
-require 'tokn/code_set'
-require 'tokn/state'
-require 'tokn/tokn_const'
+require_relative 'code_set'
+require_relative 'state'
+require_relative 'tokn_const'
 
 module ToknInternal
 
