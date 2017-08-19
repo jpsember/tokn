@@ -224,7 +224,7 @@ module ToknInternal
           if c == 'f'
             val = "\f".ord
           elsif c == 'r'
-            val == "\r".ord
+            val = "\r".ord
           elsif c == 'n'
             val = "\n".ord
           elsif c == 't'
