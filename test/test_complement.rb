@@ -31,7 +31,7 @@ class TestComplement < JSTest
     if @@dfa.nil?
       dfa = Tokn::DFA.from_script(sampleTokens)
       if true
-        dfa.generate_pdf("../../_SKIP_.pdf")
+        dfa.startState.generate_pdf("../../_SKIP_.pdf")
       end
       @@dfa = dfa
     end

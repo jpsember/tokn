@@ -460,13 +460,15 @@ module ToknInternal
     end
 
     def construct_complement(states)
-      v = false
+      v = true
 
       nfa_start, nfa_end = states
 
       if v
         puts "\n\nconstruct_complement of:\n"
         puts nfa_start.describe_state_machine
+
+        nfa_start.generate_pdf("../../_SKIP_nfa.pdf")
       end
 
       nfa_end.finalState = true
@@ -475,12 +477,13 @@ module ToknInternal
       if v
         puts "\n\nconverted to DFA:\n"
         puts dfa_start_state.describe_state_machine
+        dfa_start_state.generate_pdf("../../_SKIP_dfa.pdf")
       end
 
       states, _, _ = dfa_start_state.reachableStates
 
       f = State.new(states.size)
-      f.finalState = true
+      #f.finalState = true
 
       # + Let S be the DFA's start state
       # + Create F, a new final state
@@ -501,8 +504,12 @@ module ToknInternal
 
       states.each do |x|
         puts "processing state: #{x}" if v
-        next if x.finalState
-        puts "...not a final state"
+
+        if x.finalState
+          puts "...a final state"
+          x.finalState = false
+          next
+        end
 
         codeset = CodeSet.new(0,CODEMAX)
         x.edges.each do |crs, s|
@@ -516,11 +523,23 @@ module ToknInternal
           puts " adding edge to #{f.id} for #{codeset}" if v
         end
 
-        if x != dfa_start_state
+        # if x != dfa_start_state
           puts " adding e-transition to #{f.id}" if v
           x.addEps(f)
-        end
+        # end
+
+        #x.finalState = false
       end
+      f.finalState = true
+
+
+      if v
+        puts "\n\ncomplemented:\n"
+        puts dfa_start_state.describe_state_machine
+        dfa_start_state.generate_pdf("../../_SKIP_dfa_complemented.pdf")
+      end
+
+
 
       states.add(f)
 

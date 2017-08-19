@@ -150,6 +150,17 @@ module ToknInternal
       g
     end
 
+
+    def generate_pdf(path)
+      require "tempfile"
+
+      dot_file = Tempfile.new('dotfile')
+      FileUtils.write_text_file(dot_file.path, self.build_dot_file("dfa"))
+      system("dot -o#{path} -Tpdf #{dot_file.path}")
+      dot_file.unlink
+    end
+
+
     # Normalize a state
     #
     #  [] merge edges that go to a common state

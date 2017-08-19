@@ -1,3 +1,10 @@
-NOTA: ^(A)
+WS: (\n | \r | \t \s)+
 
-B: B
+# Why does \s not produce space?
+_TX: [^\n\r\t\s]+
+
+_KEYWORD: abc
+
+NONSPECIAL: ^($TX $KEYWORD $TX) $WS
+
+SPECIAL: $TX $KEYWORD $TX $WS
