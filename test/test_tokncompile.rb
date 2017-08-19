@@ -5,7 +5,7 @@ class TestToknCompile < JSTest
 
   def test_ToknCompile
     begin
-      TestSnapshot.new.perform true do
+      TestSnapshot.new.perform do
         output,_ = scall("ruby bin/tokncompile < test/sampletokens.txt")
         puts output
       end
