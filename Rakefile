@@ -8,5 +8,5 @@ end
 
 desc "Quick experiment"
 task :exp do
-  system("ruby lib/tokn/experiment.rb < test/exptokens.txt")
+  system("ruby lib/tokn/experiment.rb < test/sampletokens.txt")
 end
