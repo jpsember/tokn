@@ -30,12 +30,10 @@ module ToknInternal
       # produces a minimal DFA.
 
       start_state = start_state.reverseNFA
-      bld = DFABuilder.new(start_state)
-      start_state = bld.build
+      start_state = build_dfa_from_nfa(start_state)
 
       start_state = start_state.reverseNFA
-      bld = DFABuilder.new(start_state)
-      start_state = bld.build
+      start_state = build_dfa_from_nfa(start_state)
 
       State.normalizeStates(start_state)
 
@@ -119,6 +117,11 @@ module ToknInternal
     end
 
     private
+
+    def self.build_dfa_from_nfa(start_state)
+      bld = DFABuilder.new(start_state)
+      bld.build
+    end
 
     # Adds a DFA state for a set of NFA states, if one doesn't already exist
     # for the set
