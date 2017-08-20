@@ -23,12 +23,13 @@ module ToknInternal
 
       exp = false
 
+      partitionEdges(start_state)
+
       # Reverse this NFA, convert to DFA, then
       # reverse it, and convert it again.  Apparently this
       # produces a minimal DFA.
 
       start_state = start_state.reverseNFA
-      partitionEdges(start_state)
       bld = DFABuilder.new(start_state)
       start_state = bld.build
 
