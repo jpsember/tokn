@@ -19,36 +19,35 @@ module ToknInternal
 
     # Convert an NFA to a DFA.
     #
-    # @param startState the start state of the NFA
-    #
-    def self.nfa_to_dfa(startState)
+    def self.nfa_to_dfa(start_state)
+
+      exp = false
 
       # Reverse this NFA, convert to DFA, then
       # reverse it, and convert it again.  Apparently this
       # produces a minimal DFA.
 
-      rev = startState.reverseNFA
-
+      rev = start_state.reverseNFA
       bld = DFABuilder.new(rev)
-      dfa = bld.build(true)
+      start_state = bld.build(true)
 
-      rev2 = dfa.reverseNFA()
-      bld = DFABuilder.new(rev2)
+      rev = start_state.reverseNFA
+      bld = DFABuilder.new(rev)
 
       # Don't regenerate the partition; it is still valid
       # for this second build process
       #
-      dfa_start_state = bld.build(false) # don't partition
-      
-      #dfa_start_state.generate_pdf("_SKIP_experiment_0.pdf")
-      State.normalizeStates(dfa_start_state)
-      #dfa_start_state.generate_pdf("_SKIP_experiment_1.pdf")
+      start_state = bld.build(false) # don't partition
+
+      State.normalizeStates(start_state)
+
+      start_state.generate_pdf("_SKIP_prefilter.pdf") if exp
 
       # If there are edges that contain more than one token identifier,
       # remove all but the first (i.e. the one with the highest token id)
 
-      filtered_edges_found = false
-      stSet, _, _ = dfa.reachableStates
+      stSet, _, _ = start_state.reachableStates
+
       stSet.each do |s|
         s.edges.each do |lbl, dest|
           a = lbl.elements
@@ -57,33 +56,17 @@ module ToknInternal
           end
 
           primeId = a[0]
-
           next if primeId >= EPSILON-1
-          filtered_edges_found = true
 
           lbl.difference!(CodeSet.new(primeId+1, EPSILON))
         end
       end
 
-      if false
-      puts "filtered edges found: #{filtered_edges_found}"
-      if filtered_edges_found
-        puts "minimizing again"
-        dfa_start_state.generate_pdf("_SKIP_experiment_0.pdf")
-        rev = dfa_start_state.reverseNFA
-        bld = DFABuilder.new(rev)
-        dfa_start_state = bld.build(true)
-        dfa_start_state.generate_pdf("_SKIP_experiment_1.pdf")
+      start_state.generate_pdf("_SKIP_postfilter.pdf") if exp
 
-        rev2 = dfa_start_state.reverseNFA()
-        bld = DFABuilder.new(rev2)
-        dfa_start_state = bld.build(false)
-        State.normalizeStates(dfa_start_state)
-        dfa_start_state.generate_pdf("_SKIP_experiment_2.pdf")
-      end
-      end
+      raise "aborting for experiment" if exp
 
-      dfa_start_state
+      start_state
     end
 
     # Constructs a builder object

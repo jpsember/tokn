@@ -152,6 +152,8 @@ module ToknInternal
 
 
     def generate_pdf(path)
+      puts "======= Generating: #{path}"
+
       require "tempfile"
 
       dot_file = Tempfile.new('dotfile')
