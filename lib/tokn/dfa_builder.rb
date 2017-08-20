@@ -40,22 +40,7 @@ module ToknInternal
 
       start_state.generate_pdf("_SKIP_prefilter.pdf") if exp
 
-      # If there are edges that contain more than one token identifier,
-      # remove all but the first (i.e. the one with the highest token id)
-
-      stSet, _, _ = start_state.reachableStates
-
-      stSet.each do |s|
-        s.edges.each do |lbl, dest|
-          a = lbl.elements
-          next if a.size == 0
-
-          primeId = a[0]
-          next if primeId >= EPSILON-1
-
-          lbl.difference!(CodeSet.new(primeId+1, EPSILON))
-        end
-      end
+      filter_extraneous_token_edges(start_state)
 
       start_state.generate_pdf("_SKIP_postfilter.pdf") if exp
 
@@ -218,6 +203,25 @@ module ToknInternal
         end
       end
 
+    end
+
+    # If there are edges that contain more than one token identifier,
+    # remove all but the first (i.e. the one with the highest token id)
+    #
+    def self.filter_extraneous_token_edges(start_state)
+      stSet, _, _ = start_state.reachableStates
+
+      stSet.each do |s|
+        s.edges.each do |lbl, dest|
+          a = lbl.elements
+          next if a.size == 0
+
+          primeId = a[0]
+          next if primeId >= EPSILON-1
+
+          lbl.difference!(CodeSet.new(primeId+1, EPSILON))
+        end
+      end
     end
 
 
