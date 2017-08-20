@@ -1,5 +1,10 @@
-WS:   ( [\f\r\s\t\n]+ )
+WS: \n
 
-ID:  [_a-zA-Z][_a-zA-Z0-9]*
+_LS: [a-z]*
 
 KEYWORD: foo
+
+EXP: \( ^( ($LS $KEYWORD $LS) | ($LS \) $LS)) \)
+
+UNKNOWN: [^\0x0a]
+
