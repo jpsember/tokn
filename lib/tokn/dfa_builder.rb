@@ -27,17 +27,14 @@ module ToknInternal
       # reverse it, and convert it again.  Apparently this
       # produces a minimal DFA.
 
-      rev = start_state.reverseNFA
-      bld = DFABuilder.new(rev)
-      start_state = bld.build(true)
+      start_state = start_state.reverseNFA
+      partitionEdges(start_state)
+      bld = DFABuilder.new(start_state)
+      start_state = bld.build
 
-      rev = start_state.reverseNFA
-      bld = DFABuilder.new(rev)
-
-      # Don't regenerate the partition; it is still valid
-      # for this second build process
-      #
-      start_state = bld.build(false) # don't partition
+      start_state = start_state.reverseNFA
+      bld = DFABuilder.new(start_state)
+      start_state = bld.build
 
       State.normalizeStates(start_state)
 
@@ -51,9 +48,7 @@ module ToknInternal
       stSet.each do |s|
         s.edges.each do |lbl, dest|
           a = lbl.elements
-          if a.size == 0
-            next
-          end
+          next if a.size == 0
 
           primeId = a[0]
           next if primeId >= EPSILON-1
@@ -89,11 +84,7 @@ module ToknInternal
 
     # Perform the build algorithm
     #
-    # @param partition if true, partitions the edge labels into disjoint code sets
-    #
-    def build(partition = true)
-
-      !partition || partitionEdges(@nfaStart)
+    def build
 
       iset = Set.new
       iset.add(@nfaStart)
@@ -202,7 +193,7 @@ module ToknInternal
     # of characters.  See the notes at the start of this class,
     # as well as RangePartition.rb.
     #
-    def partitionEdges(startState)
+    def self.partitionEdges(startState)
 
       par = RangePartition.new
 
