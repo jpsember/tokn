@@ -30,7 +30,7 @@ module ToknInternal
       rev = startState.reverseNFA
 
       bld = DFABuilder.new(rev)
-      dfa = bld.build(true, false)  # partition, but don't normalize
+      dfa = bld.build(true)
 
       rev2 = dfa.reverseNFA()
       bld = DFABuilder.new(rev2)
@@ -38,7 +38,11 @@ module ToknInternal
       # Don't regenerate the partition; it is still valid
       # for this second build process
       #
-      dfa_start_state = bld.build(false, true) # don't partition, but do normalize
+      dfa_start_state = bld.build(false) # don't partition
+      
+      #dfa_start_state.generate_pdf("_SKIP_experiment_0.pdf")
+      State.normalizeStates(dfa_start_state)
+      #dfa_start_state.generate_pdf("_SKIP_experiment_1.pdf")
 
       # If there are edges that contain more than one token identifier,
       # remove all but the first (i.e. the one with the highest token id)
@@ -61,19 +65,22 @@ module ToknInternal
         end
       end
 
+      if false
       puts "filtered edges found: #{filtered_edges_found}"
       if filtered_edges_found
         puts "minimizing again"
         dfa_start_state.generate_pdf("_SKIP_experiment_0.pdf")
         rev = dfa_start_state.reverseNFA
         bld = DFABuilder.new(rev)
-        dfa_start_state = bld.build(true, false)  # partition, but don't normalize
+        dfa_start_state = bld.build(true)
         dfa_start_state.generate_pdf("_SKIP_experiment_1.pdf")
 
         rev2 = dfa_start_state.reverseNFA()
         bld = DFABuilder.new(rev2)
-        dfa_start_state = bld.build(false, true) # don't partition, but do normalize
+        dfa_start_state = bld.build(false)
+        State.normalizeStates(dfa_start_state)
         dfa_start_state.generate_pdf("_SKIP_experiment_2.pdf")
+      end
       end
 
       dfa_start_state
@@ -100,9 +107,8 @@ module ToknInternal
     # Perform the build algorithm
     #
     # @param partition if true, partitions the edge labels into disjoint code sets
-    # @param normalize if true, normalizes the states afterward
     #
-    def build(partition = true, normalize = true)
+    def build(partition = true)
 
       !partition || partitionEdges(@nfaStart)
 
@@ -149,11 +155,6 @@ module ToknInternal
         end
 
       end
-
-      if normalize
-        State.normalizeStates(@dfaStart)
-      end
-
       @dfaStart
     end
 
