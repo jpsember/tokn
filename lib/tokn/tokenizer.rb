@@ -42,7 +42,10 @@ class Tokenizer
   #
   def peek
 
+    v = false
+
     if @history_pointer == @token_history.size
+      puts "...peeking for next token" if v
       while true # repeat until we find a non-skipped token, or run out of text
         break if !peek_char(0)
 
@@ -52,8 +55,10 @@ class Tokenizer
         charOffset = 0
         state = @dfa.startState
         while true
-          ch = peek_char(charOffset)
-          ch = ch.ord if ch
+          ch = 0
+          next_char = peek_char(charOffset)
+          puts " state:#{state.name} next char: #{next_char}" if v
+          ch = next_char.ord if next_char
 
           nextState = nil
 
@@ -67,24 +72,24 @@ class Tokenizer
           edges = state.edges
           edges.each do |lbl,dest|
             a = lbl.elements
+            puts "   label: #{lbl} elements:#{a}" if v
             if a[0] < ToknInternal::EPSILON
               newTokenId = ToknInternal::edge_label_to_token_id(a[0])
+              #puts "    token id: #{newTokenId} length: #{charOffset}" if v
 
-              if (bestLength < charOffset || newTokenId > bestId)
+              # We don't want a longer, lower-valued token overriding a higher-valued one
+              if (newTokenId > bestId || (newTokenId == bestId && charOffset > bestLength))
                 bestLength, bestId = charOffset, newTokenId
+                puts "    new best length: #{bestLength} id: #{bestId}" if v
               end
             end
 
             if ch && lbl.contains?(ch)
               nextState = dest
-              break
             end
           end
 
-          if !nextState
-            break
-          end
-          break if !ch
+          break if !nextState || !ch
           state = nextState
           charOffset += 1
         end

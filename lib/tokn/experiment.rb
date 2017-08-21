@@ -6,6 +6,10 @@ require_relative 'token'
 require_relative 'tokenizer_exception'
 
 text = FileUtils.read_text_file("test/exptext.txt")
+
+# Remove any final linefeeds to see how end-of-input is treated
+text = text.strip
+
 puts "Tokenizing:"
 puts text
 puts

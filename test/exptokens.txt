@@ -1,10 +1,4 @@
-WS: \n
+WS: \n | \s
 
-_LS: [a-z]*
-
-KEYWORD: foo
-
-EXP: \( ^( ($LS $KEYWORD $LS) | ($LS \) $LS)) \)
-
-UNKNOWN: [^\0x0a]
-
+GENERAL: [a-z]+
+SPECIFIC: abc
