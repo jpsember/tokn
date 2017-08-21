@@ -246,6 +246,7 @@ module ToknInternal
       if value.nil?
         state.edges.each do |lbl, dest|
           next unless dest.finalState
+          puts "....calculating value for state from edge: #{lbl.elements}"
           a = lbl.elements
           primeId = a[0]
           value = ToknInternal::edge_label_to_token_id(primeId)
@@ -259,14 +260,7 @@ module ToknInternal
     end
 
     def marker_value_for(state)
-      marker_value = @node_markers[state.id]
-      if marker_value.nil?
-        marker_value =  node_value(state)
-        store_marker_value(state, marker_value)
-        puts "             (init marker value for #{state.name} to #{marker_value})"
-      end
-
-      marker_value
+      @node_markers[state.id]
     end
 
     def store_marker_value(state, marker_value)
@@ -286,8 +280,6 @@ module ToknInternal
       state_ids_processed = Set.new
       @state_list = []
 
-      marker_min = -1
-
       @node_markers = {}
       @node_values = {}
 
@@ -300,7 +292,14 @@ module ToknInternal
         @state_list << state
 
         marker_value = marker_value_for(state)
-        puts "    marker value: #{marker_value}"
+        state_value = node_value(state)
+        if !marker_value.nil?
+          marker_value = [marker_value, state_value].max
+        else
+          marker_value = state_value
+        end
+
+        puts "    marker: #{marker_value_for(state)} state:#{state_value} max:#{marker_value}"
 
         state.edges.each do |lbl, dest|
           next if dest.finalState
@@ -308,7 +307,12 @@ module ToknInternal
           dest_value = node_value(dest)
           puts "     value: #{dest_value}"
 
-          dest_marker_value = [marker_value,dest_value].max
+          dest_marker_value = marker_value_for(dest)
+          if dest_marker_value.nil?
+            dest_marker_value = marker_value
+          end
+          dest_marker_value = [dest_marker_value, marker_value].min
+          dest_marker_value = [dest_marker_value, dest_value].max
 
           store_marker_value(dest, dest_marker_value)
 
