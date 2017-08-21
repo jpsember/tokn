@@ -21,7 +21,7 @@ module ToknInternal
     #
     def self.nfa_to_dfa(start_state)
 
-      exp = false
+      exp = true
 
       partitionEdges(start_state)
 
@@ -45,6 +45,8 @@ module ToknInternal
       if false
         filter_extraneous_token_edges(start_state)
       end
+
+      filter_useless_edges(start_state)
 
       start_state.generate_pdf("_SKIP_postfilter.pdf") if exp
 
@@ -233,7 +235,112 @@ module ToknInternal
       end
     end
 
+    def self.node_value(state, node_values)
+      value = node_values[state.id]
+      if value.nil?
+        state.edges.each do |lbl, dest|
+          #token_id = -1
+          a = lbl.elements
+          if a.empty?
+            raise "unexpectedly empty elements on edge label...?"
+          end
 
-  end
+          if !a.empty?
+            primeId = a[0]
+            if primeId < ToknInternal::EPSILON
+              raise "duplicate token edges" unless value.nil?
+              value = ToknInternal::edge_label_to_token_id(primeId)
+            end
+          end
+        end
+        if value.nil?
+          value = -1
+        end
+        node_values[state.id] = value
+        puts "             (init node value for #{state.name} to #{value})"
+      end
+      value
+    end
+
+    def self.marker_value_for(state, marker_values, node_values)
+      marker_value = marker_values[state.id]
+      if marker_value.nil?
+        marker_value = self.node_value(state, node_values)
+        self.store_marker_value(state, marker_values, marker_value)
+        puts "             (init marker value for #{state.name} to #{marker_value})"
+      end
+
+      marker_value
+    end
+
+    def self.store_marker_value(state, marker_values, marker_value)
+      old_marker_value = marker_values[state.id]
+      if old_marker_value.nil? || (old_marker_value < marker_value)
+        puts "         (updating marker value for #{state.name} to: #{marker_value})"
+        marker_values[state.id] = marker_value
+      end
+    end
+
+    def self.filter_useless_edges(start_state)
+
+      puts
+      puts "============== filter useless edges"
+      puts
+
+      state_ids_processed = Set.new
+      state_list = []
+
+      marker_min = -1
+
+      node_markers = {}
+
+      node_values = {}
+
+      queue = [start_state]
+      state_ids_processed.add(start_state.id)
+
+      while !queue.empty?
+        state = queue.shift
+        puts "...popped state: #{state.name}"
+        state_list << state
+
+        marker_value = self.marker_value_for(state, node_markers, node_values)
+        puts "    marker value: #{marker_value}"
+
+        state.edges.each do |lbl, dest|
+          a = lbl.elements
+          primeId = a[0]
+
+          # Skip edge if it's a token value
+          next if primeId < ToknInternal::EPSILON
+
+          puts "    edge to: #{dest.name}"
+
+          dest_value = self.node_value(dest, node_values)
+          puts "     value: #{dest_value}"
+
+
+          dest_marker_value = [marker_value,dest_value].max
+
+          self.store_marker_value(dest, node_markers, dest_marker_value)
+
+          if !state_ids_processed.include?(dest.id)
+            state_ids_processed.add(dest.id)
+            queue << dest
+          end
+        end
+      end
+
+
+      state_list.each do |state|
+        puts "State #{state.name} value:#{self.node_value(state, node_values)} marker:#{self.marker_value_for(state,node_markers,node_values)}"
+      end
+
+    end
+
+
+
+
+  end # class DFABuilder
 
 end  # module ToknInternal
