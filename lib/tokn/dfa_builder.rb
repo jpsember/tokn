@@ -282,6 +282,8 @@ module ToknInternal
 
       @node_markers = {}
       @node_values = {}
+      @node_markers[start_state.id] = node_value(start_state)
+
 
       queue = [start_state]
       state_ids_processed.add(start_state.id)
@@ -323,23 +325,23 @@ module ToknInternal
         end
       end
 
+      puts start_state.describe_state_machine
       remove_useless_edges
 
     end
 
     def remove_useless_edges
       @state_list.each do |state|
-        puts "State #{state.name} value:#{node_value(state)} marker:#{marker_value_for(state)}"
 
         state.edges.each do |lbl, dest|
-          next unless dest.finalState
+          next if dest.finalState
 
-          marker_value = marker_value_for(state)
-          state_value = node_value(state)
+          source_marker_value = marker_value_for(state)
+          dest_marker_value = marker_value_for(dest)
 
-          next unless marker_value > state_value
+          next unless source_marker_value > dest_marker_value
 
-          puts " marker value #{marker_value} exceeds state value #{state_value}"
+          puts " source marker value #{state.name}:#{source_marker_value} exceeds dest marker value #{dest.name}:#{dest_marker_value}"
         end
       end
     end
