@@ -22,15 +22,15 @@ WS:   ( [\f\r\s\t\n]+ ) \
 #
 _DIG: \d+
 
-# Double has lower priority than int; we want ints to
-# be interpreted as ints, not as doubles
-#
+# Double has higher priority than int, since we don't want the prefix of the double
+# to be intpreted as an int
+
 # 1
-#
-DBL: \-?(($DIG(.$DIG)?)|.$DIG)
+INT: \-?$DIG
 
 # 2
-INT: \-?$DIG
+#
+DBL: \-?([0] | ([1-9]\d*)) . \d+
 
 # 3
 LBL: '([^'\n]|\\')*'

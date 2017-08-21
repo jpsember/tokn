@@ -27,9 +27,9 @@ class TestTokn3 < JSTest
   def test_continue_line_with_backslash_not_at_end
     # Note there's a space between the backslash and the linefeed; this will be interpreted
     # as an escaped space, not as a 'line stitch' command
-    script = "A: ab\\ \nB: ab"
+    script = "A: aa\\ \nB: ab"
     dfa = Tokn::DFA.from_script(script)
-    tok = Tokn::Tokenizer.new(dfa,"abab ab")
+    tok = Tokn::Tokenizer.new(dfa,"abaa ab")
     tok.read(1)
     tok.read(0)
     tok.read(1)
@@ -37,9 +37,9 @@ class TestTokn3 < JSTest
   end
 
   def test_continue_line_with_multiple_backslash
-    script = "A: ab\\\\\\\\\\\nab\nB: ab"
+    script = "A: ab\\\\\\\\\\\nab\nB: bb"
     dfa = Tokn::DFA.from_script(script)
-    tok = Tokn::Tokenizer.new(dfa,"abab\\\\abab")
+    tok = Tokn::Tokenizer.new(dfa,"bbab\\\\abbb")
     tok.read(1)
     tok.read(0)
     tok.read(1)

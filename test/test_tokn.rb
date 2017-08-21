@@ -232,7 +232,7 @@ END
       while t.has_next do
         tk = t.read
         if tk.text == 'speed'
-          tokens = t.read_sequence([5,2,4])
+          tokens = t.read_sequence([5,1,4])
           report_seq(tokens)
         end
       end

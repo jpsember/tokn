@@ -7,10 +7,9 @@ class TestTokenizer < JSTest
 
     tok =<<-'eos'
       WS: [\s\t\n]+
-      # Double has lower priority than int; we want ints to
-      # be interpreted as ints, not as doubles
-      DBL: \-?((\d(.\d)?)|.\d)
+      # Double has higher priority than int, so the double's prefix is not treated as an int
       INT: \-?\d
+      DBL: \-?([0] | ([1-9]\d*)) . \d+
     eos
 
     script =<<-'eos'
@@ -27,10 +26,9 @@ class TestTokenizer < JSTest
 
     tok =<<-'eos'
       WS: [\s\t\n]+
-      # Here INT appears before DBL, which will cause no INTs to
-      # be produced since every INT also matches a DBL, and DBL has higher precedence
+      # Here INT appears after DBL, which will cause double's prefix to be interpreted as an int
+      DBL: \-?([0] | ([1-9]\d*)) . \d+
       INT: \-?\d
-      DBL: \-?((\d(.\d)?)|.\d)
     eos
 
     script =<<-'eos'

@@ -55,7 +55,7 @@ class Tokenizer
         charOffset = 0
         state = @dfa.startState
         while true
-          ch = 0
+          ch = nil
           next_char = peek_char(charOffset)
           puts " state:#{state.name} next char: #{next_char}" if v
           ch = next_char.ord if next_char
