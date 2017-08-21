@@ -333,7 +333,9 @@ module ToknInternal
     def remove_useless_edges
       @state_list.each do |state|
 
-        state.edges.each do |lbl, dest|
+        remove_list = []
+        state.edges.each_with_index do |edge,edge_index|
+          lbl, dest = edge
           next if dest.finalState
 
           source_marker_value = marker_value_for(state)
@@ -342,7 +344,12 @@ module ToknInternal
           next unless source_marker_value > dest_marker_value
 
           puts " source marker value #{state.name}:#{source_marker_value} exceeds dest marker value #{dest.name}:#{dest_marker_value}"
+          remove_list << edge_index
         end
+
+        # Remove the useless edges in reverse order, since indices change as we remove them
+        remove_list.reverse.each { |x| state.remove_edge(x)}
+
       end
     end
 

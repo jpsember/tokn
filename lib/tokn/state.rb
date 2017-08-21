@@ -49,6 +49,10 @@ module ToknInternal
       @edges.push([codeSet, destState])
     end
 
+    def remove_edge(edge_index)
+      @edges.delete_at(edge_index) or raise "bad index"
+    end
+
     # Add a e-transition edge
     #  destState : destination state
     #
