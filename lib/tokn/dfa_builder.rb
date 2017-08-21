@@ -254,7 +254,6 @@ module ToknInternal
           value = -1
         end
         @node_values[state.id] = value
-        puts "             (init node value for #{state.name} to #{value})"
       end
       value
     end
@@ -304,14 +303,8 @@ module ToknInternal
         puts "    marker value: #{marker_value}"
 
         state.edges.each do |lbl, dest|
-          a = lbl.elements
-          primeId = a[0]
-
-          # Skip edge if it's a token value
-          next if primeId < ToknInternal::EPSILON
-
+          next if dest.finalState
           puts "    edge to: #{dest.name}"
-
           dest_value = node_value(dest)
           puts "     value: #{dest_value}"
 
