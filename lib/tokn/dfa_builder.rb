@@ -39,7 +39,12 @@ module ToknInternal
 
       start_state.generate_pdf("_SKIP_prefilter.pdf") if exp
 
-      filter_extraneous_token_edges(start_state)
+      # Don't do this filtering step, as we need to leave the
+      # multiple token values intact for our new filtering algorithm
+      # to work properly
+      if false
+        filter_extraneous_token_edges(start_state)
+      end
 
       start_state.generate_pdf("_SKIP_postfilter.pdf") if exp
 
