@@ -45,7 +45,7 @@ module ToknInternal
       if false
         filter_extraneous_token_edges(start_state)
       end
- 
+
       Filter.new.apply(start_state)
 
       start_state.generate_pdf("_SKIP_postfilter.pdf") if exp
@@ -251,13 +251,11 @@ module ToknInternal
             raise "unexpectedly empty elements on edge label...?"
           end
 
-          if !a.empty?
             primeId = a[0]
             if primeId < ToknInternal::EPSILON
               raise "duplicate token edges" unless value.nil?
               value = ToknInternal::edge_label_to_token_id(primeId)
             end
-          end
         end
         if value.nil?
           value = -1
@@ -294,7 +292,7 @@ module ToknInternal
       puts
 
       state_ids_processed = Set.new
-      state_list = []
+      @state_list = []
 
       marker_min = -1
 
@@ -307,7 +305,7 @@ module ToknInternal
       while !queue.empty?
         state = queue.shift
         puts "...popped state: #{state.name}"
-        state_list << state
+        @state_list << state
 
         marker_value = marker_value_for(state)
         puts "    marker value: #{marker_value}"
@@ -324,7 +322,6 @@ module ToknInternal
           dest_value = node_value(dest)
           puts "     value: #{dest_value}"
 
-
           dest_marker_value = [marker_value,dest_value].max
 
           store_marker_value(dest, dest_marker_value)
@@ -336,11 +333,25 @@ module ToknInternal
         end
       end
 
+      remove_useless_edges
 
-      state_list.each do |state|
+    end
+
+    def remove_useless_edges
+      @state_list.each do |state|
         puts "State #{state.name} value:#{node_value(state)} marker:#{marker_value_for(state)}"
-      end
 
+        state.edges.each do |lbl, dest|
+          next unless dest.finalState
+
+          marker_value = marker_value_for(state)
+          state_value = node_value(state)
+
+          next unless marker_value > state_value
+
+          puts " marker value #{marker_value} exceeds state value #{state_value}"
+        end
+      end
     end
 
   end # class Filter
