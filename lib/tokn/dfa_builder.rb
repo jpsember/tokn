@@ -45,8 +45,8 @@ module ToknInternal
       if false
         filter_extraneous_token_edges(start_state)
       end
-
-      filter_useless_edges(start_state)
+ 
+      Filter.new.apply(start_state)
 
       start_state.generate_pdf("_SKIP_postfilter.pdf") if exp
 
@@ -235,8 +235,14 @@ module ToknInternal
       end
     end
 
-    def self.node_value(state, node_values)
-      value = node_values[state.id]
+  end # class DFABuilder
+
+
+
+  class Filter
+
+    def node_value(state)
+      value = @node_values[state.id]
       if value.nil?
         state.edges.each do |lbl, dest|
           #token_id = -1
@@ -256,32 +262,32 @@ module ToknInternal
         if value.nil?
           value = -1
         end
-        node_values[state.id] = value
+        @node_values[state.id] = value
         puts "             (init node value for #{state.name} to #{value})"
       end
       value
     end
 
-    def self.marker_value_for(state, marker_values, node_values)
-      marker_value = marker_values[state.id]
+    def marker_value_for(state)
+      marker_value = @node_markers[state.id]
       if marker_value.nil?
-        marker_value = self.node_value(state, node_values)
-        self.store_marker_value(state, marker_values, marker_value)
+        marker_value =  node_value(state)
+        store_marker_value(state, marker_value)
         puts "             (init marker value for #{state.name} to #{marker_value})"
       end
 
       marker_value
     end
 
-    def self.store_marker_value(state, marker_values, marker_value)
-      old_marker_value = marker_values[state.id]
+    def store_marker_value(state, marker_value)
+      old_marker_value = @node_markers[state.id]
       if old_marker_value.nil? || (old_marker_value < marker_value)
         puts "         (updating marker value for #{state.name} to: #{marker_value})"
-        marker_values[state.id] = marker_value
+        @node_markers[state.id] = marker_value
       end
     end
 
-    def self.filter_useless_edges(start_state)
+    def apply(start_state)
 
       puts
       puts "============== filter useless edges"
@@ -292,9 +298,8 @@ module ToknInternal
 
       marker_min = -1
 
-      node_markers = {}
-
-      node_values = {}
+      @node_markers = {}
+      @node_values = {}
 
       queue = [start_state]
       state_ids_processed.add(start_state.id)
@@ -304,7 +309,7 @@ module ToknInternal
         puts "...popped state: #{state.name}"
         state_list << state
 
-        marker_value = self.marker_value_for(state, node_markers, node_values)
+        marker_value = marker_value_for(state)
         puts "    marker value: #{marker_value}"
 
         state.edges.each do |lbl, dest|
@@ -316,13 +321,13 @@ module ToknInternal
 
           puts "    edge to: #{dest.name}"
 
-          dest_value = self.node_value(dest, node_values)
+          dest_value = node_value(dest)
           puts "     value: #{dest_value}"
 
 
           dest_marker_value = [marker_value,dest_value].max
 
-          self.store_marker_value(dest, node_markers, dest_marker_value)
+          store_marker_value(dest, dest_marker_value)
 
           if !state_ids_processed.include?(dest.id)
             state_ids_processed.add(dest.id)
@@ -333,14 +338,11 @@ module ToknInternal
 
 
       state_list.each do |state|
-        puts "State #{state.name} value:#{self.node_value(state, node_values)} marker:#{self.marker_value_for(state,node_markers,node_values)}"
+        puts "State #{state.name} value:#{node_value(state)} marker:#{marker_value_for(state)}"
       end
 
     end
 
-
-
-
-  end # class DFABuilder
+  end # class Filter
 
 end  # module ToknInternal
