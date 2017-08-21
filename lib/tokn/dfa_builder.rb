@@ -245,17 +245,10 @@ module ToknInternal
       value = @node_values[state.id]
       if value.nil?
         state.edges.each do |lbl, dest|
-          #token_id = -1
+          next unless dest.finalState
           a = lbl.elements
-          if a.empty?
-            raise "unexpectedly empty elements on edge label...?"
-          end
-
-            primeId = a[0]
-            if primeId < ToknInternal::EPSILON
-              raise "duplicate token edges" unless value.nil?
-              value = ToknInternal::edge_label_to_token_id(primeId)
-            end
+          primeId = a[0]
+          value = ToknInternal::edge_label_to_token_id(primeId)
         end
         if value.nil?
           value = -1
