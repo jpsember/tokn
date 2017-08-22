@@ -2,6 +2,8 @@ require_relative 'range_partition'
 
 module ToknInternal
 
+  EXP = false
+
   # Converts NFAs (nondeterministic, finite state automata) to
   # minimal DFAs.
   #
@@ -17,18 +19,38 @@ module ToknInternal
   #
   class DFABuilder
 
+
     # Convert an NFA to a DFA.
     #
     def self.nfa_to_dfa(start_state)
 
-      exp = true
-
       partitionEdges(start_state)
 
+      start_state = self.minimize(start_state)
+
+      start_state.generate_pdf("_SKIP_prefilter.pdf") if EXP
+
+      start_state.generate_pdf("_SKIP_prefilter.pdf") if EXP
+
+      filter = Filter.new
+      filter.apply(start_state)
+      if filter.modified
+        # Re-minimize the dfa, since it's been modified by the filter
+        start_state = self.minimize(start_state)
+        start_state.generate_pdf("_SKIP_postfilter.pdf") if EXP
+      end
+
+      raise "aborting for experiment" if EXP
+
+      start_state
+    end
+
+    def self.minimize(nfa_start_state)
       # Reverse this NFA, convert to DFA, then
       # reverse it, and convert it again.  Apparently this
       # produces a minimal DFA.
 
+      start_state = nfa_start_state
       start_state = start_state.reverseNFA
       start_state = build_dfa_from_nfa(start_state)
 
@@ -36,22 +58,6 @@ module ToknInternal
       start_state = build_dfa_from_nfa(start_state)
 
       State.normalizeStates(start_state)
-
-      start_state.generate_pdf("_SKIP_prefilter.pdf") if exp
-
-      # Don't do this filtering step, as we need to leave the
-      # multiple token values intact for our new filtering algorithm
-      # to work properly
-      if false
-        filter_extraneous_token_edges(start_state)
-      end
-
-      Filter.new.apply(start_state)
-
-      start_state.generate_pdf("_SKIP_postfilter.pdf") if exp
-
-      raise "aborting for experiment" if exp
-
       start_state
     end
 
@@ -216,37 +222,20 @@ module ToknInternal
 
     end
 
-    # If there are edges that contain more than one token identifier,
-    # remove all but the first (i.e. the one with the highest token id)
-    #
-    def self.filter_extraneous_token_edges(start_state)
-      stSet, _, _ = start_state.reachableStates
-
-      stSet.each do |s|
-        s.edges.each do |lbl, dest|
-          a = lbl.elements
-          next if a.size == 0
-
-          primeId = a[0]
-          next if primeId >= EPSILON-1
-
-          lbl.difference!(CodeSet.new(primeId+1, EPSILON))
-        end
-      end
-    end
-
   end # class DFABuilder
 
 
 
   class Filter
 
+    attr_reader :modified
+
     def node_value(state)
       value = @node_values[state.id]
       if value.nil?
         state.edges.each do |lbl, dest|
           next unless dest.finalState
-          puts "....calculating value for state from edge: #{lbl.elements}"
+          puts "....calculating value for state from edge: #{lbl.elements}" if EXP
           a = lbl.elements
           primeId = a[0]
           value = ToknInternal::edge_label_to_token_id(primeId)
@@ -266,17 +255,20 @@ module ToknInternal
     def store_marker_value(state, marker_value)
       old_marker_value = @node_markers[state.id]
       if old_marker_value.nil? || (old_marker_value < marker_value)
-        puts "         (updating marker value for #{state.name} to: #{marker_value})"
+        puts "         (updating marker value for #{state.name} to: #{marker_value})" if EXP
         @node_markers[state.id] = marker_value
       end
     end
 
     def apply(start_state)
 
-      puts
-      puts "============== filter useless edges"
-      puts
+      if EXP
+        puts
+        puts "============== filter useless edges"
+        puts
+      end
 
+      @modified = false
       state_ids_processed = Set.new
       @state_list = []
 
@@ -284,13 +276,12 @@ module ToknInternal
       @node_values = {}
       @node_markers[start_state.id] = node_value(start_state)
 
-
       queue = [start_state]
       state_ids_processed.add(start_state.id)
 
       while !queue.empty?
         state = queue.shift
-        puts "...popped state: #{state.name}"
+        puts "...popped state: #{state.name}" if EXP
         @state_list << state
 
         marker_value = marker_value_for(state)
@@ -301,13 +292,13 @@ module ToknInternal
           marker_value = state_value
         end
 
-        puts "    marker: #{marker_value_for(state)} state:#{state_value} max:#{marker_value}"
+        puts "    marker: #{marker_value_for(state)} state:#{state_value} max:#{marker_value}" if EXP
 
         state.edges.each do |lbl, dest|
           next if dest.finalState
-          puts "    edge to: #{dest.name}"
+          puts "    edge to: #{dest.name}" if EXP
           dest_value = node_value(dest)
-          puts "     value: #{dest_value}"
+          puts "     value: #{dest_value}" if EXP
 
           dest_marker_value = marker_value_for(dest)
           if dest_marker_value.nil?
@@ -325,10 +316,11 @@ module ToknInternal
         end
       end
 
-      puts start_state.describe_state_machine
+      puts start_state.describe_state_machine if EXP
       remove_useless_edges
-
+      filter_multiple_tokens_within_edge
     end
+
 
     def remove_useless_edges
       @state_list.each do |state|
@@ -343,13 +335,34 @@ module ToknInternal
 
           next unless source_marker_value > dest_marker_value
 
-          puts " source marker value #{state.name}:#{source_marker_value} exceeds dest marker value #{dest.name}:#{dest_marker_value}"
+          puts " source marker value #{state.name}:#{source_marker_value} exceeds dest marker value #{dest.name}:#{dest_marker_value}" if EXP
           remove_list << edge_index
         end
+
+        next if remove_list.empty?
+
+        @modified = true
 
         # Remove the useless edges in reverse order, since indices change as we remove them
         remove_list.reverse.each { |x| state.remove_edge(x)}
 
+      end
+    end
+
+    def filter_multiple_tokens_within_edge
+      @state_list.each do |state|
+        state.edges.each do |lbl, dest|
+          next unless dest.finalState
+          a = lbl.elements
+          primeId = a[0]
+          exp = primeId + 1
+
+          if a[1] != exp
+            puts "...removing multiple tokens from: #{lbl}" if EXP
+            lbl.difference!(CodeSet.new(exp, EPSILON))
+            @modified = true
+          end
+        end
       end
     end
 
