@@ -156,6 +156,9 @@ module ToknInternal
 
 
     def generate_pdf(path)
+      # Put the pdf within OSX's Desktop
+      path = "#{Dir.home}/Desktop/#{File.basename(path)}"
+
       puts "======= Generating: #{path}"
 
       require "tempfile"

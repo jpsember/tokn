@@ -19,10 +19,9 @@ module ToknInternal
   #
   class DFABuilder
 
-
     # Convert an NFA to a DFA.
     #
-    def self.nfa_to_dfa(start_state)
+    def self.nfa_to_dfa(start_state, apply_filter = true)
 
       partitionEdges(start_state)
 
@@ -32,12 +31,14 @@ module ToknInternal
 
       start_state.generate_pdf("_SKIP_prefilter.pdf") if EXP
 
-      filter = Filter.new
-      filter.apply(start_state)
-      if filter.modified
-        # Re-minimize the dfa, since it's been modified by the filter
-        start_state = self.minimize(start_state)
-        start_state.generate_pdf("_SKIP_postfilter.pdf") if EXP
+      if apply_filter
+        filter = Filter.new
+        filter.apply(start_state)
+        if filter.modified
+          # Re-minimize the dfa, since it's been modified by the filter
+          start_state = self.minimize(start_state)
+          start_state.generate_pdf("_SKIP_postfilter.pdf") if EXP
+        end
       end
 
       raise "aborting for experiment" if EXP
@@ -365,6 +366,9 @@ module ToknInternal
           next unless dest.finalState
           a = lbl.elements
           primeId = a[0]
+
+          raise "expected token definitions on transition to final state" if primeId >= EPSILON
+
           exp = primeId + 1
 
           if a[1] != exp

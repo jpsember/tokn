@@ -473,7 +473,7 @@ module ToknInternal
 
       nfa_end.finalState = true
 
-      dfa_start_state = DFABuilder.nfa_to_dfa(nfa_start)
+      dfa_start_state = DFABuilder.nfa_to_dfa(nfa_start, false) # don't apply filter here
       if v
         puts "\n\nconverted to DFA:\n"
         puts dfa_start_state.describe_state_machine
