@@ -1,2 +1,8 @@
 WS:   ( [\s\n]+ )
 LBL: '([^'\n]|\\')*'
+
+
+# This disallows unescaped backslashes, and is what we want,
+# but the unit tests pass
+#
+# LBL: '   (  [^'\\\n] |  (\\')  )*    '
