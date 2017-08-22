@@ -337,7 +337,7 @@ module ToknInternal
 
         remove_list = []
         state.edges.each_with_index do |edge,edge_index|
-          lbl, dest = edge
+          _, dest = edge
           next if dest.finalState
 
           source_marker_value = marker_value_for(state)

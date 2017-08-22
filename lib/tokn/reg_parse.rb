@@ -96,7 +96,6 @@ module ToknInternal
 
       escaped = false
 
-      prev_ch = nil
       for pos in 0..s.length - 1
         ch = s[pos]
 
