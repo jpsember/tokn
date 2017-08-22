@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'js_base/js_test'
 require 'tokn'
 
@@ -45,7 +43,7 @@ class TestTopSort < JSTest
     end
     str.strip!
 
-    assert_equal("huh", str)
+    assert_equal("0 2 1 5 6 4 3", str)
   end
 
 end
