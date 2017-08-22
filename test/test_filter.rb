@@ -37,8 +37,7 @@ class TestFilter < JSTest
 
   def test_Filter
     tok = build_tokenizer_from_script
-    tok.read("X")
-    tok.read("X")
+    tok.read("LBL")
     tok.read("WS")
     assert(!tok.has_next)
   end
