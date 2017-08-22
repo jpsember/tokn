@@ -1,1 +1,2 @@
 abcabc
+!!!  this unrecognized character will generate a zero-length token

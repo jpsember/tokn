@@ -264,10 +264,11 @@ module ToknInternal
 
       if EXP
         puts
-        puts "============== filter useless edges"
+        puts "============== apply useless edge filter"
         puts
       end
 
+      @start_state = start_state
       @modified = false
       state_ids_processed = Set.new
       @state_list = []
@@ -319,8 +320,17 @@ module ToknInternal
       puts start_state.describe_state_machine if EXP
       remove_useless_edges
       filter_multiple_tokens_within_edge
+      disallow_zero_length_tokens
+
     end
 
+    def disallow_zero_length_tokens
+      @start_state.edges.each do |lbl, dest|
+        if dest.finalState
+          raise "DFA recognizes zero-length tokens!"
+        end
+      end
+    end
 
     def remove_useless_edges
       @state_list.each do |state|

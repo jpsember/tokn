@@ -2,3 +2,7 @@ WS: \n | \s
 
 GENERAL: [a-z]+
 SPECIFIC: abc
+
+# Define a token that can be of zero length, to produce an error
+#
+ZEROLENGTH: \d*
