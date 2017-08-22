@@ -55,7 +55,7 @@ END
     s = x.startState
     x.endState.finalState = true
     s.reverseNFA()
-    s_dfa = DFABuilder.nfa_to_dfa(s)
+    s_dfa = DFABuilder.nfa_to_dfa(s, false)
     TestSnapshot.new.perform do
       puts s_dfa.build_dot_file("dfa")
     end
@@ -68,7 +68,7 @@ END
     TestSnapshot.new.perform do
       puts s.build_dot_file("nfa")
     end
-    dfa = DFABuilder.nfa_to_dfa(s)
+    dfa = DFABuilder.nfa_to_dfa(s, false)
 
     oldToNewMap, _ = dfa.duplicateNFA(42)
     oldToNewMap[dfa]
