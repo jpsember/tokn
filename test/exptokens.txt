@@ -1,3 +1,4 @@
-ID:  [_a-z]+
+WS: \n | \s
 
-IF: if
+GENERAL: [a-z]+
+SPECIFIC: abc
