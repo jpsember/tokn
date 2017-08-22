@@ -1,1 +1,1 @@
-'escaped \' delimiter'
+aabaa

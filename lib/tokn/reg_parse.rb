@@ -68,6 +68,7 @@ module ToknInternal
   #
   class RegParse
 
+    @@counter = 0
     @@digit_code_set = nil
     @@wordchar_code_set = nil
 
@@ -252,6 +253,14 @@ module ToknInternal
       @endState = exp[1]
     end
 
+    # Debug utility to generate a pdf with a unique filename, based on counter
+    #
+    def dump_pdf(start_state)
+      puts "parsed script:\n\n#{start_state.describe_state_machine}"
+      start_state.generate_pdf("_SKIP_parseScript#{@@counter}.pdf")
+      @@counter+=1
+    end
+
     def newState
       s = State.new(@nextStateId)
       @nextStateId += 1
@@ -404,10 +413,11 @@ module ToknInternal
       p = peek(0)
       if p and not "|)".include? p
         e2 = parseJ
+        #dump_pdf(e2[0])
         e1[1].addEps(e2[0])
         e1 = [e1[0],e2[1]]
+        #dump_pdf(e1[0])
       end
-
       return e1
     end
 
@@ -426,7 +436,21 @@ module ToknInternal
         read
         e1[0].addEps(e1[1])
       end
-      e1
+      create_new_final_state_if_nec(e1)
+    end
+
+    # If existing final state has outgoing edges,
+    # then create a new final state, and add an e-transition to it from the old final state,
+    # so the final state has no edges back
+    #
+    def create_new_final_state_if_nec(start_end_states)
+      end_state = start_end_states[1]
+      if !end_state.edges.empty?
+        new_final_state = newState
+        end_state.addEps(new_final_state)
+        start_end_states[1] = new_final_state
+      end
+      start_end_states
     end
 
     def peek(position)
