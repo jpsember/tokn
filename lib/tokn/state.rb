@@ -342,6 +342,16 @@ module ToknInternal
       str
     end
 
+    # Perform a topological sort on NFA with this start state
+    #
+    # Returns array of states, in topological order
+    #
+    def topological_sort
+      states = []
+      states << self
+      states
+    end
+
 
     private
 

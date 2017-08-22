@@ -2,7 +2,7 @@ require_relative 'range_partition'
 
 module ToknInternal
 
-  EXP = true
+  EXP = false
 
   # Converts NFAs (nondeterministic, finite state automata) to
   # minimal DFAs.
