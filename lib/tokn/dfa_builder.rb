@@ -65,16 +65,17 @@ module ToknInternal
 
     attr_accessor :start_state
 
-    # Constructs a builder object
+    def initialize(start_state)
+      @start_state = start_state
+      @built = false
+    end
+
+    # Perform the build algorithm
     #
-    def initialize(start_state_arg)
+    def build
+      raise "already built" if @built
+      @built = true
 
-      # Question: how do we avoid trouble as a result of the argument 'start_state'
-      # having the same name as the attr_accessor method?
-
-      # My solution: add suffix _arg to argument name
-
-      @start_state = start_state_arg
       @nextId = 0
 
       # Build a map of nfa state ids => nfa states
@@ -87,11 +88,6 @@ module ToknInternal
 
       # Map of existing DFA states; key is array of NFA state ids
       @dfaStateMap = {}
-    end
-
-    # Perform the build algorithm
-    #
-    def build
 
       iset = Set.new
       iset.add(start_state)
