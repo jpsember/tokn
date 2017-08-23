@@ -84,7 +84,7 @@ module ToknInternal
       nfas.each {|s| @nfaStateMap[s.id] = s}
 
       # Initialize an array of nfa state lists, indexed by dfa state id
-      @nfaStateLists = []
+      @sorted_nfa_state_id_lists = []
 
       # Map of existing DFA states; key is array of NFA state ids
       @dfaStateMap = {}
@@ -93,14 +93,14 @@ module ToknInternal
       iset.add(start_state)
       DFABuilder.eps_closure(iset)
 
-      @dfaStart,_ = createDFAState(DFABuilder.states_to_sorted_ids(iset))
+      @dfaStart,_ = create_dfa_state_if_necessary(DFABuilder.states_to_sorted_ids(iset))
 
       unmarked = [@dfaStart]
 
       until unmarked.empty?
         dfaState  = unmarked.pop
 
-        nfaIds = @nfaStateLists[dfaState.id]
+        nfaIds = @sorted_nfa_state_id_lists[dfaState.id]
 
         # map of CodeSet => set of NFA states
         moveMap = {}
@@ -124,7 +124,7 @@ module ToknInternal
         moveMap.each_pair do |charRange,nfaStates|
           # May be better to test if already in set before calc closure; or simply has closure
           DFABuilder.eps_closure(nfaStates)
-          dfaDestState, isNew = createDFAState(DFABuilder.states_to_sorted_ids(nfaStates))
+          dfaDestState, isNew = create_dfa_state_if_necessary(DFABuilder.states_to_sorted_ids(nfaStates))
           if isNew
             unmarked.push(dfaDestState)
           end
@@ -172,33 +172,23 @@ module ToknInternal
 
     # Adds a DFA state for a set of NFA states, if one doesn't already exist
     # for the set
-    # @param nfaStateList a sorted array of NFA state ids
+    #
+    # @param sorted_nfa_state_id_list a sorted array of NFA state ids
     # @return a pair [DFA State,
     #                 created flag (boolean): true if this did not already exist]
     #
-    def createDFAState(nfaStateList)
-
-      lst = nfaStateList
-
-      newState = @nfaStateMap[lst]
-      isNewState = !newState
+    def create_dfa_state_if_necessary(sorted_nfa_state_id_list)
+      newState = @nfaStateMap[sorted_nfa_state_id_list]
+      isNewState = newState.nil?
       if isNewState
         newState = State.new(@nextId)
 
         # Determine if any of the NFA states were final states
-        newState.finalState = nfaStateList.any?{|id| @nfaStateMap[id].finalState?}
-
-        if false
-          warning "setting labels..."
-          # Set label of DFA state to show which NFA states produced it
-          # (useful for debugging)
-          newState.label = lst.map {|x| x.to_s}.join(' ')
-        end
+        newState.finalState = sorted_nfa_state_id_list.any?{|id| @nfaStateMap[id].finalState?}
 
         @nextId += 1
-        @nfaStateMap[lst] = newState
-        @nfaStateLists.push(lst)
-
+        @nfaStateMap[sorted_nfa_state_id_list] = newState
+        @sorted_nfa_state_id_lists.push(sorted_nfa_state_id_list)
       end
       return [newState,isNewState]
     end
