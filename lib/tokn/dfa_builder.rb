@@ -22,7 +22,7 @@ module ToknInternal
     #
     def self.nfa_to_dfa(start_state, apply_filter = true)
 
-      partitionEdges(start_state)
+      partition_edges(start_state)
 
       start_state = self.minimize(start_state)
 
@@ -143,6 +143,37 @@ module ToknInternal
     private
 
 
+    # Modify edges so each is labelled with a disjoint subset
+    # of characters.  See the notes at the start of this class,
+    # as well as RangePartition.rb.
+    #
+    def self.partition_edges(start_state)
+
+      par = RangePartition.new
+
+      stateSet, _, _ = start_state.reachableStates
+
+      stateSet.each do |s|
+        s.edges.each {|lbl,dest| par.addSet(lbl) }
+      end
+
+      par.prepare
+
+      stateSet.each do |s|
+        newEdges = []
+        s.edges.each do |lbl, dest|
+          newLbls = par.apply(lbl)
+          newLbls.each {|x| newEdges.push([x, dest]) }
+        end
+        s.clearEdges()
+
+        newEdges.each do |lbl,dest|
+          s.addEdge(lbl,dest)
+        end
+      end
+
+    end
+
     # Adds a DFA state for a set of NFA states, if one doesn't already exist
     # for the set
     # @param nfaStateList a sorted array of NFA state ids
@@ -196,37 +227,6 @@ module ToknInternal
         end
       end
       stateSet
-    end
-
-    # Modify edges so each is labelled with a disjoint subset
-    # of characters.  See the notes at the start of this class,
-    # as well as RangePartition.rb.
-    #
-    def self.partitionEdges(startState)
-
-      par = RangePartition.new
-
-      stateSet, _, _ = startState.reachableStates
-
-      stateSet.each do |s|
-        s.edges.each {|lbl,dest| par.addSet(lbl) }
-      end
-
-      par.prepare
-
-      stateSet.each do |s|
-        newEdges = []
-        s.edges.each do |lbl, dest|
-          newLbls = par.apply(lbl)
-          newLbls.each {|x| newEdges.push([x, dest]) }
-        end
-        s.clearEdges()
-
-        newEdges.each do |lbl,dest|
-          s.addEdge(lbl,dest)
-        end
-      end
-
     end
 
   end # class DFABuilder
