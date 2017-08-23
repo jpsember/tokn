@@ -22,9 +22,11 @@ module ToknInternal
     #
     def self.nfa_to_dfa(start_state, apply_filter = true)
 
-      DFABuilder.new(start_state).partition_edges
+      builder = DFABuilder.new(start_state)
+      builder.partition_edges
+      builder.minimize
 
-      start_state = self.minimize(start_state)
+      start_state = builder.start_state
 
       start_state.generate_pdf("_SKIP_prefilter.pdf") if EXP
 
@@ -35,7 +37,9 @@ module ToknInternal
         filter.apply
         if filter.modified
           # Re-minimize the dfa, since it's been modified by the filter
-          start_state = self.minimize(start_state)
+          builder = DFABuilder.new(start_state)
+          builder.minimize
+          start_state = builder.start_state
           start_state.generate_pdf("_SKIP_postfilter.pdf") if EXP
         end
       end
@@ -45,25 +49,23 @@ module ToknInternal
       start_state
     end
 
+    attr_accessor :start_state
+
     # Construct minimized dfa from nfa
     #
-    def self.minimize(nfa_start_state)
+    def minimize
       # Reverse this NFA, convert to DFA, then
       # reverse it, and convert it again.  Apparently this
       # produces a minimal DFA.
 
-      start_state = nfa_start_state
-      start_state = start_state.reverseNFA
-      start_state = DFABuilder.new(start_state).build
+      self.start_state = self.start_state.reverseNFA
+      self.start_state = DFABuilder.new(self.start_state).build
 
-      start_state = start_state.reverseNFA
-      start_state = DFABuilder.new(start_state).build
+      self.start_state = self.start_state.reverseNFA
+      self.start_state = DFABuilder.new(self.start_state).build
 
-      State.normalizeStates(start_state)
-      start_state
+      State.normalizeStates(self.start_state)
     end
-
-    attr_accessor :start_state
 
     def initialize(start_state)
       @start_state = start_state
@@ -93,9 +95,9 @@ module ToknInternal
       iset.add(start_state)
       eps_closure(iset)
 
-      @dfaStart,_ = create_dfa_state_if_necessary(states_to_sorted_ids(iset))
+      new_start_state,_ = create_dfa_state_if_necessary(states_to_sorted_ids(iset))
 
-      unmarked = [@dfaStart]
+      unmarked = [new_start_state]
 
       until unmarked.empty?
         dfaState  = unmarked.pop
@@ -132,7 +134,8 @@ module ToknInternal
         end
 
       end
-      @dfaStart
+
+      self.start_state = new_start_state
     end
 
     # Modify edges so each is labelled with a disjoint subset
