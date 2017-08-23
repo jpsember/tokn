@@ -4,6 +4,7 @@ module ToknInternal
 
     attr_reader :modified
     attr_reader :start_state
+    attr_accessor :experiment
 
     def initialize(start_state)
       @start_state = start_state
@@ -14,7 +15,7 @@ module ToknInternal
       raise "filter already applied" if @filter_applied
       @filter_applied = true
 
-      if EXP
+      if @experiment
         puts
         puts "============== apply useless edge filter"
         puts
@@ -33,7 +34,7 @@ module ToknInternal
 
       while !queue.empty?
         state = queue.shift
-        puts "...popped state: #{state.name}" if EXP
+        puts "...popped state: #{state.name}" if @experiment
         @state_list << state
 
         marker_value = marker_value_for(state)
@@ -44,13 +45,13 @@ module ToknInternal
           marker_value = state_value
         end
 
-        puts "    marker: #{marker_value_for(state)} state:#{state_value} max:#{marker_value}" if EXP
+        puts "    marker: #{marker_value_for(state)} state:#{state_value} max:#{marker_value}" if @experiment
 
         state.edges.each do |lbl, dest|
           next if dest.finalState
-          puts "    edge to: #{dest.name}" if EXP
+          puts "    edge to: #{dest.name}" if @experiment
           dest_value = node_value(dest)
-          puts "     value: #{dest_value}" if EXP
+          puts "     value: #{dest_value}" if @experiment
 
           dest_marker_value = marker_value_for(dest)
           if dest_marker_value.nil?
@@ -68,8 +69,8 @@ module ToknInternal
         end
       end
 
-      puts start_state.describe_state_machine if EXP
-      #remove_useless_edges
+      puts start_state.describe_state_machine if @experiment
+      remove_useless_edges
       filter_multiple_tokens_within_edge
       disallow_zero_length_tokens
     end
@@ -83,7 +84,7 @@ module ToknInternal
       if value.nil?
         state.edges.each do |lbl, dest|
           next unless dest.finalState
-          puts "....calculating value for state from edge: #{lbl.elements}" if EXP
+          puts "....calculating value for state from edge: #{lbl.elements}" if @experiment
           a = lbl.elements
           primeId = a[0]
           value = ToknInternal::edge_label_to_token_id(primeId)
@@ -103,7 +104,7 @@ module ToknInternal
     def store_marker_value(state, marker_value)
       old_marker_value = @node_markers[state.id]
       if old_marker_value.nil? || (old_marker_value < marker_value)
-        puts "         (updating marker value for #{state.name} to: #{marker_value})" if EXP
+        puts "         (updating marker value for #{state.name} to: #{marker_value})" if @experiment
         @node_markers[state.id] = marker_value
       end
     end
@@ -129,7 +130,7 @@ module ToknInternal
 
           next unless source_marker_value > dest_marker_value
 
-          puts " source marker value #{state.name}:#{source_marker_value} exceeds dest marker value #{dest.name}:#{dest_marker_value}" if EXP
+          puts " source marker value #{state.name}:#{source_marker_value} exceeds dest marker value #{dest.name}:#{dest_marker_value}" if @experiment
           remove_list << edge_index
         end
 
@@ -155,7 +156,7 @@ module ToknInternal
           exp = primeId + 1
 
           if a[1] != exp
-            puts "...removing multiple tokens from: #{lbl}" if EXP
+            puts "...removing multiple tokens from: #{lbl}" if @experiment
             lbl.difference!(CodeSet.new(exp, EPSILON))
             @modified = true
           end

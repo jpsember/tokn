@@ -14,7 +14,7 @@ module ToknInternal
   # Minimum code possible (e.g., indicating a token id)
   CODEMIN = -10000
 
-  EXP = false
+  EXP = true
 
   module_function
 

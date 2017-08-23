@@ -24,7 +24,7 @@ module ToknInternal
 
     def initialize(start_state)
       @start_state = start_state
-      @with_filter = false
+      @with_filter = true
       @experiment = false
     end
 
@@ -39,6 +39,7 @@ module ToknInternal
 
       if @with_filter
         filter = Filter.new(@start_state)
+        filter.experiment = @experiment
         filter.apply
         if filter.modified
           # Re-minimize the dfa, since it's been modified by the filter
