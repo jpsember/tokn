@@ -10,36 +10,6 @@ module ToknInternal
       @filter_applied = false
     end
 
-    def node_value(state)
-      value = @node_values[state.id]
-      if value.nil?
-        state.edges.each do |lbl, dest|
-          next unless dest.finalState
-          puts "....calculating value for state from edge: #{lbl.elements}" if EXP
-          a = lbl.elements
-          primeId = a[0]
-          value = ToknInternal::edge_label_to_token_id(primeId)
-        end
-        if value.nil?
-          value = -1
-        end
-        @node_values[state.id] = value
-      end
-      value
-    end
-
-    def marker_value_for(state)
-      @node_markers[state.id]
-    end
-
-    def store_marker_value(state, marker_value)
-      old_marker_value = @node_markers[state.id]
-      if old_marker_value.nil? || (old_marker_value < marker_value)
-        puts "         (updating marker value for #{state.name} to: #{marker_value})" if EXP
-        @node_markers[state.id] = marker_value
-      end
-    end
-
     def apply
       raise "filter already applied" if @filter_applied
       @filter_applied = true
@@ -102,6 +72,40 @@ module ToknInternal
       #remove_useless_edges
       filter_multiple_tokens_within_edge
       disallow_zero_length_tokens
+    end
+
+
+    private
+
+
+    def node_value(state)
+      value = @node_values[state.id]
+      if value.nil?
+        state.edges.each do |lbl, dest|
+          next unless dest.finalState
+          puts "....calculating value for state from edge: #{lbl.elements}" if EXP
+          a = lbl.elements
+          primeId = a[0]
+          value = ToknInternal::edge_label_to_token_id(primeId)
+        end
+        if value.nil?
+          value = -1
+        end
+        @node_values[state.id] = value
+      end
+      value
+    end
+
+    def marker_value_for(state)
+      @node_markers[state.id]
+    end
+
+    def store_marker_value(state, marker_value)
+      old_marker_value = @node_markers[state.id]
+      if old_marker_value.nil? || (old_marker_value < marker_value)
+        puts "         (updating marker value for #{state.name} to: #{marker_value})" if EXP
+        @node_markers[state.id] = marker_value
+      end
     end
 
     def disallow_zero_length_tokens
