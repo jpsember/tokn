@@ -6,6 +6,8 @@ module ToknInternal
     attr_reader :start_state
     attr_accessor :experiment
 
+    INF_DISTANCE = CODEMAX
+
     def initialize(start_state)
       @start_state = start_state
       @filter_applied = false
@@ -19,57 +21,47 @@ module ToknInternal
         puts
         puts "============== apply useless edge filter"
         puts
+        puts @start_state.describe_state_machine if @experiment
       end
 
       @modified = false
-      state_ids_processed = Set.new
-      @state_list = []
 
-      @node_markers = {}
-      @node_values = {}
-      @node_markers[start_state.id] = node_value(start_state)
+      build_topological_state_list
+      construct_node_values
 
-      queue = [start_state]
-      state_ids_processed.add(start_state.id)
+      @node_distances = {}
+      @node_distances[@start_state.id] = node_value(@start_state)
 
-      while !queue.empty?
-        state = queue.shift
-        puts "...popped state: #{state.name}" if @experiment
-        @state_list << state
+      # Determine minimum distances to each node, as minimum of maximum token values found over all paths ending at node
+      #
+      @state_list.each do |state_u|
+        distance_u = node_distance(state_u)
 
-        marker_value = marker_value_for(state)
-        state_value = node_value(state)
-        if !marker_value.nil?
-          marker_value = [marker_value, state_value].max
-        else
-          marker_value = state_value
-        end
+        puts " processing: #{state_u.name}; distance #{distance_u}" if @experiment
 
-        puts "    marker: #{marker_value_for(state)} state:#{state_value} max:#{marker_value}" if @experiment
+        state_u.edges.each do |lbl, state_v|
+          next if state_v.finalState
+          value_v = node_value(state_v)
+          distance_v = node_distance(state_v)
+          distance_v_relaxed = [[distance_u, value_v].max, node_distance(state_v)].min
 
-        state.edges.each do |lbl, dest|
-          next if dest.finalState
-          puts "    edge to: #{dest.name}" if @experiment
-          dest_value = node_value(dest)
-          puts "     value: #{dest_value}" if @experiment
+          puts "  edge to: #{state_v.name}; value #{value_v}; dist #{distance_v}; relaxed #{distance_v_relaxed}" if @experiment
 
-          dest_marker_value = marker_value_for(dest)
-          if dest_marker_value.nil?
-            dest_marker_value = marker_value
+          if distance_v_relaxed < distance_v
+            puts "  storing relaxed distance" if @experiment
+            @node_distances[state_v.id] = distance_v_relaxed
           end
-          dest_marker_value = [dest_marker_value, marker_value].min
-          dest_marker_value = [dest_marker_value, dest_value].max
 
-          store_marker_value(dest, dest_marker_value)
-
-          if !state_ids_processed.include?(dest.id)
-            state_ids_processed.add(dest.id)
-            queue << dest
-          end
         end
       end
 
-      puts start_state.describe_state_machine if @experiment
+      if @experiment
+        puts "Node distances:"
+        @state_list.each do |state|
+          puts " #{state.name}: #{@node_distances[state.id]}"
+        end
+      end
+
       remove_useless_edges
       filter_multiple_tokens_within_edge
       disallow_zero_length_tokens
@@ -79,9 +71,14 @@ module ToknInternal
     private
 
 
-    def node_value(state)
-      value = @node_values[state.id]
-      if value.nil?
+    def build_topological_state_list
+      @state_list = @start_state.topological_sort
+    end
+
+    def construct_node_values
+      @node_values = {}
+      @state_list.each do |state|
+        value = nil
         state.edges.each do |lbl, dest|
           next unless dest.finalState
           puts "....calculating value for state from edge: #{lbl.elements}" if @experiment
@@ -94,19 +91,14 @@ module ToknInternal
         end
         @node_values[state.id] = value
       end
-      value
     end
 
-    def marker_value_for(state)
-      @node_markers[state.id]
+    def node_value(state)
+      @node_values[state.id]
     end
 
-    def store_marker_value(state, marker_value)
-      old_marker_value = @node_markers[state.id]
-      if old_marker_value.nil? || (old_marker_value < marker_value)
-        puts "         (updating marker value for #{state.name} to: #{marker_value})" if @experiment
-        @node_markers[state.id] = marker_value
-      end
+    def node_distance(state)
+      @node_distances[state.id] || INF_DISTANCE
     end
 
     def disallow_zero_length_tokens
@@ -118,20 +110,21 @@ module ToknInternal
     end
 
     def remove_useless_edges
-      @state_list.each do |state|
+      @state_list.each do |state_u|
+
+        state_u_distance = node_distance(state_u)
 
         remove_list = []
-        state.edges.each_with_index do |edge,edge_index|
-          _, dest = edge
-          next if dest.finalState
+        state_u.edges.each_with_index do |edge,edge_index|
+          _, state_v = edge
+          next if state_v.finalState
 
-          source_marker_value = marker_value_for(state)
-          dest_marker_value = marker_value_for(dest)
+          value_v = node_value(state_v)
 
-          next unless source_marker_value > dest_marker_value
-
-          puts " source marker value #{state.name}:#{source_marker_value} exceeds dest marker value #{dest.name}:#{dest_marker_value}" if @experiment
-          remove_list << edge_index
+          if (value_v >= 0 && value_v < state_u_distance)
+            puts " source distance #{state_u.name}:#{state_u_distance} exceeds dest token value #{state_v.name}:#{value_v}" if @experiment
+            remove_list << edge_index
+          end
         end
 
         next if remove_list.empty?
@@ -139,7 +132,7 @@ module ToknInternal
         @modified = true
 
         # Remove the useless edges in reverse order, since indices change as we remove them
-        remove_list.reverse.each { |x| state.remove_edge(x)}
+        remove_list.reverse.each { |x| stateu_u.remove_edge(x)}
 
       end
     end
