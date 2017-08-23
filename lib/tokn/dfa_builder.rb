@@ -18,11 +18,11 @@ module ToknInternal
   #
   class DFABuilder
 
-    attr_accessor :start_state
+    attr_reader :start_state
     attr_accessor :with_filter
 
     def initialize(start_state)
-      self.start_state = start_state
+      @start_state = start_state
       self.with_filter = false
     end
 
@@ -61,10 +61,10 @@ module ToknInternal
       # reverse it, and convert it again.  Apparently this
       # produces a minimal DFA.
 
-      self.start_state = self.start_state.reverseNFA
+      @start_state = self.start_state.reverseNFA
       nfa_to_dfa_aux
 
-      self.start_state = self.start_state.reverseNFA
+      @start_state = self.start_state.reverseNFA
       nfa_to_dfa_aux
 
       State.normalizeStates(self.start_state)
@@ -130,7 +130,7 @@ module ToknInternal
 
       end
 
-      self.start_state = new_start_state
+      @start_state = new_start_state
     end
 
     # Modify edges so each is labelled with a disjoint subset
