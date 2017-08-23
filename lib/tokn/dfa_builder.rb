@@ -22,7 +22,7 @@ module ToknInternal
     #
     def self.nfa_to_dfa(start_state, apply_filter = true)
 
-      partition_edges(start_state)
+      DFABuilder.new(start_state).partition_edges
 
       start_state = self.minimize(start_state)
 
@@ -135,19 +135,15 @@ module ToknInternal
       @dfaStart
     end
 
-
-    private
-
-
     # Modify edges so each is labelled with a disjoint subset
     # of characters.  See the notes at the start of this class,
     # as well as RangePartition.rb.
     #
-    def self.partition_edges(start_state)
+    def partition_edges
 
       par = RangePartition.new
 
-      stateSet, _, _ = start_state.reachableStates
+      stateSet, _, _ = @start_state.reachableStates
 
       stateSet.each do |s|
         s.edges.each {|lbl,dest| par.addSet(lbl) }
@@ -169,6 +165,10 @@ module ToknInternal
       end
 
     end
+
+
+    private
+
 
     # Adds a DFA state for a set of NFA states, if one doesn't already exist
     # for the set
