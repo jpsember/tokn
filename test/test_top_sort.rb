@@ -33,11 +33,6 @@ class TestTopSort < JSTest
   end
 
   def test_TopSort
-
-    puts
-    puts
-    puts
-
     dfa = build_dfa_from_script
     state = dfa.startState
 
