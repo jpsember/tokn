@@ -18,38 +18,43 @@ module ToknInternal
   #
   class DFABuilder
 
-    # Convert an NFA to a DFA.
+    attr_accessor :start_state
+    attr_accessor :with_filter
+
+    def initialize(start_state)
+      self.start_state = start_state
+      self.with_filter = false
+      @built = false
+    end
+
+
+    # Convert an NFA to a DFA; return the new start state
     #
-    def self.nfa_to_dfa(start_state, apply_filter = true)
+    def nfa_to_dfa
 
-      builder = DFABuilder.new(start_state)
-      builder.partition_edges
-      builder.minimize
+      partition_edges
+      minimize
 
-      start_state = builder.start_state
+      self.start_state.generate_pdf("_SKIP_prefilter.pdf") if EXP
 
-      start_state.generate_pdf("_SKIP_prefilter.pdf") if EXP
-
-      start_state.generate_pdf("_SKIP_prefilter.pdf") if EXP
-
-      if apply_filter
-        filter = Filter.new(start_state)
+      if self.with_filter
+        filter = Filter.new(self.start_state)
         filter.apply
         if filter.modified
           # Re-minimize the dfa, since it's been modified by the filter
-          builder = DFABuilder.new(start_state)
-          builder.minimize
-          start_state = builder.start_state
-          start_state.generate_pdf("_SKIP_postfilter.pdf") if EXP
+          minimize
+          self.start_state.generate_pdf("_SKIP_postfilter.pdf") if EXP
         end
       end
 
       raise "aborting for experiment" if EXP
 
-      start_state
+      self.start_state
     end
 
-    attr_accessor :start_state
+
+    private
+
 
     # Construct minimized dfa from nfa
     #
@@ -59,17 +64,17 @@ module ToknInternal
       # produces a minimal DFA.
 
       self.start_state = self.start_state.reverseNFA
-      self.start_state = DFABuilder.new(self.start_state).build
+      rebuild
 
       self.start_state = self.start_state.reverseNFA
-      self.start_state = DFABuilder.new(self.start_state).build
+      rebuild
 
       State.normalizeStates(self.start_state)
     end
 
-    def initialize(start_state)
-      @start_state = start_state
+    def rebuild
       @built = false
+      build
     end
 
     # Perform the build algorithm
@@ -168,10 +173,6 @@ module ToknInternal
       end
 
     end
-
-
-    private
-
 
     # Adds a DFA state for a set of NFA states, if one doesn't already exist
     # for the set
