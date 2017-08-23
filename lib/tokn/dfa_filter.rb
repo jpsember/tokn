@@ -132,7 +132,7 @@ module ToknInternal
         @modified = true
 
         # Remove the useless edges in reverse order, since indices change as we remove them
-        remove_list.reverse.each { |x| stateu_u.remove_edge(x)}
+        remove_list.reverse.each { |x| state_u.remove_edge(x)}
 
       end
     end
