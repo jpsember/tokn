@@ -20,10 +20,12 @@ module ToknInternal
 
     attr_reader :start_state
     attr_accessor :with_filter
+    attr_accessor :experiment
 
     def initialize(start_state)
       @start_state = start_state
-      self.with_filter = false
+      @with_filter = false
+      @experiment = false
     end
 
     # Convert an NFA to a DFA; return the new start state
@@ -33,21 +35,21 @@ module ToknInternal
       partition_edges
       minimize
 
-      self.start_state.generate_pdf("_SKIP_prefilter.pdf") if EXP
+      @start_state.generate_pdf("_SKIP_prefilter.pdf") if @experiment
 
-      if self.with_filter
-        filter = Filter.new(self.start_state)
+      if @with_filter
+        filter = Filter.new(@start_state)
         filter.apply
         if filter.modified
           # Re-minimize the dfa, since it's been modified by the filter
           minimize
-          self.start_state.generate_pdf("_SKIP_postfilter.pdf") if EXP
+          @start_state.generate_pdf("_SKIP_postfilter.pdf") if @experiment
         end
       end
 
-      raise "aborting for experiment" if EXP
+      raise "aborting for experiment" if @experiment
 
-      self.start_state
+      @start_state
     end
 
 
@@ -61,13 +63,13 @@ module ToknInternal
       # reverse it, and convert it again.  Apparently this
       # produces a minimal DFA.
 
-      @start_state = self.start_state.reverseNFA
+      @start_state = @start_state.reverseNFA
       nfa_to_dfa_aux
 
-      @start_state = self.start_state.reverseNFA
+      @start_state = @start_state.reverseNFA
       nfa_to_dfa_aux
 
-      State.normalizeStates(self.start_state)
+      State.normalizeStates(@start_state)
     end
 
     # Perform the build algorithm

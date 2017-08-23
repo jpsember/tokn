@@ -128,6 +128,7 @@ module ToknInternal
       combined = combineTokenNFAs()
 
       builder = DFABuilder.new(combined)
+      builder.experiment = EXP
       dfa = builder.nfa_to_dfa
 
       @dfa = Tokn::DFA.new(tokenListSmall, dfa)
