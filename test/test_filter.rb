@@ -37,7 +37,7 @@ class TestFilter < JSTest
 
   def build_dfa_from_script
     dfa = Tokn::DFA.from_script(TOKEN_SCRIPT)
-    dfa.startState.generate_pdf("_SKIP_dfa.pdf")
+    #dfa.startState.generate_pdf("_SKIP_dfa.pdf")
     dfa
   end
 
