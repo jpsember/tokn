@@ -46,6 +46,8 @@ module ToknInternal
       start_state
     end
 
+    # Construct minimized dfa from nfa
+    #
     def self.minimize(nfa_start_state)
       # Reverse this NFA, convert to DFA, then
       # reverse it, and convert it again.  Apparently this
@@ -53,10 +55,10 @@ module ToknInternal
 
       start_state = nfa_start_state
       start_state = start_state.reverseNFA
-      start_state = build_dfa_from_nfa(start_state)
+      start_state = DFABuilder.new(start_state).build
 
       start_state = start_state.reverseNFA
-      start_state = build_dfa_from_nfa(start_state)
+      start_state = DFABuilder.new(start_state).build
 
       State.normalizeStates(start_state)
       start_state
@@ -138,12 +140,9 @@ module ToknInternal
       @dfaStart
     end
 
+
     private
 
-    def self.build_dfa_from_nfa(start_state)
-      bld = DFABuilder.new(start_state)
-      bld.build
-    end
 
     # Adds a DFA state for a set of NFA states, if one doesn't already exist
     # for the set
