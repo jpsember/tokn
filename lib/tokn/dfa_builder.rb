@@ -24,7 +24,6 @@ module ToknInternal
     def initialize(start_state)
       self.start_state = start_state
       self.with_filter = false
-      @built = false
     end
 
 
@@ -64,25 +63,17 @@ module ToknInternal
       # produces a minimal DFA.
 
       self.start_state = self.start_state.reverseNFA
-      rebuild
+      build
 
       self.start_state = self.start_state.reverseNFA
-      rebuild
+      build
 
       State.normalizeStates(self.start_state)
-    end
-
-    def rebuild
-      @built = false
-      build
     end
 
     # Perform the build algorithm
     #
     def build
-      raise "already built" if @built
-      @built = true
-
       @nextId = 0
 
       # Build a map of nfa state ids => nfa states
