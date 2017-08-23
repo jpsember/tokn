@@ -62,15 +62,23 @@ module ToknInternal
       start_state
     end
 
+    attr_accessor :start_state
+
     # Constructs a builder object
     #
-    def initialize(nfaStartState)
+    def initialize(start_state_arg)
+
+      # Question: how do we avoid trouble as a result of the argument 'start_state'
+      # having the same name as the attr_accessor method?
+
+      # My solution: add suffix _arg to argument name
+
+      @start_state = start_state_arg
       @nextId = 0
-      @nfaStart = nfaStartState
 
       # Build a map of nfa state ids => nfa states
       @nfaStateMap = {}
-      nfas, _, _ = @nfaStart.reachableStates
+      nfas, _, _ = start_state.reachableStates
       nfas.each {|s| @nfaStateMap[s.id] = s}
 
       # Initialize an array of nfa state lists, indexed by dfa state id
@@ -85,7 +93,7 @@ module ToknInternal
     def build
 
       iset = Set.new
-      iset.add(@nfaStart)
+      iset.add(start_state)
       epsClosure(iset)
 
       @dfaStart,_ = createDFAState(stateSetToIdArray(iset))
