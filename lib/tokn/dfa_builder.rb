@@ -319,7 +319,7 @@ module ToknInternal
       end
 
       puts start_state.describe_state_machine if EXP
-      remove_useless_edges
+      #remove_useless_edges
       filter_multiple_tokens_within_edge
       disallow_zero_length_tokens
     end

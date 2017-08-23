@@ -161,10 +161,8 @@ module Tokn
 
       stateList = []
 
-      puts "serializing"
       nextId = 0
       idToStateMap.each_pair do |id, st|
-        puts " id: #{id}"
         if nextId != id
           raise ArgumentError, "unexpected state ids"
         end
