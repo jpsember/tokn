@@ -26,7 +26,6 @@ module ToknInternal
       self.with_filter = false
     end
 
-
     # Convert an NFA to a DFA; return the new start state
     #
     def nfa_to_dfa
@@ -63,17 +62,17 @@ module ToknInternal
       # produces a minimal DFA.
 
       self.start_state = self.start_state.reverseNFA
-      build
+      nfa_to_dfa_aux
 
       self.start_state = self.start_state.reverseNFA
-      build
+      nfa_to_dfa_aux
 
       State.normalizeStates(self.start_state)
     end
 
     # Perform the build algorithm
     #
-    def build
+    def nfa_to_dfa_aux
       @nextId = 0
 
       # Build a map of nfa state ids => nfa states
