@@ -3,8 +3,6 @@ require_relative "dfa_filter"
 
 module ToknInternal
 
-  EXP = false
-
   # Converts NFAs (nondeterministic, finite state automata) to
   # minimal DFAs.
   #
@@ -33,8 +31,8 @@ module ToknInternal
       start_state.generate_pdf("_SKIP_prefilter.pdf") if EXP
 
       if apply_filter
-        filter = Filter.new
-        filter.apply(start_state)
+        filter = Filter.new(start_state)
+        filter.apply
         if filter.modified
           # Re-minimize the dfa, since it's been modified by the filter
           start_state = self.minimize(start_state)

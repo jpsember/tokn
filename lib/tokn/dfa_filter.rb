@@ -3,6 +3,12 @@ module ToknInternal
   class Filter
 
     attr_reader :modified
+    attr_reader :start_state
+
+    def initialize(start_state)
+      @start_state = start_state
+      @filter_applied = false
+    end
 
     def node_value(state)
       value = @node_values[state.id]
@@ -34,7 +40,9 @@ module ToknInternal
       end
     end
 
-    def apply(start_state)
+    def apply
+      raise "filter already applied" if @filter_applied
+      @filter_applied = true
 
       if EXP
         puts
@@ -42,7 +50,6 @@ module ToknInternal
         puts
       end
 
-      @start_state = start_state
       @modified = false
       state_ids_processed = Set.new
       @state_list = []
@@ -98,7 +105,7 @@ module ToknInternal
     end
 
     def disallow_zero_length_tokens
-      @start_state.edges.each do |lbl, dest|
+      start_state.edges.each do |lbl, dest|
         if dest.finalState
           raise "DFA recognizes zero-length tokens!"
         end
