@@ -91,9 +91,9 @@ module ToknInternal
 
       iset = Set.new
       iset.add(start_state)
-      DFABuilder.eps_closure(iset)
+      eps_closure(iset)
 
-      @dfaStart,_ = create_dfa_state_if_necessary(DFABuilder.states_to_sorted_ids(iset))
+      @dfaStart,_ = create_dfa_state_if_necessary(states_to_sorted_ids(iset))
 
       unmarked = [@dfaStart]
 
@@ -123,8 +123,8 @@ module ToknInternal
 
         moveMap.each_pair do |charRange,nfaStates|
           # May be better to test if already in set before calc closure; or simply has closure
-          DFABuilder.eps_closure(nfaStates)
-          dfaDestState, isNew = create_dfa_state_if_necessary(DFABuilder.states_to_sorted_ids(nfaStates))
+          eps_closure(nfaStates)
+          dfaDestState, isNew = create_dfa_state_if_necessary(states_to_sorted_ids(nfaStates))
           if isNew
             unmarked.push(dfaDestState)
           end
@@ -193,13 +193,13 @@ module ToknInternal
       return [newState,isNewState]
     end
 
-    def self.states_to_sorted_ids(s)
+    def states_to_sorted_ids(s)
       s.to_a.map {|x| x.id}.sort
     end
 
     # Calculate the epsilon closure of a set of NFA states
     #
-    def self.eps_closure(stateSet)
+    def eps_closure(stateSet)
       stk = stateSet.to_a
       while !stk.empty?
         s = stk.pop
