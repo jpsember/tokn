@@ -46,7 +46,6 @@ class TestFilter < JSTest
   end
 
   def test_Filter
-    raise "sample of failing test"
     tok = build_tokenizer_from_script
 
     tok.read("MISC")
