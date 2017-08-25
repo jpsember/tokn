@@ -265,12 +265,21 @@ class TestTokenizer < JSTest
   end
 
   def test_string_expr
-    tok =<<-'eos'
-    STRING: ( " ([^\n"] | (\\") )* " | ' ([^\n']|(\\'))* ' )
-    eos
-    script = FileUtils.read_text_file(path_to_resources('_string_expr.txt')).strip!
-    verify(tok,script,nil)
+    verify(STRING_EXPR_TOKENS,STRING_EXPR_SCRIPT.strip,nil)
   end
+
+  STRING_EXPR_SCRIPT = <<-'END'
+
+z"ab"z"d""ab"z"a\"b"z"a\""z"z
+z"
+z'ab'z'd''ab'z'a\'b'z'a\'z'z
+z"z
+
+END
+
+  STRING_EXPR_TOKENS = <<-'END'
+    STRING: ( " ([^\n"] | (\\") )* " | ' ([^\n']|(\\'))* ' )
+END
 
 end
 
