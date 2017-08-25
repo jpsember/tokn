@@ -186,7 +186,7 @@ class TestTokenizer < JSTest
   end
 
   def test_illegal_bracketexpr_range
-    assert_raise ToknInternal::ParseException do
+    assert_raises ToknInternal::ParseException do
       tok =<<-'eos'
         C: [b-a]
       eos
@@ -213,21 +213,21 @@ class TestTokenizer < JSTest
 
   def test_bracket_expr_disallowed
     script = 'C: [a-z^e^f]'
-    assert_raise ToknInternal::ParseException do
+    assert_raises ToknInternal::ParseException do
       Tokn::DFA.from_script(script)
     end
   end
 
   def test_bracket_expr_disallowed2
     script = 'C: [a-z^]'
-    assert_raise ToknInternal::ParseException do
+    assert_raises ToknInternal::ParseException do
       Tokn::DFA.from_script(script)
     end
   end
 
   def test_bracket_expr_disallowed3
     script = 'C: [^]'
-    assert_raise ToknInternal::ParseException do
+    assert_raises ToknInternal::ParseException do
       Tokn::DFA.from_script(script)
     end
   end

@@ -103,7 +103,7 @@ END
 
   def test_Tokenizer_Missing_Expected
 
-    assert_raise Tokn::TokenizerException do
+    assert_raises Tokn::TokenizerException do
 
       tok = build_tokenizer_from_script
 
@@ -129,7 +129,7 @@ END
   end
 
   def test_UnrecognizedToken
-    assert_raise Tokn::TokenizerException do
+    assert_raises Tokn::TokenizerException do
       tok = build_tokenizer_from_script
       while tok.has_next
         t = tok.read
@@ -141,7 +141,7 @@ END
   end
 
   def test_ReadPastEnd
-    assert_raise Tokn::TokenizerException do
+    assert_raises Tokn::TokenizerException do
       tok = build_tokenizer_from_script
       while tok.has_next
         tok.read
@@ -152,7 +152,7 @@ END
 
   def test_UnreadBeforeStart
 
-    assert_raise Tokn::TokenizerException do
+    assert_raises Tokn::TokenizerException do
       tok = build_tokenizer_from_script
       k = 0
       while tok.has_next
@@ -216,7 +216,7 @@ END
   end
 
   def test_read_named_sequence_unconditionally_fails
-    assert_raise Tokn::TokenizerException do
+    assert_raises Tokn::TokenizerException do
       dfa = Tokn::DFA.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
@@ -245,7 +245,7 @@ END
   end
 
   def test_read_id_sequence_unconditionally_fails
-    assert_raise Tokn::TokenizerException do
+    assert_raises Tokn::TokenizerException do
       dfa = Tokn::DFA.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
@@ -363,7 +363,7 @@ END
     history_size = 8
     t = Tokn::Tokenizer.new(dfa,File.open('diskfile.txt','r'),'sep',history_size)
     500.times{t.read}
-    e = assert_raise Tokn::TokenizerException do
+    e = assert_raises Tokn::TokenizerException do
         # Include an amount greater than the slack
         t.unread(history_size+110)
     assert(e.message.start_with?('Token unavailable'))
@@ -383,7 +383,7 @@ END
   def test_unknown
     dfa = Tokn::DFA.from_script(TOKEN_SCRIPT2)
     t = Tokn::Tokenizer.new(dfa,'ddd')
-    e = assert_raise Tokn::TokenizerException do
+    e = assert_raises Tokn::TokenizerException do
       t.read
     end
     assert(e.message.start_with?('Unknown token'))

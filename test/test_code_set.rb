@@ -157,8 +157,8 @@ class TestCodeSet < JSTest
   def test_illegalRange
     prep
 
-    assert_raise(RangeError) { add 60,50 }
-    assert_raise(RangeError) { add 60,60 }
+    assert_raises(RangeError) { add 60,50 }
+    assert_raises(RangeError) { add 60,60 }
   end
 
   def neg(lower, upper)

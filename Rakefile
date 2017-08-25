@@ -3,12 +3,10 @@ require 'rake/testtask'
 Rake::TestTask.new do |t|
   t.libs << "test"
   t.test_files = FileList['test/test*.rb']
-  t.verbose = false
 end
 
 Rake::TestTask.new("test:only") do |t|
   t.libs << "test"
-  t.warning = true
   t.test_files = FileList["test/test_filter.rb"]
 end
 
