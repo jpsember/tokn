@@ -41,67 +41,19 @@ class Tokenizer
   # Returns Token, or nil if end of input
   #
   def peek
-
     v = false
-
     if @history_pointer == @token_history.size
       puts "...peeking for next token" if v
       while true # repeat until we find a non-skipped token, or run out of text
-        break if !peek_char(0)
 
-        bestLength = 1
-        bestId = ToknInternal::UNKNOWN_TOKEN
+        peekToken = peek_aux
+        break if peekToken.nil?
 
-        charOffset = 0
-        state = @dfa.startState
-        while true
-          ch = nil
-          next_char = peek_char(charOffset)
-          puts " state:#{state.name} next char: #{next_char}" if v
-          ch = next_char.ord if next_char
 
-          nextState = nil
-
-          # Examine edges leaving this state.
-          # If one is labelled with a token id, we don't need to match the character with it;
-          # store as best token found if length is longer than previous, or equal to previous
-          # with higher id.
-
-          # If an edge is labelled with the current character, advance to that state.
-
-          edges = state.edges
-          edges.each do |lbl,dest|
-            a = lbl.elements
-            puts "   label: #{lbl} elements:#{a}" if v
-            if a[0] < ToknInternal::EPSILON
-              newTokenId = ToknInternal::edge_label_to_token_id(a[0])
-              #puts "    token id: #{newTokenId} length: #{charOffset}" if v
-
-              # We don't want a longer, lower-valued token overriding a higher-valued one
-              if (newTokenId > bestId || (newTokenId == bestId && charOffset > bestLength))
-                bestLength, bestId = charOffset, newTokenId
-                puts "    new best length: #{bestLength} id: #{bestId}" if v
-              end
-            end
-
-            if ch && lbl.contains?(ch)
-              nextState = dest
-            end
-          end
-
-          break if !nextState || !ch
-          state = nextState
-          charOffset += 1
-        end
-
-        best_text = skip_chars(bestLength)
-
-        if bestId == @skipTokenId
-          advance_cursor_for_token_text(best_text)
+        if peekToken.id == @skipTokenId
+          advance_cursor_for_token_text(peekToken.text)
           next
         end
-
-        peekToken = Token.new(bestId, best_text, 1 + @lineNumber, 1 + @column)
 
         add_token_to_history(peekToken)
         break # We found a token, so stop
@@ -114,6 +66,60 @@ class Tokenizer
     end
 
     ret
+  end
+
+  def peek_aux
+    v = false
+
+    return nil if !peek_char(0)
+
+    bestLength = 1
+    bestId = ToknInternal::UNKNOWN_TOKEN
+
+    charOffset = 0
+    state = @dfa.startState
+    while true
+      ch = nil
+      next_char = peek_char(charOffset)
+      puts " state:#{state.name} next char: #{next_char}" if v
+      ch = next_char.ord if next_char
+
+      nextState = nil
+
+      # Examine edges leaving this state.
+      # If one is labelled with a token id, we don't need to match the character with it;
+      # store as best token found if length is longer than previous, or equal to previous
+      # with higher id.
+
+      # If an edge is labelled with the current character, advance to that state.
+
+      edges = state.edges
+      edges.each do |lbl,dest|
+        a = lbl.elements
+        puts "   label: #{lbl} elements:#{a}" if v
+        if a[0] < ToknInternal::EPSILON
+          newTokenId = ToknInternal::edge_label_to_token_id(a[0])
+          #puts "    token id: #{newTokenId} length: #{charOffset}" if v
+
+          # We don't want a longer, lower-valued token overriding a higher-valued one
+          if (newTokenId > bestId || (newTokenId == bestId && charOffset > bestLength))
+            bestLength, bestId = charOffset, newTokenId
+            puts "    new best length: #{bestLength} id: #{bestId}" if v
+          end
+        end
+
+        if ch && lbl.contains?(ch)
+          nextState = dest
+        end
+      end
+
+      break if !nextState || !ch
+      state = nextState
+      charOffset += 1
+    end
+
+    best_text = skip_chars(bestLength)
+    Token.new(bestId, best_text, 1 + @lineNumber, 1 + @column)
   end
 
   def advance_cursor_for_token_text(text)
