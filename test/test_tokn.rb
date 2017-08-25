@@ -383,6 +383,92 @@ END
     assert(e.message.start_with?('Unknown token'))
   end
 
+  def test_continue_line_with_backslash
+    # There are no characters between the backslash and the linefeed; this will be interpreted
+    # as a 'line stitch' command
+    script = "A: ab\\\nab"
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"abababababab")
+    tok.read
+    tok.read
+    tok.read
+    assert(!tok.has_next)
+  end
+
+  def test_continue_line_with_backslash_not_at_end
+    # Note there's a space between the backslash and the linefeed; this will be interpreted
+    # as an escaped space, not as a 'line stitch' command
+    script = "A: aa\\ \nB: ab"
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"abaa ab")
+    tok.read(1)
+    tok.read(0)
+    tok.read(1)
+    assert(!tok.has_next)
+  end
+
+  def test_continue_line_with_multiple_backslash
+    script = "A: ab\\\\\\\\\\\nab\nB: bb"
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"bbab\\\\abbb")
+    tok.read(1)
+    tok.read(0)
+    tok.read(1)
+    assert(!tok.has_next)
+  end
+
+  def test_Tokenizer
+    TestSnapshot.new.perform do
+
+      dfa = Tokn::DFA.from_script(SAMPLETOKENS3)
+      tok = Tokn::Tokenizer.new(dfa, SAMPLETEXT3)
+
+      tokList = []
+      while tok.has_next
+        t = tok.read
+        tokList.push(t)
+        puts " read: #{dfa.token_name(t.id)} '#{t}'"
+      end
+
+      tok.unread(tokList.size)
+
+      tokList.each do |t1|
+        tName = tok.name_of(t1)
+        tok.read(tName)
+      end
+    end
+  end
+
+  def test_comment_problem
+    script = ""
+    script << 'WS: (   [\\x00-\\x20]+ | \\# [\\x00-\\x09\\x0b-\\x7f]* \\n? )'
+    script << "\n"
+    script << 'ID: \\d+'
+    script << "\n"
+
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"   14  \n   # white space 42 \n  19 83  ")
+    [0,1,0,0,0,1,0,1,0].each do |id|
+      tok.read(id)
+    end
+    assert !tok.has_next
+  end
+
+  def test_altern_problem
+    script = ""
+    script << 'WS: (   [\\x00-\\x20]+ | \\# [\\x00-\\x09\\x0b-\\x7f]* \\n? )'
+    script << "\n"
+    script << 'TAGEND:   (  (/ [a-zA-Z]*) | \? )? >'
+    script << "\n"
+
+    dfa = Tokn::DFA.from_script(script)
+    tok = Tokn::Tokenizer.new(dfa,"/abc>  >  ?>  ")
+    [1,0,1,0,1,0].each do |id|
+      tok.read(id)
+    end
+    assert !tok.has_next
+  end
+
   # We put this at the end because the heredoc confuses Sublime editor
 
   SAMPLETEXT2 =<<-'EOS'
@@ -401,6 +487,18 @@ x
 d
 /*    /*/
 e
+EOS
+
+    SAMPLETEXT3 =<<-'EOS'
+the time has come 42
+the Walrus said
+EOS
+
+    SAMPLETOKENS3 =<<-'EOS'
+UNKNOWN: [\u0000-\uffff]
+WS: ( [\f\r\s\t\n]+ | \
+       \#[^\n]*\n? )
+WORD: [a-zA-Z]+('[a-zA-Z]+)*
 EOS
 
 end
