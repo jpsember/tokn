@@ -16,11 +16,22 @@ class TestTopSort < JSTest
   end
 
   def sampleText
-    @sampleText ||= FileUtils.read_text_file("../sampletext3.txt")
+    @sampleText ||= <<'EOS'
+'escaped \' delimiter'
+EOS
   end
 
   def sampleTokens
-    @sampleTokens ||= FileUtils.read_text_file("../sampletokens3.txt")
+    @sampleTokens ||= <<'EOS'
+WS:   ( [\s\n]+ )
+LBL: '([^'\n]|\\')*'
+
+
+# This disallows unescaped backslashes, and is what we want,
+# but the unit tests pass
+#
+#LBL: '   (  [^'\\\n] |  (\\')  )*    '
+EOS
   end
 
   def build_dfa_from_script
