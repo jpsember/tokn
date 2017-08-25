@@ -1,18 +1,10 @@
-#!/usr/bin/env ruby
-
 require 'js_base/js_test'
 require 'tokn'
 
 class TestComplement < JSTest
 
-  @@dfa = nil
-
-  include ToknInternal
-
   def setup
     enter_test_directory
-    @sampleText = nil
-    @sampleTokens = nil
   end
 
   def teardown
@@ -39,11 +31,7 @@ END
   end
 
   def build_dfa_from_script
-    if @@dfa.nil?
-      dfa = Tokn::DFA.from_script(sampleTokens)
-      @@dfa = dfa
-    end
-    @@dfa
+    Tokn::DFA.from_script(sampleTokens)
   end
 
   def build_tokenizer_from_script
