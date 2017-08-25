@@ -41,22 +41,20 @@ class Tokenizer
   # Returns Token, or nil if end of input
   #
   def peek
-    v = false
     if @history_pointer == @token_history.size
-      puts "...peeking for next token" if v
-      while true # repeat until we find a non-skipped token, or run out of text
 
-        peekToken = peek_aux
-        break if peekToken.nil?
+      # repeat until we find a non-skipped token, or run out of text
+      while true
 
+        token = peek_aux
+        break if token.nil?
 
-        if peekToken.id == @skipTokenId
-          advance_cursor_for_token_text(peekToken.text)
-          next
+        if token.id == @skipTokenId
+          advance_cursor_for_token_text(token.text)
+        else
+          add_token_to_history(token)
+          break # We found a token, so stop
         end
-
-        add_token_to_history(peekToken)
-        break # We found a token, so stop
       end
     end
 
