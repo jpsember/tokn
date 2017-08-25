@@ -1,5 +1,0 @@
-WS: \n | \s
-
-GENERAL: [a-z]+
-SPECIFIC: abc
-
