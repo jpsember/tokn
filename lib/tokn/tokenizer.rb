@@ -67,21 +67,18 @@ class Tokenizer
   end
 
   def peek_aux
-    v = false
-
     return nil if !peek_char(0)
 
-    bestLength = 1
-    bestId = ToknInternal::UNKNOWN_TOKEN
+    best_length = 1
+    best_id = ToknInternal::UNKNOWN_TOKEN
 
     charOffset = 0
     state = @dfa.startState
     while true
       ch = nil
       next_char = peek_char(charOffset)
-      puts " state:#{state.name} next char: #{next_char}" if v
-      ch = next_char.ord if next_char
 
+      ch = next_char.ord if next_char
       nextState = nil
 
       # Examine edges leaving this state.
@@ -94,15 +91,12 @@ class Tokenizer
       edges = state.edges
       edges.each do |lbl,dest|
         a = lbl.elements
-        puts "   label: #{lbl} elements:#{a}" if v
         if a[0] < ToknInternal::EPSILON
           newTokenId = ToknInternal::edge_label_to_token_id(a[0])
-          #puts "    token id: #{newTokenId} length: #{charOffset}" if v
 
           # We don't want a longer, lower-valued token overriding a higher-valued one
-          if (newTokenId > bestId || (newTokenId == bestId && charOffset > bestLength))
-            bestLength, bestId = charOffset, newTokenId
-            puts "    new best length: #{bestLength} id: #{bestId}" if v
+          if (newTokenId > best_id || (newTokenId == best_id && charOffset > best_length))
+            best_length, best_id = charOffset, newTokenId
           end
         end
 
@@ -116,8 +110,8 @@ class Tokenizer
       charOffset += 1
     end
 
-    best_text = skip_chars(bestLength)
-    Token.new(bestId, best_text, 1 + @lineNumber, 1 + @column)
+    best_text = skip_chars(best_length)
+    Token.new(best_id, best_text, 1 + @lineNumber, 1 + @column)
   end
 
   def advance_cursor_for_token_text(text)
