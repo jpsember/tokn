@@ -236,7 +236,6 @@ class TestTokenizer < JSTest
   # Extract tokens from script
   #
   def verify(tokens_defn_string,script,skip_token_name='WS')
-    # return if @allow.nil?
     dfa = Tokn::DFA.from_script(tokens_defn_string)
     if false
       dotfile = dfa.startState.build_dot_file("dfa")
@@ -257,29 +256,6 @@ class TestTokenizer < JSTest
       end
     end
   end
-
-  # Determine path to a file relative to this files's directory
-  #
-  def path_to_resources(file)
-    File.join(File.dirname(File.expand_path(__FILE__)), file)
-  end
-
-  def test_string_expr
-    verify(STRING_EXPR_TOKENS,STRING_EXPR_SCRIPT.strip,nil)
-  end
-
-  STRING_EXPR_SCRIPT = <<-'END'
-
-z"ab"z"d""ab"z"a\"b"z"a\""z"z
-z"
-z'ab'z'd''ab'z'a\'b'z'a\'z'z
-z"z
-
-END
-
-  STRING_EXPR_TOKENS = <<-'END'
-    STRING: ( " ([^\n"] | (\\") )* " | ' ([^\n']|(\\'))* ' )
-END
 
 end
 
