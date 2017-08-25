@@ -9,8 +9,6 @@ class TestTokn < JSTest
 
   def setup
     enter_test_directory
-    @sampleText = nil
-    @sampleTokens = nil
   end
 
   def teardown
@@ -35,11 +33,7 @@ class TestTokn < JSTest
 END
 
   def build_dfa_from_script
-    dfa = Tokn::DFA.from_script(sampleTokens)
-    if false
-      FileUtils.write_text_file("../_test_tokn.dot",dfa.startState.build_dot_file("dfa"))
-    end
-    dfa
+    Tokn::DFA.from_script(sampleTokens)
   end
 
   def build_tokenizer_from_script
@@ -51,7 +45,7 @@ END
   end
 
   def test_build_DFA
-    x =  RegParse.new(REGEX_SCRIPT)
+    x = RegParse.new(REGEX_SCRIPT)
     s = x.startState
     x.endState.finalState = true
     s.reverseNFA()
@@ -408,6 +402,5 @@ d
 /*    /*/
 e
 EOS
-
 
 end

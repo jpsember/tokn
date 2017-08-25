@@ -13,10 +13,10 @@ class TestTokenizer < JSTest
     eos
 
     script =<<-'eos'
-        5.2
-        5
-        -5.2
-        -5
+5.2
+5
+-5.2
+-5
     eos
 
     verify(tok,script)
@@ -32,10 +32,10 @@ class TestTokenizer < JSTest
     eos
 
     script =<<-'eos'
-        5.2
-        5
-        -5.2
-        -5
+5.2
+5
+-5.2
+-5
     eos
 
     verify(tok,script)
@@ -46,7 +46,7 @@ class TestTokenizer < JSTest
       DIGIT: \d
     eos
     script = "0123.456789/:AF"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_w
@@ -54,7 +54,7 @@ class TestTokenizer < JSTest
       W: \w
     eos
     script = "/0189:@AZ[^_`az{"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr
@@ -62,7 +62,7 @@ class TestTokenizer < JSTest
       C: [bcd]
     eos
     script = "abcde"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_with_omitted_single_char
@@ -70,7 +70,7 @@ class TestTokenizer < JSTest
       C: [\x00-\x20^\n]
     eos
     script = "   \t  \n \t a b"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_with_some_omitted
@@ -78,7 +78,7 @@ class TestTokenizer < JSTest
       C: [\x00-\x20^\n\t]
     eos
     script = "   \t  \n \t a b"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_alternate_hex_value_syntax
@@ -86,7 +86,7 @@ class TestTokenizer < JSTest
       C: [\0x00-\0x20^\n\t]
     eos
     script = "   \t  \n \t a b"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_with_omitted_range
@@ -94,7 +94,7 @@ class TestTokenizer < JSTest
       C: [a-h^g-m]
     eos
     script = "abcdefghijklmnop"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_negated_bracketexpr
@@ -102,7 +102,7 @@ class TestTokenizer < JSTest
       C: [^bcd]
     eos
     script = "abcde"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_range
@@ -110,7 +110,7 @@ class TestTokenizer < JSTest
       C: [b-d]
     eos
     script = "abcde"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_range2
@@ -118,7 +118,7 @@ class TestTokenizer < JSTest
       C: [b-b]
     eos
     script = "abcde"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_range3
@@ -126,7 +126,7 @@ class TestTokenizer < JSTest
       C: [ac-df]
     eos
     script = "abcdefg"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_dec
@@ -134,7 +134,7 @@ class TestTokenizer < JSTest
       C: [\d]
     eos
     script = "abc09defg"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_word
@@ -142,7 +142,7 @@ class TestTokenizer < JSTest
       C: [\w]
     eos
     script = "./_?01_w#"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_dec_neg
@@ -150,7 +150,7 @@ class TestTokenizer < JSTest
       C: [^\d]
     eos
     script = "abc09defg"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_word_neg
@@ -158,7 +158,7 @@ class TestTokenizer < JSTest
       C: [^\w]
     eos
     script = "./_?01_w#"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_negated_bracketexpr_range
@@ -166,7 +166,7 @@ class TestTokenizer < JSTest
       C: [^b-d]
     eos
     script = "abcde"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_negated_bracketexpr_range2
@@ -174,7 +174,7 @@ class TestTokenizer < JSTest
       C: [b-b]
     eos
     script = "abcde"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_negated_bracketexpr_range3
@@ -182,7 +182,7 @@ class TestTokenizer < JSTest
       C: [ac-df]
     eos
     script = "abcdefg"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_illegal_bracketexpr_range
@@ -191,7 +191,7 @@ class TestTokenizer < JSTest
         C: [b-a]
       eos
       script = "abcde"
-      verify(tok,script,nil)
+      verify(tok,script)
     end
   end
 
@@ -200,7 +200,7 @@ class TestTokenizer < JSTest
       C: [a\nc-df]
     eos
     script = "abc\ndefg"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracketexpr_negated_escaped_chars
@@ -208,7 +208,7 @@ class TestTokenizer < JSTest
       C: [^\nb]
     eos
     script = "abc\ndefg"
-    verify(tok,script,nil)
+    verify(tok,script)
   end
 
   def test_bracket_expr_disallowed
@@ -235,18 +235,12 @@ class TestTokenizer < JSTest
 
   # Extract tokens from script
   #
-  def verify(tokens_defn_string,script,skip_token_name='WS')
+  def verify(tokens_defn_string, script)
     dfa = Tokn::DFA.from_script(tokens_defn_string)
-    if false
-      dotfile = dfa.startState.build_dot_file("dfa")
-      path = "_t.dot"
-      warning "writing dot file to #{path}"
-      FileUtils.write_text_file(path,dotfile)
-    end
 
     TestSnapshot.new.perform do
 
-      tok = Tokn::Tokenizer.new(dfa, script, skip_token_name)
+      tok = Tokn::Tokenizer.new(dfa, script)
 
       tok.accept_unknown_tokens = true
 
