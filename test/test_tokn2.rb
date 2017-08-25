@@ -4,7 +4,7 @@ require 'tokn'
 class TestTokn2 < JSTest
 
   def teardown
-    leave_test_directory(true)
+    leave_test_directory
   end
 
   def build_tokenizer_from_script
