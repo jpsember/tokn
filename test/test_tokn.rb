@@ -223,7 +223,7 @@ END
       while t.has_next do
         tk = t.read
         if tk.text == 'speed'
-          tokens = t.read_sequence('ASSIGN INT INT')
+          t.read_sequence('ASSIGN INT INT')
         end
       end
     end
@@ -252,7 +252,7 @@ END
       while t.has_next do
         tk = t.read
         if tk.text == 'speed'
-          tokens = t.read_sequence([5,2,2])
+          t.read_sequence([5,2,2])
         end
       end
     end

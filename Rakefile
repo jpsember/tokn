@@ -19,3 +19,10 @@ desc "Quick experiment #2"
 task :exp2 do
   system("ruby lib/tokn/experiment.rb < test/sampletokens.txt")
 end
+
+desc "Recompile sample tokens"
+task :sampletokens do
+  chdir("test") do
+    system("tokncompile < sampletokens.txt > compileddfa.txt")
+  end
+end
