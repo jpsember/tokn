@@ -24,7 +24,15 @@ class TestComplement < JSTest
   end
 
   def sampleTokens
-    @sampleTokens ||= FileUtils.read_text_file("../complement_tokens.txt")
+    @sampleTokens ||= <<-'END'
+
+WS: (\n | \r | \t | \s)+
+_TX: [^\n\r\t\s]+
+_KEYWORD: abc
+NONSPECIAL: ^($TX $KEYWORD $TX) $WS
+SPECIAL: $TX $KEYWORD $TX $WS
+
+END
   end
 
   def build_dfa_from_script

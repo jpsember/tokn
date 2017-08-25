@@ -1,9 +1,0 @@
-WS: (\n | \r | \t | \s)+
-
-_TX: [^\n\r\t\s]+
-
-_KEYWORD: abc
-
-NONSPECIAL: ^($TX $KEYWORD $TX) $WS
-
-SPECIAL: $TX $KEYWORD $TX $WS
