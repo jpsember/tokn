@@ -20,7 +20,10 @@ class TestComplement < JSTest
   end
 
   def sampleText
-    @sampleText ||= FileUtils.read_text_file("../complement_text.txt")
+    @sampleText ||= <<-'END'
+xyz abc 123abcdef 789ab012
+END
+
   end
 
   def sampleTokens
