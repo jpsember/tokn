@@ -29,7 +29,7 @@ class TestFilter < JSTest
 
   def sampleText
     @sampleText ||= TOKEN_TEXT
-   end
+  end
 
   def sampleTokens
     @sampleTokens ||= TOKEN_TEXT
@@ -46,6 +46,7 @@ class TestFilter < JSTest
   end
 
   def test_Filter
+    raise "sample of failing test"
     tok = build_tokenizer_from_script
 
     tok.read("MISC")
