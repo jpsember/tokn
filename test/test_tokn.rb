@@ -36,7 +36,7 @@ END
 
   def build_dfa_from_script
     dfa = Tokn::DFA.from_script(sampleTokens)
-    if true
+    if false
       FileUtils.write_text_file("../_test_tokn.dot",dfa.startState.build_dot_file("dfa"))
     end
     dfa
@@ -317,7 +317,7 @@ END
   def test_c_style_comments
     TestSnapshot.new.perform do
       dfa = Tokn::DFA.from_script(sampleTokens)
-      text = FileUtils.read_text_file("../sampletext2.txt")
+      text = SAMPLETEXT2
       t = Tokn::Tokenizer.new(dfa, text)
 
       while t.has_next do
@@ -388,5 +388,26 @@ END
     end
     assert(e.message.start_with?('Unknown token'))
   end
+
+  # We put this at the end because the heredoc confuses Sublime editor
+
+  SAMPLETEXT2 =<<-'EOS'
+// c-style comments:
+
+/**/
+a
+/***/
+b
+/****/
+c
+/*
+x
+*/
+/* x   /* x */
+d
+/*    /*/
+e
+EOS
+
 
 end
