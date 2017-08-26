@@ -86,31 +86,28 @@ class Tokenizer
         next_char_integer = next_char.ord
       end
 
-      next_state = nil
-
       # Examine edges leaving this state.
       # If one is labelled with a token id, we don't need to match the character with it;
-      # store as best token found if length is longer than previous, or equal to previous
-      # with higher id.
+      # store as best token found if id is not less than previous best.
 
       # If an edge is labelled with the current character, advance to that state.
 
-      edges = state.edges
-      edges.each do |lbl,dest|
+      next_state = nil
+      state.edges.each do |edge_label,dest_state|
 
         # If edge points to a final state, its label will correspond to a single token id;
         # otherwise, its label contains a set of nonnegative character codes
 
-        if dest.finalState
-          token_id = ToknInternal::edge_label_to_token_id(lbl.elements[0])
+        if dest_state.finalState
+          token_id = ToknInternal::edge_label_to_token_id(edge_label.elements[0])
 
           # We don't want a longer, lower-valued token overriding a higher-valued one.
           # Fortunately, it seems our 'useless edge' filter ensures that this will never happen.
           if token_id >= best_id
             best_length, best_id = char_offset, token_id
           end
-        elsif lbl.contains?(next_char_integer)
-          next_state = dest
+        elsif edge_label.contains?(next_char_integer)
+          next_state = dest_state
         end
       end
 
