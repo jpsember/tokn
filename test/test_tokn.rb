@@ -44,7 +44,7 @@ END
 
   def test_build_DFA
     x = RegParse.new(REGEX_SCRIPT)
-    s = x.startState
+    s = x.start_state
     x.endState.finalState = true
     s.reverseNFA()
     builder = DFABuilder.new(s)
@@ -57,7 +57,7 @@ END
 
   def test_cvt_NFA_to_DFA
     x = RegParse.new(REGEX_SCRIPT)
-    s = x.startState
+    s = x.start_state
     x.endState.finalState = true
     TestSnapshot.new.perform do
       puts s.build_dot_file("nfa")

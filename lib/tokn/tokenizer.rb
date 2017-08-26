@@ -76,7 +76,7 @@ class Tokenizer
     best_id = ToknInternal::UNKNOWN_TOKEN
 
     char_offset = 0
-    state = @dfa.startState
+    state = @dfa.start_state
 
     while true
 

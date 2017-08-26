@@ -72,7 +72,7 @@ module ToknInternal
     @@digit_code_set = nil
     @@wordchar_code_set = nil
 
-    attr_reader :startState, :endState
+    attr_reader :start_state, :endState
 
     # Construct a parser and perform the parsing
     # @param script script to parse
@@ -248,7 +248,7 @@ module ToknInternal
       @cursor = 0
 
       exp = parseE
-      @startState = exp[0]
+      @start_state = exp[0]
       @endState = exp[1]
     end
 
@@ -357,9 +357,9 @@ module ToknInternal
       end
       rg = tokInfo[1]
 
-      oldToNewMap, @nextStateId = rg.startState.duplicateNFA(@nextStateId)
+      oldToNewMap, @nextStateId = rg.start_state.duplicateNFA(@nextStateId)
 
-      newStart = oldToNewMap[rg.startState]
+      newStart = oldToNewMap[rg.start_state]
       newEnd = oldToNewMap[rg.endState]
 
       [newStart, newEnd]

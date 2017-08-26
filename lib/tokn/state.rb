@@ -77,8 +77,8 @@ module ToknInternal
     #
     # > start state
     #
-    def self.normalizeStates(startState)
-      stateSet, _,_ = startState.reachableStates
+    def self.normalizeStates(start_state)
+      stateSet, _,_ = start_state.reachableStates
       stateSet.map{|s| s.normalize}
     end
 
@@ -90,8 +90,8 @@ module ToknInternal
     def build_dot_file(title = "nfa")
       stateList = {}
 
-      startState = self
-      genAux( stateList, startState)
+      start_state = self
+      genAux( stateList, start_state)
 
       # Display long labels in an external label box
       #
@@ -113,7 +113,7 @@ module ToknInternal
         g << "]\n"
       end
 
-      g << "\n \"\" -> \"#{startState.name}\"\n"
+      g << "\n \"\" -> \"#{start_state.name}\"\n"
       stateList.each_value do |s|
         s.edges.each do |crs, s2|
           crs_text = crs.to_s

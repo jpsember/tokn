@@ -6,7 +6,7 @@ class TestFilter < JSTest
   def test_generated_edge_count
     dfa = Tokn::DFA.from_script(TOKEN_SCRIPT)
 
-    states,_,_ = dfa.startState.reachableStates
+    states,_,_ = dfa.start_state.reachableStates
     total_edges = 0
     states.each do |state|
       total_edges += state.edges.size
@@ -16,7 +16,11 @@ class TestFilter < JSTest
   end
 
   def test_Filter
-    dfa = Tokn::DFA.from_script_with_pdf(TOKEN_SCRIPT)
+    if false
+      dfa = Tokn::DFA.from_script_with_pdf(TOKEN_SCRIPT)
+    else
+      dfa = Tokn::DFA.from_script(TOKEN_SCRIPT)
+    end
 
     text = "abcabcdef"
     tok = Tokn::Tokenizer.new(dfa, text)

@@ -45,7 +45,7 @@ EOS
 
   def test_TopSort
     dfa = build_dfa_from_script
-    state = dfa.startState
+    state = dfa.start_state
 
     sorted_states = state.topological_sort
     str = ""

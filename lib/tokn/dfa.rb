@@ -62,18 +62,18 @@ module Tokn
 
     end
 
-    attr_reader :startState, :tokenNames
+    attr_reader :start_state, :tokenNames
 
     # Construct a DFA, given a list of token names and a starting state.
     #
-    def initialize(tokenNameList, startState)
+    def initialize(tokenNameList, start_state)
 
-      if (startState.id != 0)
+      if (start_state.id != 0)
         raise ArgumentError, "Start state id must be zero"
       end
 
       @tokenNames = tokenNameList
-      @startState = startState
+      @start_state = start_state
       @tokenIdMap = {}
       @tokenNames.each_with_index do |name, i|
         @tokenIdMap[name] = i
@@ -135,7 +135,7 @@ module Tokn
 
       h = {"version"=>DFA.version, "tokens"=>tokenNames}
 
-      stateSet,_,_ = startState.reachableStates
+      stateSet,_,_ = start_state.reachableStates
 
       idToStateMap = {}
       stateSet.each{ |st| idToStateMap[st.id] = st }
@@ -156,7 +156,7 @@ module Tokn
         raise ArgumentError, "bad states"
       end
 
-      if stateList[0] != startState
+      if stateList[0] != start_state
         raise ArgumentError, "bad start state"
       end
 

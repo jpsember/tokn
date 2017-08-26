@@ -139,7 +139,7 @@ module ToknInternal
 
       # Create a new distinguished start state
 
-      startState = State.new(0)
+      start_state = State.new(0)
       baseId = 1
 
       @tokenListBig.each do |tokenName, regParse, index, tokenId|
@@ -147,9 +147,9 @@ module ToknInternal
         # Skip anonymous token definitions
         next if tokenId.nil?
 
-        oldToNewMap, baseId = regParse.startState.duplicateNFA(baseId)
+        oldToNewMap, baseId = regParse.start_state.duplicateNFA(baseId)
 
-        dupStart = oldToNewMap[regParse.startState]
+        dupStart = oldToNewMap[regParse.start_state]
 
         # Transition from the expression's end state (not a final state)
         # to a new final state, with the transitioning edge
@@ -165,9 +165,9 @@ module ToknInternal
         dupEnd.addEdge(CodeSet.new(ToknInternal.token_id_to_edge_label(tokenId)), dupfinalState)
 
         # Add an e-transition from the start state to this expression's start
-        startState.addEdge(CodeSet.new(EPSILON),dupStart)
+        start_state.addEdge(CodeSet.new(EPSILON),dupStart)
       end
-      startState
+      start_state
     end
 
     # Regex for token names preceding regular expressions
