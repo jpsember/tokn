@@ -62,20 +62,20 @@ module Tokn
 
     end
 
-    attr_reader :start_state, :tokenNames
+    attr_reader :start_state, :token_names
 
     # Construct a DFA, given a list of token names and a starting state.
     #
-    def initialize(tokenNameList, start_state)
+    def initialize(token_name_list, start_state)
 
       if (start_state.id != 0)
         raise ArgumentError, "Start state id must be zero"
       end
 
-      @tokenNames = tokenNameList
+      @token_names = token_name_list
       @start_state = start_state
       @tokenIdMap = {}
-      @tokenNames.each_with_index do |name, i|
+      @token_names.each_with_index do |name, i|
         @tokenIdMap[name] = i
       end
 
@@ -92,10 +92,10 @@ module Tokn
       elsif tokenId == UNKNOWN_TOKEN
         nm = "<UNKNOWN>"
       else
-        if tokenId < 0 || tokenId >= tokenNames.size
+        if tokenId < 0 || tokenId >= token_names.size
           raise IndexError, "No such token id:#{tokenId}"
         end
-        nm = tokenNames[tokenId]
+        nm = token_names[tokenId]
       end
       nm
     end
@@ -133,7 +133,7 @@ module Tokn
     #
     def serialize
 
-      h = {"version"=>DFA.version, "tokens"=>tokenNames}
+      h = {"version"=>DFA.version, "tokens"=>token_names}
 
       stateSet,_,_ = start_state.reachableStates
 
