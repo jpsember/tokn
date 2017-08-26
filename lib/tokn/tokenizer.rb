@@ -104,8 +104,9 @@ class Tokenizer
         if dest.finalState
           token_id = ToknInternal::edge_label_to_token_id(lbl.elements[0])
 
-          # We don't want a longer, lower-valued token overriding a higher-valued one
-          if (token_id > best_id || (token_id == best_id && char_offset > best_length))
+          # We don't want a longer, lower-valued token overriding a higher-valued one.
+          # Fortunately, it seems our 'useless edge' filter ensures that this will never happen.
+          if token_id >= best_id
             best_length, best_id = char_offset, token_id
           end
         elsif lbl.contains?(next_char_integer)
