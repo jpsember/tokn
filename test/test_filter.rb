@@ -16,7 +16,7 @@ class TestFilter < JSTest
   end
 
   def test_Filter
-    dfa = Tokn::DFA.from_script(TOKEN_SCRIPT)
+    dfa = Tokn::DFA.from_script_with_pdf(TOKEN_SCRIPT)
 
     text = "abcabcdef"
     tok = Tokn::Tokenizer.new(dfa, text)

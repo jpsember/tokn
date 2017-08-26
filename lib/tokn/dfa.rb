@@ -20,6 +20,14 @@ module Tokn
       td.parse(script)
     end
 
+    # Compile a Tokenizer DFA from a token definition script, generating pdfs while doing so
+    #
+    def self.from_script_with_pdf(script)
+      td = TokenDefParser.new
+      td.generate_pdf = true
+      td.parse(script)
+    end
+
     # Compile a Tokenizer DFA from a JSON string
     #
     def self.from_json(jsonStr)
