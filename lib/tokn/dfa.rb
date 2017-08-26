@@ -92,10 +92,10 @@ module Tokn
       elsif tokenId == UNKNOWN_TOKEN
         nm = "<UNKNOWN>"
       else
-        if tokenId < 0 || tokenId >= token_names.size
+        if tokenId < 0 || tokenId >= @token_names.size
           raise IndexError, "No such token id:#{tokenId}"
         end
-        nm = token_names[tokenId]
+        nm = @token_names[tokenId]
       end
       nm
     end
@@ -133,7 +133,7 @@ module Tokn
     #
     def serialize
 
-      h = {"version"=>DFA.version, "tokens"=>token_names}
+      h = {"version" => DFA.version, "tokens" => @token_names}
 
       stateSet,_,_ = start_state.reachableStates
 
