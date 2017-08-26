@@ -100,16 +100,11 @@ module Tokn
       nm
     end
 
-    def tokenId(tokenName)
-      token_id(tokenName)
-    end
-
     # Get id of token given its name, or nil if no such token found
     #
     def token_id(token_name)
       @tokenIdMap[token_name]
     end
-
 
     # Serialize this DFA to a JSON string.
     # The DFA in JSON form has this structure:

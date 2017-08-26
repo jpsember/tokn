@@ -19,7 +19,7 @@ class Tokenizer
 
     @skipTokenId = nil
     if skipName
-      @skipTokenId = dfa.tokenId(skipName)
+      @skipTokenId = dfa.token_id(skipName)
       if !@skipTokenId
         raise ArgumentError, "No token with name "+skipName+" found"
       end
