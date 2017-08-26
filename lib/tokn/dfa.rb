@@ -14,32 +14,10 @@ module Tokn
     include ToknInternal
 
     # Compile a Tokenizer DFA from a token definition script.
-    # Uses persist_path to first check if the file exists and
-    # if so, assumes it contains (in JSON form) a previously compiled
-    # DFA matching this script, and reads the DFA from it.
-    # Second, if no such file exists, it writes the DFA to it after compilation.
     #
-    # If no persist_path argument is given, uses path derived from
-    # hash of script, and stored in hidden subdirectory of the home directory.
-    #
-    def self.from_script(script, persist_path = nil)
-
-      if persist_path.nil?
-        require 'digest/sha1'
-        persist_dir = File.join(Dir.home,".compiled_dfa_#{DFA.version}")
-        FileUtils.mkdir_p(persist_dir)
-        persist_path = File.join(persist_dir,Digest::SHA1.hexdigest(script))
-      end
-
-      if File.exist?(persist_path)
-        return from_json(FileUtils.read_text_file(persist_path))
-      end
-
+    def self.from_script(script)
       td = TokenDefParser.new
-      #td.generate_pdf = true
-      dfa = td.parse(script)
-      FileUtils.write_text_file(persist_path, dfa.serialize())
-      dfa
+      td.parse(script)
     end
 
     # Compile a Tokenizer DFA from a JSON string
@@ -56,7 +34,7 @@ module Tokn
       tNames = h["tokens"]
       stateInfo = h["states"]
 
-      st = []                      # (key_val),i
+      st = []
       stateInfo.each_with_index do |_,i|
         st.push(State.new(i))
       end
