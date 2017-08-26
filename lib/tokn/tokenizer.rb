@@ -97,17 +97,18 @@ class Tokenizer
 
       edges = state.edges
       edges.each do |lbl,dest|
-        a = lbl.elements
-        if a[0] < ToknInternal::EPSILON
-          newTokenId = ToknInternal::edge_label_to_token_id(a[0])
+
+        # If edge points to a final state, its label will correspond to a single token id;
+        # otherwise, its label contains a set of nonnegative character codes
+
+        if dest.finalState
+          token_id = ToknInternal::edge_label_to_token_id(lbl.elements[0])
 
           # We don't want a longer, lower-valued token overriding a higher-valued one
-          if (newTokenId > best_id || (newTokenId == best_id && char_offset > best_length))
-            best_length, best_id = char_offset, newTokenId
+          if (token_id > best_id || (token_id == best_id && char_offset > best_length))
+            best_length, best_id = char_offset, token_id
           end
-        end
-
-        if next_char_integer >= 0 && lbl.contains?(next_char_integer)
+        elsif lbl.contains?(next_char_integer)
           next_state = dest
         end
       end
