@@ -67,19 +67,26 @@ class Tokenizer
   end
 
   def peek_aux
+
+    # If no characters remain, return nil
     return nil if !peek_char(0)
 
+    # Default to an unknown token of a single character
     best_length = 1
     best_id = ToknInternal::UNKNOWN_TOKEN
 
-    charOffset = 0
+    char_offset = 0
     state = @dfa.startState
-    while true
-      ch = nil
-      next_char = peek_char(charOffset)
 
-      ch = next_char.ord if next_char
-      nextState = nil
+    while true
+
+      next_char_integer = -1
+      next_char = peek_char(char_offset)
+      if next_char
+        next_char_integer = next_char.ord
+      end
+
+      next_state = nil
 
       # Examine edges leaving this state.
       # If one is labelled with a token id, we don't need to match the character with it;
@@ -95,19 +102,19 @@ class Tokenizer
           newTokenId = ToknInternal::edge_label_to_token_id(a[0])
 
           # We don't want a longer, lower-valued token overriding a higher-valued one
-          if (newTokenId > best_id || (newTokenId == best_id && charOffset > best_length))
-            best_length, best_id = charOffset, newTokenId
+          if (newTokenId > best_id || (newTokenId == best_id && char_offset > best_length))
+            best_length, best_id = char_offset, newTokenId
           end
         end
 
-        if ch && lbl.contains?(ch)
-          nextState = dest
+        if next_char_integer >= 0 && lbl.contains?(next_char_integer)
+          next_state = dest
         end
       end
 
-      break if !nextState || !ch
-      state = nextState
-      charOffset += 1
+      break if !next_state
+      state = next_state
+      char_offset += 1
     end
 
     best_text = skip_chars(best_length)
