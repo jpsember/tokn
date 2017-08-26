@@ -125,7 +125,7 @@ module ToknInternal
       combined = combineTokenNFAs()
 
       builder = DFABuilder.new(combined)
-      builder.experiment = @generate_pdf
+      builder.generate_pdf = @generate_pdf
       dfa = builder.nfa_to_dfa
 
       Tokn::DFA.new(tokenListSmall, dfa)

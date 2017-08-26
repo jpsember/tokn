@@ -4,24 +4,25 @@ module ToknInternal
 
     attr_reader :modified
     attr_reader :start_state
-    attr_accessor :experiment
+    attr_accessor :verbose
 
     INF_DISTANCE = CODEMAX
 
     def initialize(start_state)
       @start_state = start_state
       @filter_applied = false
+      @verbose = false
     end
 
     def apply
       raise "filter already applied" if @filter_applied
       @filter_applied = true
 
-      if @experiment
+      if @verbose
         puts
         puts "============== apply useless edge filter"
         puts
-        puts @start_state.describe_state_machine if @experiment
+        puts @start_state.describe_state_machine
       end
 
       @modified = false
@@ -37,7 +38,7 @@ module ToknInternal
       @state_list.each do |state_u|
         distance_u = node_distance(state_u)
 
-        puts " processing: #{state_u.name}; distance #{distance_u}" if @experiment
+        puts " processing: #{state_u.name}; distance #{distance_u}" if @verbose
 
         state_u.edges.each do |lbl, state_v|
           next if state_v.finalState
@@ -45,17 +46,17 @@ module ToknInternal
           distance_v = node_distance(state_v)
           distance_v_relaxed = [[distance_u, value_v].max, node_distance(state_v)].min
 
-          puts "  edge to: #{state_v.name}; value #{value_v}; dist #{distance_v}; relaxed #{distance_v_relaxed}" if @experiment
+          puts "  edge to: #{state_v.name}; value #{value_v}; dist #{distance_v}; relaxed #{distance_v_relaxed}" if @verbose
 
           if distance_v_relaxed < distance_v
-            puts "  storing relaxed distance" if @experiment
+            puts "  storing relaxed distance" if @verbose
             @node_distances[state_v.id] = distance_v_relaxed
           end
 
         end
       end
 
-      if @experiment
+      if @verbose
         puts "Node distances:"
         @state_list.each do |state|
           puts " #{state.name}: #{@node_distances[state.id]}"
@@ -80,7 +81,7 @@ module ToknInternal
         value = nil
         state.edges.each do |lbl, dest|
           next unless dest.finalState
-          puts "....calculating value for state from edge: #{lbl.elements}" if @experiment
+          puts "....calculating value for state from edge: #{lbl.elements}" if @verbose
           a = lbl.elements
           primeId = a[0]
           value = ToknInternal::edge_label_to_token_id(primeId)
@@ -121,7 +122,7 @@ module ToknInternal
           value_v = node_value(state_v)
 
           if (value_v >= 0 && value_v < state_u_distance)
-            puts " source distance #{state_u.name}:#{state_u_distance} exceeds dest token value #{state_v.name}:#{value_v}" if @experiment
+            puts " source distance #{state_u.name}:#{state_u_distance} exceeds dest token value #{state_v.name}:#{value_v}" if @verbose
             remove_list << edge_index
           end
         end

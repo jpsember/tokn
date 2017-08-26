@@ -20,12 +20,12 @@ module ToknInternal
 
     attr_reader :start_state
     attr_accessor :with_filter
-    attr_accessor :experiment
+    attr_accessor :generate_pdf
 
     def initialize(start_state)
       @start_state = start_state
       @with_filter = true
-      @experiment = false
+      @generate_pdf = false
     end
 
     # Convert an NFA to a DFA; return the new start state
@@ -35,20 +35,18 @@ module ToknInternal
       partition_edges
       minimize
 
-      @start_state.generate_pdf("_SKIP_prefilter.pdf") if @experiment
+      @start_state.generate_pdf("_SKIP_prefilter.pdf") if @generate_pdf
 
       if @with_filter
         filter = Filter.new(@start_state)
-        filter.experiment = @experiment
+        filter.verbose = @generate_pdf
         filter.apply
         if filter.modified
           # Re-minimize the dfa, since it's been modified by the filter
           minimize
-          @start_state.generate_pdf("_SKIP_postfilter.pdf") if @experiment
+          @start_state.generate_pdf("_SKIP_postfilter.pdf") if @generate_pdf
         end
       end
-
-      raise "aborting for experiment" if @experiment
 
       @start_state
     end

@@ -32,10 +32,11 @@ module Tokn
       end
 
       if File.exist?(persist_path)
-        from_json(FileUtils.read_text_file(persist_path))
+        return from_json(FileUtils.read_text_file(persist_path))
       end
 
       td = TokenDefParser.new
+      #td.generate_pdf = true
       dfa = td.parse(script)
       FileUtils.write_text_file(persist_path, dfa.serialize())
       dfa
