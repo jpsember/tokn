@@ -8,6 +8,10 @@ module Tokn
   #
   class DFA
 
+    def self.version
+      2.0
+    end
+
     include ToknInternal
 
     # Compile a Tokenizer DFA from a token definition script.
@@ -23,7 +27,7 @@ module Tokn
 
       if persist_path.nil?
         require 'digest/sha1'
-        persist_dir = File.join(Dir.home,'.compiled_dfa')
+        persist_dir = File.join(Dir.home,".compiled_dfa_#{DFA.version}")
         FileUtils.mkdir_p(persist_dir)
         persist_path = File.join(persist_dir,Digest::SHA1.hexdigest(script))
       end
@@ -50,11 +54,10 @@ module Tokn
     def self.from_json(jsonStr)
 
       h = JSON.parse(jsonStr)
-
       version = h["version"]
 
-      if !version || version.floor != VERSION.floor
-        raise ArgumentError,"Bad or missing version number: #{version}, expected #{VERSION}"
+      if !version || version.floor != DFA.version.floor
+        raise ArgumentError,"Bad or missing version number: #{version}, expected #{DFA.version}"
       end
 
       tNames = h["tokens"]
@@ -151,8 +154,7 @@ module Tokn
     #
     def serialize
 
-      h = {"version"=>VERSION, "tokens"=>tokenNames}
-
+      h = {"version"=>DFA.version, "tokens"=>tokenNames}
 
       stateSet,_,_ = startState.reachableStates
 
@@ -191,8 +193,6 @@ module Tokn
 
     private
 
-
-    VERSION = 1.0
 
     def stateToList(state)
       list = [state.finalState?]
