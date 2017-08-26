@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'js_base/js_test'
 require 'tokn'
 
