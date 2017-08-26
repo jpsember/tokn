@@ -42,13 +42,6 @@ module Tokn
       dfa
     end
 
-    # Similar to from_script, but reads the script into memory from
-    # the file at scriptPath.
-    #
-    def self.from_script_file(scriptPath, persist_path = nil)
-      self.from_script(FileUtils.read_text_file(scriptPath), persist_path)
-    end
-
     # Compile a Tokenizer DFA from a JSON string
     #
     def self.from_json(jsonStr)
@@ -183,7 +176,7 @@ module Tokn
 
       stateInfo = []
       stateList.each do |st|
-          stateInfo.push(stateToList(st))
+        stateInfo.push(stateToList(st))
       end
       h["states"] = stateInfo
 
