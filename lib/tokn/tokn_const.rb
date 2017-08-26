@@ -14,8 +14,6 @@ module ToknInternal
   # Minimum code possible (e.g., indicating a token id)
   CODEMIN = -10000
 
-  EXP = false
-
   module_function
 
   # Convert a token id (>=0) to an edge label value ( < 0)

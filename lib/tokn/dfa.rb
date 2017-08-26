@@ -35,8 +35,8 @@ module Tokn
         from_json(FileUtils.read_text_file(persist_path))
       end
 
-      td = TokenDefParser.new(script)
-      dfa = td.dfa
+      td = TokenDefParser.new
+      dfa = td.parse(script)
       FileUtils.write_text_file(persist_path, dfa.serialize())
       dfa
     end

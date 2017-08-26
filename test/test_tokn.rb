@@ -72,7 +72,8 @@ END
   end
 
   def test_TokenDefParser
-    TokenDefParser.new(TOKEN_SCRIPT2)
+    parser = TokenDefParser.new
+    parser.parse(TOKEN_SCRIPT2)
   end
 
   def test_Tokenizer

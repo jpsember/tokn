@@ -38,7 +38,7 @@ The token extraction algorithm has these steps:
 
 1. Begin at the start state, S0.
 1. Look at the next character in the source (text) file.  If there is an arrow (edge) labelled with that character, follow it to another state (it may lead to the same state; that's okay), and advance the cursor to the next character in the source file.
-1.  If there's an arrow labelled with a negative number N, don't follow the edge, but instead remember the lowest (i.e., most negative) such N found.
+1.  If there's an arrow labelled with a negative number N, don't follow the edge, but instead remember the lowest (i.e., highest absolute value) such N found.
 1.  Continue steps 2 and 3 until no further progress is possible.
 1.  At this point, N indicates the name of the token found.  The cursor should be restored to the point it was at when that N was recorded.  The token's text consists of the characters from the starting cursor position to that point.
 1.  If no N value was recorded, then the source text doesn't match any of the tokens, which is considered an error.

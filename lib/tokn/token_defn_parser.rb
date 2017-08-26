@@ -21,18 +21,15 @@ module ToknInternal
   #
   class TokenDefParser
 
-    attr_reader :dfa
+    attr_accessor :generate_pdf
+
+    def initialize
+      @generate_pdf = false
+    end
 
     # Compile a token definition script into a DFA
     #
-    def initialize(script)
-      @script = script
-      parseScript
-    end
-
-    private
-
-    def parseScript
+    def parse(script)
       nextTokenId = 0
 
       # List of tokens entries, including anonymous ones
@@ -44,7 +41,7 @@ module ToknInternal
       # Maps token name to token entry
       @tokenNameMap = {}
 
-      @lines = @script.split("\n")
+      @lines = script.split("\n")
 
       # Join lines that have been ended with '\' to their following lines;
       # only do this if there's an odd number of '\' at the end
@@ -71,7 +68,7 @@ module ToknInternal
         end
       end
       if accum
-         raise ParseException, "Incomplete final line: "+@script
+         raise ParseException, "Incomplete final line: "+script
       end
       @lines = joined_lines
 
@@ -128,10 +125,10 @@ module ToknInternal
       combined = combineTokenNFAs()
 
       builder = DFABuilder.new(combined)
-      builder.experiment = EXP
+      builder.experiment = @generate_pdf
       dfa = builder.nfa_to_dfa
 
-      @dfa = Tokn::DFA.new(tokenListSmall, dfa)
+      Tokn::DFA.new(tokenListSmall, dfa)
     end
 
     # Combine the individual NFAs constructed for the token definitions into
