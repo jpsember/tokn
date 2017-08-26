@@ -3,35 +3,36 @@ require 'tokn'
 
 class TestFilter < JSTest
 
-  def build_dfa_from_script
+  def test_generated_edge_count
     dfa = Tokn::DFA.from_script(TOKEN_SCRIPT)
-    #dfa.startState.generate_pdf("_SKIP_dfa.pdf")
-    dfa
-  end
 
-  def build_tokenizer_from_script
-    Tokn::Tokenizer.new(build_dfa_from_script, TOKEN_TEXT, "WS")
+    states,_,_ = dfa.startState.reachableStates
+    total_edges = 0
+    states.each do |state|
+      total_edges += state.edges.size
+    end
+
+    assert_equal(11, total_edges)
   end
 
   def test_Filter
-    tok = build_tokenizer_from_script
+    dfa = Tokn::DFA.from_script(TOKEN_SCRIPT)
 
-    tok.read("MISC")
-    tok.read("MISC")
+    text = "abcabcdef"
+    tok = Tokn::Tokenizer.new(dfa, text)
+
     tok.read("SPECIFIC")
-    tok.read("MISC")
+    tok.read("SPECIFIC")
+    tok.read("GENERAL")
 
     assert(!tok.has_next)
   end
 
   TOKEN_SCRIPT =<<-'END'
-WS:   ( [\s\n]+ )
-MISC: [a-z]+
-SPECIFIC: foo
-END
 
-  TOKEN_TEXT =<<-'END'
-abc abcfoodef foo ghi
+GENERAL: [a-z]+
+SPECIFIC: abc
+
 END
 
 end
