@@ -74,11 +74,7 @@ module Tokn
 
       @token_names = token_name_list
       @start_state = start_state
-      @tokenIdMap = {}
-      @token_names.each_with_index do |name, i|
-        @tokenIdMap[name] = i
-      end
-
+      @token_id_map = nil
     end
 
     # Determine the name of a token, given its id.
@@ -103,7 +99,13 @@ module Tokn
     # Get id of token given its name, or nil if no such token found
     #
     def token_id(token_name)
-      @tokenIdMap[token_name]
+      if @token_id_map.nil?
+        @token_id_map = {}
+        @token_names.each_with_index do |name, i|
+          @token_id_map[name] = i
+        end
+      end
+      @token_id_map[token_name]
     end
 
     # Serialize this DFA to a JSON string.
