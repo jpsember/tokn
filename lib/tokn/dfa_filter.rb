@@ -63,7 +63,6 @@ module ToknInternal
       end
 
       remove_useless_edges
-      filter_multiple_tokens_within_edge
       disallow_zero_length_tokens
     end
 
@@ -134,26 +133,6 @@ module ToknInternal
         # Remove the useless edges in reverse order, since indices change as we remove them
         remove_list.reverse.each { |x| state_u.remove_edge(x)}
 
-      end
-    end
-
-    def filter_multiple_tokens_within_edge
-      @state_list.each do |state|
-        state.edges.each do |lbl, dest|
-          next unless dest.finalState
-          a = lbl.elements
-          primeId = a[0]
-
-          raise "expected token definitions on transition to final state" if primeId >= EPSILON
-
-          exp = primeId + 1
-
-          if a[1] != exp
-            puts "...removing multiple tokens from: #{lbl}" if @experiment
-            lbl.difference!(CodeSet.new(exp, EPSILON))
-            @modified = true
-          end
-        end
       end
     end
 
