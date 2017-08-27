@@ -1,4 +1,4 @@
-require 'js_base/js_test'
+require "js_test"
 
 class TestToknProcess < JSTest
 
@@ -18,8 +18,7 @@ class TestToknProcess < JSTest
     system("tokncompile < ../sampletokens.txt > #{dfa_path}")
 
     TestSnapshot.new.perform do
-      output,_ = scall("toknprocess #{dfa_path} ../sampletext.txt")
-      puts output
+      SysCall.new("toknprocess #{dfa_path} ../sampletext.txt").hide_command.call
     end
   end
 

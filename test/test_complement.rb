@@ -1,4 +1,4 @@
-require 'js_base/js_test'
+require "js_test"
 require 'tokn'
 
 class TestComplement < JSTest

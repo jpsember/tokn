@@ -1,4 +1,4 @@
-require 'js_base/js_test'
+require "js_test"
 require 'tokn'
 
 class TestTokn < JSTest
@@ -14,11 +14,11 @@ class TestTokn < JSTest
   end
 
   def sampleText
-    @sampleText ||= FileUtils.read_text_file("../sampletext.txt")
+    @sampleText ||= File.read("../sampletext.txt")
   end
 
   def sampleTokens
-    @sampleTokens ||= FileUtils.read_text_file("../sampletokens.txt")
+    @sampleTokens ||= File.read("../sampletokens.txt")
   end
 
   REGEX_SCRIPT = "(\\-?[0-9]+)|[_a-zA-Z][_a-zA-Z0-9]*|333q"
