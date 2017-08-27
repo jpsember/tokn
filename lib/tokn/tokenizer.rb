@@ -1,5 +1,7 @@
 module Tokn
 
+class TokenizerException < Exception; end
+
 # Extracts tokens from a script, given a previously constructed DFA.
 #
 class Tokenizer
