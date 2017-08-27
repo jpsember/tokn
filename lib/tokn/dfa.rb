@@ -31,8 +31,8 @@ module Tokn
       end
 
       st.each do |s|
-        finalState, edgeList = stateInfo[s.id]
-        s.finalState = finalState
+        final_state, edgeList = stateInfo[s.id]
+        s.final_state = final_state
         edgeList.each do |edge|
           label,destState = edge
           cr = CodeSet.new()

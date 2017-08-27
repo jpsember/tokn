@@ -41,7 +41,7 @@ module ToknInternal
         puts " processing: #{state_u.name}; distance #{distance_u}" if @verbose
 
         state_u.edges.each do |lbl, state_v|
-          next if state_v.finalState
+          next if state_v.final_state
           value_v = node_value(state_v)
           distance_v = node_distance(state_v)
           distance_v_relaxed = [[distance_u, value_v].max, node_distance(state_v)].min
@@ -80,7 +80,7 @@ module ToknInternal
       @state_list.each do |state|
         value = nil
         state.edges.each do |lbl, dest|
-          next unless dest.finalState
+          next unless dest.final_state
           puts "....calculating value for state from edge: #{lbl.elements}" if @verbose
           a = lbl.elements
           primeId = a[0]
@@ -103,7 +103,7 @@ module ToknInternal
 
     def disallow_zero_length_tokens
       start_state.edges.each do |lbl, dest|
-        if dest.finalState
+        if dest.final_state
           raise "DFA recognizes zero-length tokens!"
         end
       end
@@ -117,7 +117,7 @@ module ToknInternal
         remove_list = []
         state_u.edges.each_with_index do |edge,edge_index|
           _, state_v = edge
-          next if state_v.finalState
+          next if state_v.final_state
 
           value_v = node_value(state_v)
 

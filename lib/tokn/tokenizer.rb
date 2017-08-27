@@ -100,7 +100,7 @@ class Tokenizer
         # If edge points to a final state, its label will correspond to a single token id;
         # otherwise, its label contains a set of nonnegative character codes
 
-        if dest_state.finalState
+        if dest_state.final_state
           token_id = ToknInternal::edge_label_to_token_id(edge_label.elements[0])
 
           # We don't want a longer, lower-valued token overriding a higher-valued one.

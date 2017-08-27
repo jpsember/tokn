@@ -31,7 +31,7 @@ module Tokn
     #  }
     #
     # Each state has this format:
-    #  [ finalState (boolean),
+    #  [ final_state (boolean),
     #   [edge0, edge1, ...]
     #  ]
     #
@@ -74,7 +74,7 @@ module Tokn
 
       stateInfo = []
       stateList.each do |state|
-        list = [state.finalState]
+        list = [state.final_state]
         ed = []
         state.edges.each do |lbl, dest|
           edInfo = [lbl.elements, dest.id]

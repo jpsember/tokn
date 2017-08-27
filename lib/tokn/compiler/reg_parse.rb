@@ -494,7 +494,7 @@ module ToknInternal
         nfa_start.generate_pdf("../../_SKIP_nfa.pdf")
       end
 
-      nfa_end.finalState = true
+      nfa_end.final_state = true
 
       builder = DFABuilder.new(nfa_start)
       builder.with_filter = false
@@ -532,9 +532,9 @@ module ToknInternal
       states.each do |x|
         puts "processing state: #{x}" if v
 
-        if x.finalState
+        if x.final_state
           puts "...a final state" if v
-          x.finalState = false
+          x.final_state = false
           next
         end
 
@@ -553,7 +553,7 @@ module ToknInternal
         puts " adding e-transition to #{f.id}" if v
         x.addEps(f)
       end
-      f.finalState = true
+      f.final_state = true
 
       if v
         puts "\n\ncomplemented:\n"

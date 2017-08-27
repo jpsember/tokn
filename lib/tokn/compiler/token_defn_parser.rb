@@ -154,12 +154,12 @@ module ToknInternal
         # it from character codes)
         dupEnd = oldToNewMap[regParse.endState]
 
-        dupfinalState = State.new(baseId)
+        dupfinal_state = State.new(baseId)
         baseId += 1
-        dupfinalState.finalState = true
+        dupfinal_state.final_state = true
 
         # Why do I need to add 'ToknInternal.' here?  Very confusing.
-        dupEnd.addEdge(CodeSet.new(ToknInternal.token_id_to_edge_label(tokenId)), dupfinalState)
+        dupEnd.addEdge(CodeSet.new(ToknInternal.token_id_to_edge_label(tokenId)), dupfinal_state)
 
         # Add an e-transition from the start state to this expression's start
         start_state.addEdge(CodeSet.new(EPSILON),dupStart)

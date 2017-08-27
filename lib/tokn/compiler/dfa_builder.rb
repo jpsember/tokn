@@ -176,7 +176,7 @@ module ToknInternal
         newState = State.new(@nextId)
 
         # Determine if any of the NFA states were final states
-        newState.finalState = sorted_nfa_state_id_list.any?{|id| @nfaStateMap[id].finalState}
+        newState.final_state = sorted_nfa_state_id_list.any?{|id| @nfaStateMap[id].final_state}
 
         @nextId += 1
         @nfaStateMap[sorted_nfa_state_id_list] = newState
