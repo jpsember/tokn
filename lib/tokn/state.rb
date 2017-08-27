@@ -18,7 +18,6 @@ module ToknInternal
 
     attr_accessor :id
     attr_accessor :finalState
-    alias_method :finalState?, :finalState
     attr_accessor :label
 
     # Edges are a list of [label:CharSetRange, dest:State] pairs
@@ -105,7 +104,7 @@ module ToknInternal
 
       stateList.each_value do |s|
         g << " \"#{s.name}\" [shape="
-        if s.finalState?
+        if s.finalState
           g << "doubleoctagon"
         else
           g << "octagon"
@@ -221,7 +220,7 @@ module ToknInternal
 
       oldStates.each do |s|
         s2 = State.new((s.id - oldMinId) + dupBaseId)
-        s2.finalState = s.finalState?
+        s2.finalState = s.finalState
         s2.label = s.label
 
         oldToNewStateMap[s] = s2
@@ -258,7 +257,7 @@ module ToknInternal
           u.finalState = true
         end
 
-        if s.finalState?
+        if s.finalState
           newStartStateList.push(u)
         end
 

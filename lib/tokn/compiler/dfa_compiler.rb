@@ -74,7 +74,7 @@ module Tokn
 
       stateInfo = []
       stateList.each do |state|
-        list = [state.finalState?]
+        list = [state.finalState]
         ed = []
         state.edges.each do |lbl, dest|
           edInfo = [lbl.elements, dest.id]
