@@ -10,8 +10,7 @@
 # toknprocess dfa.txt sampletext.txt
 #
 
-require 'tokn/compiler/compiler'
-require 'js_base'
+require 'tokn/compiler'
 
 include Tokn
 
@@ -21,14 +20,14 @@ if ARGV.size < 2 || ARGV.size > 3
 end
 
 
-compiled_dfa = FileUtils.read_text_file(ARGV[0])
+compiled_dfa = File.read(ARGV[0])
 dfa = DFA.from_json(compiled_dfa)
 skipName = nil
 if ARGV.size >= 3
 	skipName = ARGV[2]
 end
 
-tk = Tokenizer.new(dfa, FileUtils.read_text_file(ARGV[1]), skipName)
+tk = Tokenizer.new(dfa, File.read(ARGV[1]), skipName)
 
 while tk.has_next
   t = tk.read

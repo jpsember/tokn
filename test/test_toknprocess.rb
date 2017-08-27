@@ -18,7 +18,7 @@ class TestToknProcess < JSTest
     system("tokncompile < ../sampletokens.txt > #{dfa_path}")
 
     TestSnapshot.new.perform do
-      output,_ = scall("ruby ../../bin/toknprocess #{dfa_path} ../sampletext.txt")
+      output,_ = scall("toknprocess #{dfa_path} ../sampletext.txt")
       puts output
     end
   end

@@ -1,5 +1,5 @@
 require 'js_base/js_test'
-require 'tokn/compiler/compiler'
+require 'tokn/compiler'
 
 class TestFilter < JSTest
 

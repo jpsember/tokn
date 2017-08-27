@@ -14,7 +14,7 @@ module Tokn
     # Compile a Tokenizer DFA from a JSON string
     #
     def self.from_json(jsonStr)
-
+      require "json"
       h = JSON.parse(jsonStr)
       version = h["version"]
 
