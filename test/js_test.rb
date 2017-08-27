@@ -232,41 +232,15 @@ class TestSnapshot
   end
 
   def calc_diff(path1=nil, path2=nil)
-    df,_ = scall("diff -C 1 \"#{path1}\" \"#{path2}\"", false)
+    df = SysCall.new("diff -C 1 \"#{path1}\" \"#{path2}\"").hide.output
+
     if df.size == 0
       nil
     else
       # If difference was detected, call with more user-friendly output
-      df,_ = scall("diff --width=130 -y \"#{path1}\" \"#{path2}\"", false)
-      df
+      SysCall.new("diff --width=130 -y \"#{path1}\" \"#{path2}\"").hide.output
     end
   end
-
-  # Make a system call
-  #
-  # @param cmd command to execute
-  # @param abort_if_problem if return code is nonzero, raises SystemCallException
-  # @return [captured output, success flag] (where success is true if return code was zero)
-  #
-  def scall(cmd, abort_if_problem = true)
-    res = nil
-    status = false
-    begin
-      res,status = Open3.capture2e(cmd)
-    rescue Exception => e
-      status = 1
-      res = e.to_s
-    end
-
-    success = (status == 0)
-
-    if !success && abort_if_problem
-      raise SystemCallException,"Failed system call (status=#{status}): '#{cmd}'\n"+res
-    end
-
-    [res, success]
-  end
-
 
 end
 
