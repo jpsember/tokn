@@ -175,7 +175,7 @@ module ToknInternal
     #  [] delete edges that have empty labels
     #  [] sort edges by destination state ids
     #
-    def normalize()
+    def normalize
 
       @edges.sort!{|x,y|
         _,dest1 = x
@@ -183,28 +183,27 @@ module ToknInternal
         dest1.id <=> dest2.id
       }
 
-      newEdges = []
-      prevLabel, prevDest = nil,nil
+      new_edges = []
+      prev_label, prev_dest = nil,nil
 
       edges.each do |label,dest|
-        if prevDest and prevDest.id == dest.id
-          # changed = true
-          prevLabel.addSet(label)
+        if prev_dest and prev_dest.id == dest.id
+          prev_label.addSet(label)
         else
-          if prevDest
-            newEdges.push([prevLabel,prevDest])
+          if prev_dest
+            new_edges.push([prev_label,prev_dest])
           end
           # Must start a fresh copy!  Don't want to modify the original label.
-          prevLabel = label.makeCopy()
-          prevDest = dest
+          prev_label = label.makeCopy()
+          prev_dest = dest
         end
       end
 
-      if prevDest
-        newEdges.push([prevLabel,prevDest])
+      if prev_dest
+        new_edges.push([prev_label,prev_dest])
       end
 
-      @edges = newEdges
+      @edges = new_edges
     end
 
     # Duplicate the NFA reachable from this state, possibly with new ids
