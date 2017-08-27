@@ -10,7 +10,7 @@
 # toknprocess dfa.txt sampletext.txt
 #
 
-require_relative '../lib/tokn/compiler/compiler'
+require 'tokn/compiler/compiler'
 require 'js_base'
 
 include Tokn
