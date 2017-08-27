@@ -1,0 +1,29 @@
+# Token ids for compileddfa.txt
+#
+WS           = 0
+INT          = 1
+DBL          = 2
+LBL          = 3
+ID           = 4
+ASSIGN       = 5
+EQUIV        = 6
+IF           = 7
+DO           = 8
+BROP         = 9
+BRCL         = 10
+
+// Token ids for compileddfa.txt
+//
+private static final int 
+WS=0,
+INT=1,
+DBL=2,
+LBL=3,
+ID=4,
+ASSIGN=5,
+EQUIV=6,
+IF=7,
+DO=8,
+BROP=9,
+BRCL=10,
+

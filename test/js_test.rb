@@ -255,6 +255,8 @@ class SysCall
     @hide_output = false
     @hide_command = false
     @dryrun = false
+    @rescue = false
+    @verbose = false
   end
 
   def hide_command(flag = true)

@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+# Generate token names from dfa, suitable for inclusion in Ruby or Java source
+
+require 'tokn/compiler'
+
+include Tokn
+
+if ARGV.size != 1
+  puts "Usage: toknids <dfa file>"
+  abort
+end
+
+filename = ARGV[0]
+compiled_dfa = File.read(filename)
+dfa = DFA.from_json(compiled_dfa)
+
+puts "# Token ids for #{File.basename(filename)}"
+puts "#"
+dfa.token_names.each_with_index do |name, index|
+  printf(   "%-12s = #{index}\n", name)
+end
+puts
+
+puts "// Token ids for #{File.basename(filename)}"
+puts "//"
+  puts "private static final int "
+  dfa.token_names.each_with_index do |name, index|
+  puts "#{name}=#{index},"
+end
+puts
