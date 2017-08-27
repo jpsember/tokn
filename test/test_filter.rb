@@ -1,6 +1,5 @@
 require 'js_base/js_test'
-require 'tokn'
-require 'tokn/dfa_compiler'
+require_relative '../lib/tokn/compiler/tokn_compiler'
 
 class TestFilter < JSTest
 

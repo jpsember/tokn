@@ -1,6 +1,3 @@
-require_relative "range_partition"
-require_relative "dfa_filter"
-
 module ToknInternal
 
   # Converts NFAs (nondeterministic, finite state automata) to

@@ -1,6 +1,3 @@
-require_relative 'reg_parse'
-require_relative 'dfa_builder'
-
 module ToknInternal
 
   # Parses a token definition script, and generates an NFA that

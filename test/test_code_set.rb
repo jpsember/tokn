@@ -1,5 +1,5 @@
 require 'js_base/js_test'
-require 'tokn'
+require_relative '../lib/tokn'
 
 class TestCodeSet < JSTest
 

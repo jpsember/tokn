@@ -1,5 +1,3 @@
-require_relative 'token_defn_parser'
-
 module Tokn
 
   # Support for compiling and serializing DFAs

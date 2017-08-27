@@ -1,5 +1,3 @@
-require_relative 'token_defn_parser'
-
 module Tokn
 
   # A DFA for tokenizing; includes pointer to a start state, and

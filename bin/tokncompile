@@ -8,8 +8,7 @@
 # tokncompile < sampletokens.txt > dfa.txt
 #
 
-require 'tokn'
-require 'tokn/dfa_compiler'
+require 'tokn/compiler/tokn_compiler'
 
 dfa = Tokn::DFACompiler.from_script(ARGF.read)
 puts Tokn::DFACompiler.serialize(dfa)
