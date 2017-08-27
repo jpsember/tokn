@@ -20,6 +20,5 @@ text file to a sequence of those tokens.
   s.homepage    = 'https://github.com/jpsember/tokn'
   s.license = 'MIT'
 
-  s.add_dependency('js_base','~> 1.2')
   s.add_dependency('trollop')
 end
