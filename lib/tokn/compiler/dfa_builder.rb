@@ -75,7 +75,7 @@ module ToknInternal
 
       # Build a map of nfa state ids => nfa states
       @nfaStateMap = {}
-      nfas, _, _ = start_state.reachableStates
+      nfas = start_state.reachable_states
       nfas.each {|s| @nfaStateMap[s.id] = s}
 
       # Initialize an array of nfa state lists, indexed by dfa state id
@@ -139,7 +139,7 @@ module ToknInternal
 
       par = RangePartition.new
 
-      stateSet, _, _ = @start_state.reachableStates
+      stateSet = @start_state.reachable_states
 
       stateSet.each do |s|
         s.edges.each {|lbl,dest| par.addSet(lbl) }

@@ -47,7 +47,7 @@ module Tokn
 
       h = {"version" => DFA.version, "tokens" => dfa.token_names}
 
-      stateSet,_,_ = dfa.start_state.reachableStates
+      stateSet = dfa.start_state.reachable_states
 
       idToStateMap = {}
       stateSet.each{ |st| idToStateMap[st.id] = st }

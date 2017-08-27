@@ -506,7 +506,7 @@ module ToknInternal
         dfa_start_state.generate_pdf("../../_SKIP_dfa.pdf")
       end
 
-      states, _, _ = dfa_start_state.reachableStates
+      states = dfa_start_state.reachable_states
 
       f = State.new(states.size)
 

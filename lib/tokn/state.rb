@@ -77,8 +77,7 @@ module ToknInternal
     # > start state
     #
     def self.normalizeStates(start_state)
-      stateSet, _,_ = start_state.reachableStates
-      stateSet.map{|s| s.normalize}
+      start_state.reachable_states.map{|s| s.normalize}
     end
 
     # Generate a .dot file of the state machine
@@ -213,7 +212,8 @@ module ToknInternal
     #     1 + highest id in new NFA ]
     #
     def duplicateNFA(dupBaseId)
-      oldStates, oldMinId, oldMaxId = reachableStates()
+      oldStates = reachable_states
+      oldMinId, oldMaxId = range_of_state_ids(oldStates)
 
       oldToNewStateMap = {}
 
@@ -238,8 +238,6 @@ module ToknInternal
     #
     def reverseNFA
 
-      stateSet, _, maxId = reachableStates()
-
       edgeList = []
 
       newStartStateList = []
@@ -247,6 +245,7 @@ module ToknInternal
 
       newStateMap = {}
 
+      stateSet = reachable_states
       stateSet.each do |s|
         u = State.new(s.id)
         newStateMap[u.id] = u
@@ -271,6 +270,7 @@ module ToknInternal
       end
 
       # Create a distinguished start node that points to each of the start nodes
+      _,maxId = range_of_state_ids(stateSet)
       w = State.new(maxId)
       newStartStateList.each {|s| w.addEps(s)}
       w
@@ -278,37 +278,45 @@ module ToknInternal
 
     # Build set of states reachable from this state
     #
-    # > list of starting states
-    # < [ set,   set of states reachable from those states
-    #     minId, lowest id in set
-    #     maxId    1 + highest id in set
-    #   ]
-    #
-    def reachableStates()
+    def reachable_states
       set = Set.new
       stack = []
       stack.push(self)
 
-      maxId = self.id
-      minId = self.id
-
       while !stack.empty?
         st = stack.pop
         set.add(st)
-        if minId > st.id
-          minId = st.id
-        end
-        if maxId < st.id
-          maxId = st.id
-        end
-
         st.edges.each do |lbl, dest|
           if set.add?(dest)
             stack.push(dest)
           end
         end
       end
-      [set, minId,  1+maxId]
+      set
+    end
+
+    # Get range of states in a set
+    #
+    # returns [lowest id in set, 1 + highest id in set]
+    #
+    def range_of_state_ids(states)
+      max_id = -1
+      min_id = -1
+
+      states.each do |state|
+        if max_id < 0
+          max_id = state.id
+          min_id = state.id
+        else
+          if min_id > state.id
+            min_id = state.id
+          end
+          if max_id < state.id
+            max_id = state.id
+          end
+        end
+      end
+      [min_id, max_id + 1]
     end
 
     def to_s
@@ -332,9 +340,8 @@ module ToknInternal
     # Construct string representation of the state machine reachable from this state
     #
     def describe_state_machine
-      state_set,_,_ = self.reachableStates
       str = ""
-      state_set.sort{|x,y| x.id <=> y.id}.each do |x|
+      self.reachable_states.sort{|x,y| x.id <=> y.id}.each do |x|
         str << x.to_s << "\n"
       end
       str

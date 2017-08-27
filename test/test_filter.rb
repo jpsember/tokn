@@ -6,7 +6,7 @@ class TestFilter < JSTest
   def test_generated_edge_count
     dfa = Tokn::DFACompiler.from_script(TOKEN_SCRIPT)
 
-    states,_,_ = dfa.start_state.reachableStates
+    states = dfa.start_state.reachable_states
     total_edges = 0
     states.each do |state|
       total_edges += state.edges.size
