@@ -31,7 +31,7 @@ END
   end
 
   def build_dfa_from_script
-    Tokn::DFA.from_script(sampleTokens)
+    Tokn::DFACompiler.from_script(sampleTokens)
   end
 
   def build_tokenizer_from_script

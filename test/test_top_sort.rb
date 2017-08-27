@@ -35,7 +35,7 @@ EOS
   end
 
   def build_dfa_from_script
-    dfa = Tokn::DFA.from_script(sampleTokens)
+    dfa = Tokn::DFACompiler.from_script(sampleTokens)
     dfa
   end
 

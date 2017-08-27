@@ -13,21 +13,6 @@ module Tokn
 
     include ToknInternal
 
-    # Compile a Tokenizer DFA from a token definition script.
-    #
-    def self.from_script(script)
-      td = TokenDefParser.new
-      td.parse(script)
-    end
-
-    # Compile a Tokenizer DFA from a token definition script, generating pdfs while doing so
-    #
-    def self.from_script_with_pdf(script)
-      td = TokenDefParser.new
-      td.generate_pdf = true
-      td.parse(script)
-    end
-
     # Compile a Tokenizer DFA from a JSON string
     #
     def self.from_json(jsonStr)
@@ -106,80 +91,6 @@ module Tokn
         end
       end
       @token_id_map[token_name]
-    end
-
-    # Serialize this DFA to a JSON string.
-    # The DFA in JSON form has this structure:
-    #
-    #  {
-    #    "version" => version number (float)
-    #    "tokens" => array of token names (strings)
-    #    "states" => array of states, ordered by id (0,1,..)
-    #  }
-    #
-    # Each state has this format:
-    #  [ finalState (boolean),
-    #   [edge0, edge1, ...]
-    #  ]
-    #
-    # Edge:
-    #  [label, destination id (integer)]
-    #
-    # Labels are arrays of integers, exactly the structure of
-    # a CodeSet array.
-    #
-    def serialize
-
-      h = {"version" => DFA.version, "tokens" => @token_names}
-
-      stateSet,_,_ = start_state.reachableStates
-
-      idToStateMap = {}
-      stateSet.each{ |st| idToStateMap[st.id] = st }
-
-      stateList = []
-
-      nextId = 0
-      idToStateMap.each_pair do |id, st|
-        if nextId != id
-          raise ArgumentError, "unexpected state ids"
-        end
-        nextId += 1
-
-        stateList.push(st)
-      end
-
-      if stateList.size == 0
-        raise ArgumentError, "bad states"
-      end
-
-      if stateList[0] != start_state
-        raise ArgumentError, "bad start state"
-      end
-
-      stateInfo = []
-      stateList.each do |st|
-        stateInfo.push(stateToList(st))
-      end
-      h["states"] = stateInfo
-
-      JSON.generate(h)
-    end
-
-
-    private
-
-
-    def stateToList(state)
-      list = [state.finalState?]
-      ed = []
-      state.edges.each do |lbl, dest|
-        edInfo = [lbl.elements, dest.id]
-        ed.push(edInfo)
-      end
-      list.push(ed)
-
-      list
     end
 
   end

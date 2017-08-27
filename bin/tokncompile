@@ -9,6 +9,7 @@
 #
 
 require 'tokn'
-require 'js_base'
+require 'tokn/dfa_compiler'
 
-puts Tokn::DFA.from_script(ARGF.read).serialize()
+dfa = Tokn::DFACompiler.from_script(ARGF.read)
+puts Tokn::DFACompiler.serialize(dfa)

@@ -67,7 +67,7 @@ definitions shown earlier.
 ```
 require 'tokn'
 
-dfa = Tokn::DFA.from_script(FileUtils.read_text_file("sampletokens.txt"))
+dfa = Tokn::DFACompiler.from_script(FileUtils.read_text_file("sampletokens.txt"))
 t = Tokn::Tokenizer.new(dfa,FileUtils.read_text_file("sampletext.txt"))
 
 while t.has_next

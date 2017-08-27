@@ -31,7 +31,7 @@ class TestTokn < JSTest
 END
 
   def build_dfa_from_script
-    Tokn::DFA.from_script(sampleTokens)
+    Tokn::DFACompiler.from_script(sampleTokens)
   end
 
   def build_tokenizer_from_script
@@ -178,7 +178,7 @@ END
 
   def test_read_named_sequence
     TestSnapshot.new.perform do
-      dfa = Tokn::DFA.from_script(sampleTokens)
+      dfa = Tokn::DFACompiler.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
       while t.has_next do
@@ -195,7 +195,7 @@ END
 
   def test_read_named_sequence_unconditionally
     TestSnapshot.new.perform do
-      dfa = Tokn::DFA.from_script(sampleTokens)
+      dfa = Tokn::DFACompiler.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
       while t.has_next do
@@ -210,7 +210,7 @@ END
 
   def test_read_named_sequence_unconditionally_fails
     assert_raises Tokn::TokenizerException do
-      dfa = Tokn::DFA.from_script(sampleTokens)
+      dfa = Tokn::DFACompiler.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
       while t.has_next do
@@ -224,7 +224,7 @@ END
 
   def test_read_id_sequence_unconditionally
     TestSnapshot.new.perform do
-      dfa = Tokn::DFA.from_script(sampleTokens)
+      dfa = Tokn::DFACompiler.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
       while t.has_next do
@@ -239,7 +239,7 @@ END
 
   def test_read_id_sequence_unconditionally_fails
     assert_raises Tokn::TokenizerException do
-      dfa = Tokn::DFA.from_script(sampleTokens)
+      dfa = Tokn::DFACompiler.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
       while t.has_next do
@@ -254,7 +254,7 @@ END
 
   def test_read_id_sequence
     TestSnapshot.new.perform do
-      dfa = Tokn::DFA.from_script(sampleTokens)
+      dfa = Tokn::DFACompiler.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
       while t.has_next do
@@ -273,7 +273,7 @@ END
 
   def test_read_named_sequence_with_wildcards
     TestSnapshot.new.perform do
-      dfa = Tokn::DFA.from_script(sampleTokens)
+      dfa = Tokn::DFACompiler.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
       while t.has_next do
@@ -291,7 +291,7 @@ END
 
   def test_read_id_sequence_with_wildcards
     TestSnapshot.new.perform do
-      dfa = Tokn::DFA.from_script(sampleTokens)
+      dfa = Tokn::DFACompiler.from_script(sampleTokens)
       t = Tokn::Tokenizer.new(dfa, sampleText, "WS")
 
       while t.has_next do
@@ -309,7 +309,7 @@ END
 
   def test_c_style_comments
     TestSnapshot.new.perform do
-      dfa = Tokn::DFA.from_script(sampleTokens)
+      dfa = Tokn::DFACompiler.from_script(sampleTokens)
       text = SAMPLETEXT2
       t = Tokn::Tokenizer.new(dfa, text)
 
@@ -328,7 +328,7 @@ END
 
   def test_read_from_file
     build_file
-    dfa = Tokn::DFA.from_script(TOKEN_SCRIPT2)
+    dfa = Tokn::DFACompiler.from_script(TOKEN_SCRIPT2)
     t = Tokn::Tokenizer.new(dfa,File.open('diskfile.txt','r'),'sep',50)
     1000.times do
       t.read('tku')
@@ -340,7 +340,7 @@ END
 
   def test_unread_from_file_legal
     build_file
-    dfa = Tokn::DFA.from_script(TOKEN_SCRIPT2)
+    dfa = Tokn::DFACompiler.from_script(TOKEN_SCRIPT2)
     history_size = 8
     total_tokens = 3000
 
@@ -352,7 +352,7 @@ END
 
   def test_unread_from_file_illegal
     build_file
-    dfa = Tokn::DFA.from_script(TOKEN_SCRIPT2)
+    dfa = Tokn::DFACompiler.from_script(TOKEN_SCRIPT2)
     history_size = 8
     t = Tokn::Tokenizer.new(dfa,File.open('diskfile.txt','r'),'sep',history_size)
     500.times{t.read}
@@ -374,7 +374,7 @@ END
   end
 
   def test_unknown
-    dfa = Tokn::DFA.from_script(TOKEN_SCRIPT2)
+    dfa = Tokn::DFACompiler.from_script(TOKEN_SCRIPT2)
     t = Tokn::Tokenizer.new(dfa,'ddd')
     e = assert_raises Tokn::TokenizerException do
       t.read
@@ -386,7 +386,7 @@ END
     # There are no characters between the backslash and the linefeed; this will be interpreted
     # as a 'line stitch' command
     script = "A: ab\\\nab"
-    dfa = Tokn::DFA.from_script(script)
+    dfa = Tokn::DFACompiler.from_script(script)
     tok = Tokn::Tokenizer.new(dfa,"abababababab")
     tok.read
     tok.read
@@ -398,7 +398,7 @@ END
     # Note there's a space between the backslash and the linefeed; this will be interpreted
     # as an escaped space, not as a 'line stitch' command
     script = "A: aa\\ \nB: ab"
-    dfa = Tokn::DFA.from_script(script)
+    dfa = Tokn::DFACompiler.from_script(script)
     tok = Tokn::Tokenizer.new(dfa,"abaa ab")
     tok.read(1)
     tok.read(0)
@@ -408,7 +408,7 @@ END
 
   def test_continue_line_with_multiple_backslash
     script = "A: ab\\\\\\\\\\\nab\nB: bb"
-    dfa = Tokn::DFA.from_script(script)
+    dfa = Tokn::DFACompiler.from_script(script)
     tok = Tokn::Tokenizer.new(dfa,"bbab\\\\abbb")
     tok.read(1)
     tok.read(0)
@@ -419,7 +419,7 @@ END
   def test_Tokenizer3
     TestSnapshot.new.perform do
 
-      dfa = Tokn::DFA.from_script(SAMPLETOKENS3)
+      dfa = Tokn::DFACompiler.from_script(SAMPLETOKENS3)
       tok = Tokn::Tokenizer.new(dfa, SAMPLETEXT3)
 
       tokList = []
@@ -445,7 +445,7 @@ END
     script << 'ID: \\d+'
     script << "\n"
 
-    dfa = Tokn::DFA.from_script(script)
+    dfa = Tokn::DFACompiler.from_script(script)
     tok = Tokn::Tokenizer.new(dfa,"   14  \n   # white space 42 \n  19 83  ")
     [0,1,0,0,0,1,0,1,0].each do |id|
       tok.read(id)
@@ -460,7 +460,7 @@ END
     script << 'TAGEND:   (  (/ [a-zA-Z]*) | \? )? >'
     script << "\n"
 
-    dfa = Tokn::DFA.from_script(script)
+    dfa = Tokn::DFACompiler.from_script(script)
     tok = Tokn::Tokenizer.new(dfa,"/abc>  >  ?>  ")
     [1,0,1,0,1,0].each do |id|
       tok.read(id)
@@ -679,21 +679,21 @@ END
   def test_bracket_expr_disallowed
     script = 'C: [a-z^e^f]'
     assert_raises ToknInternal::ParseException do
-      Tokn::DFA.from_script(script)
+      Tokn::DFACompiler.from_script(script)
     end
   end
 
   def test_bracket_expr_disallowed2
     script = 'C: [a-z^]'
     assert_raises ToknInternal::ParseException do
-      Tokn::DFA.from_script(script)
+      Tokn::DFACompiler.from_script(script)
     end
   end
 
   def test_bracket_expr_disallowed3
     script = 'C: [^]'
     assert_raises ToknInternal::ParseException do
-      Tokn::DFA.from_script(script)
+      Tokn::DFACompiler.from_script(script)
     end
   end
 
@@ -701,7 +701,7 @@ END
   # Extract tokens from script
   #
   def verify(tokens_defn_string, script)
-    dfa = Tokn::DFA.from_script(tokens_defn_string)
+    dfa = Tokn::DFACompiler.from_script(tokens_defn_string)
 
     TestSnapshot.new.perform do
 
