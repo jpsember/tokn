@@ -1,5 +1,5 @@
 require "js_test"
-require 'tokn'
+require "tokn/compiler"
 
 class TestTokn < JSTest
 
@@ -72,7 +72,7 @@ END
   end
 
   def test_TokenDefParser
-    parser = Tokn::TokenDefParser.new
+    parser = TokenDefParser.new
     parser.parse(TOKEN_SCRIPT2)
   end
 

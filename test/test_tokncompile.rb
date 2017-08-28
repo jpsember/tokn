@@ -1,4 +1,5 @@
 require "js_test"
+require "tokn/compiler"
 
 class TestToknCompile < JSTest
 

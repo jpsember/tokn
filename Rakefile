@@ -7,6 +7,6 @@ end
 
 Rake::TestTask.new("test:only") do |t|
   t.libs << "test"
-  t.test_files = FileList["test/test_filter.rb"]
+  t.test_files = FileList["test/test_complement.rb"]
 end
 

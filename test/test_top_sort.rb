@@ -1,5 +1,5 @@
 require "js_test"
-require 'tokn'
+require "tokn/compiler"
 
 class TestTopSort < JSTest
 
@@ -47,7 +47,10 @@ EOS
     dfa = build_dfa_from_script
     state = dfa.start_state
 
-    sorted_states = state.topological_sort
+    sorter = TopSort.new(state)
+    sorter.perform
+    sorted_states = sorter.sorted_states
+
     str = ""
     sorted_states.each do |s|
       str << " " << "#{s.id}"

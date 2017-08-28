@@ -1,10 +1,11 @@
 # This file includes all tokn compiler-related classes
 
-require "tokn"
+require_relative "../tokn"
 
-require "tokn/compiler/token_defn_parser"
-require "tokn/compiler/reg_parse"
-require "tokn/compiler/dfa_builder"
-require "tokn/compiler/range_partition"
-require "tokn/compiler/dfa_filter"
-require "tokn/compiler/dfa_compiler"
+require_relative "compiler/token_defn_parser"
+require_relative "compiler/reg_parse"
+require_relative "compiler/dfa_builder"
+require_relative "compiler/range_partition"
+require_relative "compiler/dfa_filter"
+require_relative "compiler/dfa_compiler"
+require_relative "compiler/topological_sort"

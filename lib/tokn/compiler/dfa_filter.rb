@@ -72,7 +72,9 @@ module ToknInternal
 
 
     def build_topological_state_list
-      @state_list = @start_state.topological_sort
+      sorter = TopSort.new(@start_state)
+      sorter.perform
+      @state_list = sorter.sorted_states
     end
 
     def construct_node_values
