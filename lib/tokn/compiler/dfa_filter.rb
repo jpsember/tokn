@@ -106,7 +106,7 @@ module ToknInternal
     def disallow_zero_length_tokens
       start_state.edges.each do |lbl, dest|
         if dest.final_state
-          raise "DFA recognizes zero-length tokens!"
+          raise ParseException, "DFA recognizes zero-length tokens!"
         end
       end
     end

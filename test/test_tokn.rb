@@ -698,9 +698,13 @@ END
   end
 
   def test_zero_length_tokens
-    script = 'ZERO: \d*'
-    assert_raises ToknInternal::ParseException do
+    script = '# Comment' + "\n" + 'ZERO: \d*'
+    exception = nil
+    begin
       Tokn::DFACompiler.from_script(script)
+      raise "expected exception"
+    rescue ToknInternal::ParseException => e
+      assert e.message.include?("zero-length")
     end
   end
 
