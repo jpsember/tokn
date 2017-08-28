@@ -72,7 +72,7 @@ END
   end
 
   def test_TokenDefParser
-    parser = TokenDefParser.new
+    parser = Tokn::TokenDefParser.new
     parser.parse(TOKEN_SCRIPT2)
   end
 
