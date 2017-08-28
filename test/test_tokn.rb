@@ -43,7 +43,7 @@ END
   end
 
   def test_build_DFA
-    x = RegParse.new(REGEX_SCRIPT,{})
+    x = RegParse.new(REGEX_SCRIPT,{},1)
     s = x.start_state
     x.endState.final_state = true
     s.reverseNFA()
@@ -56,7 +56,7 @@ END
   end
 
   def test_cvt_NFA_to_DFA
-    x = RegParse.new(REGEX_SCRIPT,{})
+    x = RegParse.new(REGEX_SCRIPT,{},1)
     s = x.start_state
     x.endState.final_state = true
     TestSnapshot.new.perform do
@@ -738,6 +738,24 @@ EOT
       assert e.message.include?("line 5;")
     end
   end
+
+  def test_missing_hex_digit
+    script =<<-'EOT'
+#
+#
+ALPHA: abc
+BETA: abc[123\u01h5]fgh
+EOT
+
+    begin
+      Tokn::DFACompiler.from_script(script)
+      raise "expected exception"
+    rescue ToknInternal::ParseException => e
+      assert e.message.include?("Missing hex digit")
+      assert e.message.include?("line 4;")
+    end
+  end
+
 
   # Extract tokens from script
   #

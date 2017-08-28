@@ -89,10 +89,12 @@ module ToknInternal
     #     (mapping names to ids) to be consulted if a curly brace expression appears
     #     in the script
     #
-    def initialize(script, tokenDefMap)
+    def initialize(script, tokenDefMap, orig_line_number)
+      @orig_script = script
       @script = filter_ws(script)
       @nextStateId = 0
       @tokenDefMap = tokenDefMap
+      @orig_line_number = orig_line_number
       parseScript
     end
 
@@ -145,8 +147,7 @@ module ToknInternal
       if i + 3 < @script.size
         s += '...'
       end
-      s << "\n Expression being parsed: '" << @script << "'"
-      raise ParseException, msg + ": "+s
+      raise ParseException.build(msg + ": " + s, @orig_line_number, @orig_script)
     end
 
     # Read next character as a hex digit

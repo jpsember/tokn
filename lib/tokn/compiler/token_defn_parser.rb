@@ -96,7 +96,7 @@ module ToknInternal
 
         expr = line[pos+1..-1]
 
-        rex = RegParse.new(expr, @tokenNameMap)
+        rex = RegParse.new(expr, @tokenNameMap, line_number)
 
         # Give it the next available token id, if it's not an anonymous token; else -1
 
