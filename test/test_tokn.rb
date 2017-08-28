@@ -697,6 +697,12 @@ END
     end
   end
 
+  def test_zero_length_tokens
+    script = 'ZERO: \d*'
+    assert_raises ToknInternal::ParseException do
+      Tokn::DFACompiler.from_script(script)
+    end
+  end
 
   # Extract tokens from script
   #
