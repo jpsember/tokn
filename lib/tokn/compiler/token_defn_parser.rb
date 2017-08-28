@@ -109,14 +109,14 @@ module ToknInternal
         entry = TokenEntry.new(tokenName, rex, token_id)
 
         if @tokenNameMap.has_key?(tokenName)
-          raise ParseException, "Duplicate token name, line #{line_number}; #{line}"
+          raise ParseException.build("Duplicate token name",line_number,line)
         end
         @tokenNameMap[entry.name] = entry
 
         next if entry.id < 0
 
         if accepts_zero_characters(rex.start_state, rex.endState)
-          raise ParseException, "Zero-length tokens accepted, line #{line_number}; #{line}"
+          raise ParseException.build("Zero-length tokens accepted",line_number,line)
         end
 
         token_records << entry

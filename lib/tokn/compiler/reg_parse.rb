@@ -6,7 +6,16 @@ module ToknInternal
 
   # Exception thrown if problem parsing regular expression
   #
-  class ParseException < Exception; end
+  class ParseException < Exception
+
+    def self.build(message, line_number, line)
+      unless line_number.nil?
+        message = message + ", line #{line_number}; #{line}"
+      end
+      ParseException.new(message)
+    end
+
+  end
 
   # Parses a single regular expression from a string.
   # Produces an NFA with distinguished start and end states
