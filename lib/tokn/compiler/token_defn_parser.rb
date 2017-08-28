@@ -34,41 +34,47 @@ module ToknInternal
       # Maps token name to token entry
       @tokenNameMap = {}
 
-      @lines = script.split("\n")
+      script_lines = script.split("\n")
+      @original_line_numbers = []
 
       # Join lines that have been ended with '\' to their following lines;
       # only do this if there's an odd number of '\' at the end
-      joined_lines = []
+
+      @lines = []
       accum = nil
-      @lines.each do |line|
-        # puts "examining line: '#{line}'"
+      accum_start_line = nil
+
+      script_lines.each_with_index do |line, original_line_number|
+
         trailing_backslash_count = 0
         while line.length > trailing_backslash_count && line[-1-trailing_backslash_count] == '\\'
           trailing_backslash_count += 1
         end
+
+        if accum.nil?
+          accum = ""
+          accum_start_line = original_line_number
+        end
+
         if (trailing_backslash_count % 2 == 1)
-          if !accum
-            accum = ''
-          end
           accum << line[0...-1]
         else
-          if accum
-            accum << line
-            line = accum
-            accum = nil
-          end
-          joined_lines << line
+          accum << line
+          @lines << accum
+          @original_line_numbers << accum_start_line
+          accum = nil
         end
       end
-      if accum
+
+      if !accum.nil?
          raise ParseException, "Incomplete final line: "+script
       end
-      @lines = joined_lines
 
       # Now that we've stitched together lines where there were trailing \ characters,
       # process each line as a complete token definition
 
-      @lines.each_with_index do |line, line_number|
+      @lines.each_with_index do |line, line_index|
+        line_number = 1 + @original_line_numbers[line_index]
 
         # Strip whitespace only from the left side (which will strip all of
         # it, if the entire line is whitespace).  We want to preserve any

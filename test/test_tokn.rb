@@ -698,12 +698,13 @@ END
   end
 
   def test_zero_length_tokens
-    script = '# Comment' + "\n" + 'ZERO: \d*'
+    script = '# Comment' + "\n" + "# another\n"+ 'ZERO: \d*'
     begin
       Tokn::DFACompiler.from_script(script)
       raise "expected exception"
     rescue ToknInternal::ParseException => e
       assert e.message.include?("Zero-length")
+      assert e.message.include?("line 3;")
     end
   end
 
@@ -714,6 +715,27 @@ END
       raise "expected exception"
     rescue ToknInternal::ParseException => e
       assert e.message.include?("Duplicate")
+    end
+  end
+
+  def test_split_lines_error_bookkeeping
+    script =<<-'EOT'
+# Comment on first two lines
+#
+ALPHA: abc\
+         zzz
+SYNTAX \
+       ERROR \
+        SPREAD ACROSS MULTIPLE LINES
+
+EOT
+
+    begin
+      Tokn::DFACompiler.from_script(script)
+      raise "expected exception"
+    rescue ToknInternal::ParseException => e
+      assert e.message.include?("Syntax error")
+      assert e.message.include?("line 5;")
     end
   end
 
