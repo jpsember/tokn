@@ -109,6 +109,10 @@ module ToknInternal
 
         next if entry.id < 0
 
+        if accepts_zero_characters(rex.start_state, rex.endState)
+          raise ParseException, "Zero-length tokens accepted, line #{line_number}; #{line}"
+        end
+
         token_records << entry
       end
 
@@ -119,6 +123,23 @@ module ToknInternal
       dfa = builder.nfa_to_dfa
 
       Tokn::DFA.new(token_records.map{|x| x.name}, dfa)
+    end
+
+    # Determine if regex accepts zero characters
+    def accepts_zero_characters(start_state, end_state)
+      marked_states = Set.new
+      state_stack = [start_state]
+      while !state_stack.empty?
+        state = state_stack.pop
+        next if marked_states.include? state.id
+        marked_states.add(state.id)
+        return true if state.id == end_state.id
+        state.edges.each do |label, dest_state|
+          next unless label.contains? EPSILON
+          state_stack << dest_state
+        end
+      end
+      false
     end
 
     # Combine the individual NFAs constructed for the token definitions into

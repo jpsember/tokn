@@ -703,7 +703,7 @@ END
       Tokn::DFACompiler.from_script(script)
       raise "expected exception"
     rescue ToknInternal::ParseException => e
-      assert e.message.include?("zero-length")
+      assert e.message.include?("Zero-length")
     end
   end
 

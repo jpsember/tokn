@@ -64,7 +64,6 @@ module ToknInternal
       end
 
       remove_useless_edges
-      disallow_zero_length_tokens
     end
 
 
@@ -101,14 +100,6 @@ module ToknInternal
 
     def node_distance(state)
       @node_distances[state.id] || INF_DISTANCE
-    end
-
-    def disallow_zero_length_tokens
-      start_state.edges.each do |lbl, dest|
-        if dest.final_state
-          raise ParseException, "DFA recognizes zero-length tokens!"
-        end
-      end
     end
 
     def remove_useless_edges
