@@ -100,7 +100,7 @@ module ToknInternal
           nextTokenId += 1
         end
 
-        tkEntry = TokenEntry.new(tokenName, rex, token_records.size, tkId)
+        tkEntry = TokenEntry.new(tokenName, rex, tkId)
 
         if @tokenNameMap.has_key?(tokenName)
           raise ParseException, "Duplicate token name: "+line
@@ -169,12 +169,11 @@ module ToknInternal
 
   class TokenEntry
 
-    attr_reader :name, :reg_ex, :index, :id
+    attr_reader :name, :reg_ex, :id
 
-    def initialize(name, reg_ex, index, id)
+    def initialize(name, reg_ex, id)
       @name = name
       @reg_ex = reg_ex
-      @index = index
       @id = id
     end
 
