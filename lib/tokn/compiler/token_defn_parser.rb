@@ -27,8 +27,6 @@ module ToknInternal
     # Compile a token definition script into a DFA
     #
     def parse(script)
-      @generate_pdf = true
-
       nextTokenId = 0
 
       # List of tokens entries, including anonymous ones

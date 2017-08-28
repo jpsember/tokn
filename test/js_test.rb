@@ -232,14 +232,18 @@ class TestSnapshot
   end
 
   def calc_diff(path1=nil, path2=nil)
-    df = SysCall.new("diff -C 1 \"#{path1}\" \"#{path2}\"").hide.output
-
+    s = SysCall.new("diff -C 1 \"#{path1}\" \"#{path2}\"")
+    s.with_rescue
+    df = s.output
     if df.size == 0
       nil
     else
       # If difference was detected, call with more user-friendly output
-      SysCall.new("diff --width=130 -y \"#{path1}\" \"#{path2}\"").hide.output
+      s = SysCall.new("diff --width=130 -y \"#{path1}\" \"#{path2}\"")
+      s.with_rescue
+      df = s.output
     end
+    df
   end
 
 end

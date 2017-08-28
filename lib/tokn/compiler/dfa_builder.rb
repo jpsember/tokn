@@ -28,7 +28,6 @@ module ToknInternal
     # Convert an NFA to a DFA; return the new start state
     #
     def nfa_to_dfa
-      @generate_pdf = true
 
       partition_edges
       minimize
