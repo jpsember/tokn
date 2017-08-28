@@ -100,12 +100,12 @@ module ToknInternal
           nextTokenId += 1
         end
 
-        tkEntry = [tokenName, rex, token_records.size, tkId]
+        tkEntry = TokenEntry.new(tokenName, rex, token_records.size, tkId)
 
         if @tokenNameMap.has_key?(tokenName)
           raise ParseException, "Duplicate token name: "+line
         end
-        @tokenNameMap[tkEntry[0]] = tkEntry
+        @tokenNameMap[tkEntry.name] = tkEntry
 
         next if tkId.nil?
 
@@ -134,10 +134,8 @@ module ToknInternal
       start_state = State.new(0)
       baseId = 1
 
-      token_records.each do |tokenName, regParse, index, tokenId|
-
-        # Skip anonymous token definitions
-        next if tokenId.nil?
+      token_records.each do |tk|
+        regParse = tk.reg_ex
 
         oldToNewMap, baseId = regParse.start_state.duplicateNFA(baseId)
 
@@ -154,7 +152,7 @@ module ToknInternal
         dupfinal_state.final_state = true
 
         # Why do I need to add 'ToknInternal.' here?  Very confusing.
-        dupEnd.addEdge(CodeSet.new(ToknInternal.token_id_to_edge_label(tokenId)), dupfinal_state)
+        dupEnd.addEdge(CodeSet.new(ToknInternal.token_id_to_edge_label(tk.id)), dupfinal_state)
 
         # Add an e-transition from the start state to this expression's start
         start_state.addEdge(CodeSet.new(EPSILON),dupStart)
@@ -165,6 +163,20 @@ module ToknInternal
     # Regex for token names preceding regular expressions
     #
     TOKENNAME_EXPR = Regexp.new("[_A-Za-z][_A-Za-z0-9]*\s*:\s*")
+
+  end
+
+
+  class TokenEntry
+
+    attr_reader :name, :reg_ex, :index, :id
+
+    def initialize(name, reg_ex, index, id)
+      @name = name
+      @reg_ex = reg_ex
+      @index = index
+      @id = id
+    end
 
   end
 

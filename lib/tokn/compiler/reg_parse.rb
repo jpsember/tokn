@@ -346,6 +346,7 @@ module ToknInternal
       if name  !~ TOKENREF_EXPR
         abort "Problem with token name"
       end
+
       tokInfo = nil
       if @tokenDefMap
         tokInfo = @tokenDefMap[name]
@@ -355,7 +356,7 @@ module ToknInternal
       if !tokInfo
         abort "Undefined token"
       end
-      rg = tokInfo[1]
+      rg = tokInfo.reg_ex
 
       oldToNewMap, @nextStateId = rg.start_state.duplicateNFA(@nextStateId)
 
