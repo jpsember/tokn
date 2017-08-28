@@ -29,11 +29,8 @@ module ToknInternal
     def parse(script)
       nextTokenId = 0
 
-      # List of tokens entries, including anonymous ones
-      @tokenListBig = []
-
-      # List of tokens names, excluding anonymous ones
-      tokenListSmall = []
+      token_records = []
+      token_names = []
 
       # Maps token name to token entry
       @tokenNameMap = {}
@@ -103,43 +100,41 @@ module ToknInternal
           nextTokenId += 1
         end
 
-        tkEntry = [tokenName, rex, @tokenListBig.size, tkId]
+        tkEntry = [tokenName, rex, token_records.size, tkId]
 
         if @tokenNameMap.has_key?(tokenName)
           raise ParseException, "Duplicate token name: "+line
         end
-
-
-        @tokenListBig.push(tkEntry)
         @tokenNameMap[tkEntry[0]] = tkEntry
 
-        if !tkId.nil?
-          tokenListSmall.push(tokenName)
-        end
+        next if tkId.nil?
+
+        token_records << tkEntry
+        token_names << tokenName
 
       end
 
-      combined = combineTokenNFAs()
+      combined = combineTokenNFAs(token_records)
 
       builder = DFABuilder.new(combined)
       builder.generate_pdf = @generate_pdf
       dfa = builder.nfa_to_dfa
 
-      Tokn::DFA.new(tokenListSmall, dfa)
+      Tokn::DFA.new(token_names, dfa)
     end
 
     # Combine the individual NFAs constructed for the token definitions into
     # one large NFA, each augmented with an edge labelled with the appropriate
     # token identifier to let the tokenizer see which token led to the final state.
     #
-    def combineTokenNFAs
+    def combineTokenNFAs(token_records)
 
       # Create a new distinguished start state
 
       start_state = State.new(0)
       baseId = 1
 
-      @tokenListBig.each do |tokenName, regParse, index, tokenId|
+      token_records.each do |tokenName, regParse, index, tokenId|
 
         # Skip anonymous token definitions
         next if tokenId.nil?
