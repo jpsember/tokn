@@ -30,7 +30,6 @@ module ToknInternal
       nextTokenId = 0
 
       token_records = []
-      token_names = []
 
       # Maps token name to token entry
       @tokenNameMap = {}
@@ -110,8 +109,6 @@ module ToknInternal
         next if tkId.nil?
 
         token_records << tkEntry
-        token_names << tokenName
-
       end
 
       combined = combineTokenNFAs(token_records)
@@ -120,7 +117,7 @@ module ToknInternal
       builder.generate_pdf = @generate_pdf
       dfa = builder.nfa_to_dfa
 
-      Tokn::DFA.new(token_names, dfa)
+      Tokn::DFA.new(token_records.map{|x| x.name}, dfa)
     end
 
     # Combine the individual NFAs constructed for the token definitions into
