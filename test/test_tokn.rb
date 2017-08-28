@@ -43,7 +43,7 @@ END
   end
 
   def test_build_DFA
-    x = RegParse.new(REGEX_SCRIPT)
+    x = RegParse.new(REGEX_SCRIPT,{})
     s = x.start_state
     x.endState.final_state = true
     s.reverseNFA()
@@ -56,7 +56,7 @@ END
   end
 
   def test_cvt_NFA_to_DFA
-    x = RegParse.new(REGEX_SCRIPT)
+    x = RegParse.new(REGEX_SCRIPT,{})
     s = x.start_state
     x.endState.final_state = true
     TestSnapshot.new.perform do

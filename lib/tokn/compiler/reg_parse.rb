@@ -85,11 +85,11 @@ module ToknInternal
 
     # Construct a parser and perform the parsing
     # @param script script to parse
-    # @param tokenDefMap if not nil, a map of previously parsed regular expressions
+    # @param tokenDefMap a map of previously parsed regular expressions
     #     (mapping names to ids) to be consulted if a curly brace expression appears
     #     in the script
     #
-    def initialize(script, tokenDefMap = nil)
+    def initialize(script, tokenDefMap)
       @script = filter_ws(script)
       @nextStateId = 0
       @tokenDefMap = tokenDefMap
@@ -356,12 +356,9 @@ module ToknInternal
         abort "Problem with token name"
       end
 
-      tokInfo = nil
-      if @tokenDefMap
-        tokInfo = @tokenDefMap[name]
-        # Leading underscore is optional in this instance, as a convenience
-        tokInfo ||= @tokenDefMap["_#{name}"]
-      end
+      tokInfo = @tokenDefMap[name]
+      # Leading underscore is optional in this instance, as a convenience
+      tokInfo ||= @tokenDefMap["_#{name}"]
       if !tokInfo
         abort "Undefined token"
       end
