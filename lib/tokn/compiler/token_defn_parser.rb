@@ -67,7 +67,7 @@ module ToknInternal
       end
 
       if !accum.nil?
-         raise ParseException, "Incomplete final line: "+script
+         raise ParseException, "Incomplete final line: #{script}"
       end
 
       # Now that we've stitched together lines where there were trailing \ characters,
@@ -87,7 +87,7 @@ module ToknInternal
         end
 
         if !(line =~ TOKENNAME_EXPR)
-          raise ParseException, "Syntax error, line #{line_number}; #{line}"
+          raise ParseException.build("Syntax error", line_number, line)
         end
 
         pos = line.index(":")
