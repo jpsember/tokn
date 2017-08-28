@@ -699,12 +699,21 @@ END
 
   def test_zero_length_tokens
     script = '# Comment' + "\n" + 'ZERO: \d*'
-    exception = nil
     begin
       Tokn::DFACompiler.from_script(script)
       raise "expected exception"
     rescue ToknInternal::ParseException => e
       assert e.message.include?("zero-length")
+    end
+  end
+
+  def test_duplicate_token_names
+    script = "A: a\nB: b\nB: c\n"
+    begin
+      Tokn::DFACompiler.from_script(script)
+      raise "expected exception"
+    rescue ToknInternal::ParseException => e
+      assert e.message.include?("Duplicate")
     end
   end
 

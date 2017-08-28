@@ -27,7 +27,7 @@ module ToknInternal
     # Compile a token definition script into a DFA
     #
     def parse(script)
-      nextTokenId = 0
+      next_token_id = 0
 
       token_records = []
 
@@ -68,7 +68,7 @@ module ToknInternal
       # Now that we've stitched together lines where there were trailing \ characters,
       # process each line as a complete token definition
 
-      @lines.each_with_index do |line, lineNumber|
+      @lines.each_with_index do |line, line_number|
 
         # Strip whitespace only from the left side (which will strip all of
         # it, if the entire line is whitespace).  We want to preserve any
@@ -81,7 +81,7 @@ module ToknInternal
         end
 
         if !(line =~ TOKENNAME_EXPR)
-          raise ParseException, "Syntax error, line #"+lineNumber.to_s+": "+line
+          raise ParseException, "Syntax error, line #{line_number}; #{line}"
         end
 
         pos = line.index(":")
@@ -92,26 +92,27 @@ module ToknInternal
 
         rex = RegParse.new(expr, @tokenNameMap)
 
-        # Give it the next available token id, if it's not an anonymous token
-        tkId = nil
+        # Give it the next available token id, if it's not an anonymous token; else -1
+
+        token_id = -1
         if tokenName[0] != '_'
-          tkId = nextTokenId
-          nextTokenId += 1
+          token_id = next_token_id
+          next_token_id += 1
         end
 
-        tkEntry = TokenEntry.new(tokenName, rex, tkId)
+        entry = TokenEntry.new(tokenName, rex, token_id)
 
         if @tokenNameMap.has_key?(tokenName)
-          raise ParseException, "Duplicate token name: "+line
+          raise ParseException, "Duplicate token name, line #{line_number}; #{line}"
         end
-        @tokenNameMap[tkEntry.name] = tkEntry
+        @tokenNameMap[entry.name] = entry
 
-        next if tkId.nil?
+        next if entry.id < 0
 
-        token_records << tkEntry
+        token_records << entry
       end
 
-      combined = combineTokenNFAs(token_records)
+      combined = combine_token_nfas(token_records)
 
       builder = DFABuilder.new(combined)
       builder.generate_pdf = @generate_pdf
@@ -124,7 +125,7 @@ module ToknInternal
     # one large NFA, each augmented with an edge labelled with the appropriate
     # token identifier to let the tokenizer see which token led to the final state.
     #
-    def combineTokenNFAs(token_records)
+    def combine_token_nfas(token_records)
 
       # Create a new distinguished start state
 
