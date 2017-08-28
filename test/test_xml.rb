@@ -32,8 +32,7 @@ class TestXML < JSTest
   end
 
   def test_xml_parser
-    parser = ToknInternal::TokenDefParser.new
-    parser.parse(File.read("../xmltokens.txt"))
+    tok = File.read("../xmltokens.txt")
     script = File.read("../xmlscript.txt")
     verify(tok,script)
   end

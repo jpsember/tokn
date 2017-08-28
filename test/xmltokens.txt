@@ -1,55 +1,9 @@
-# DFA token definitions for XML / HTML parsing
-#
-
-
-# Whitespace includes space, linefeed, tab, cr
-# or comments <!-- ... -->
-#
-# We must be careful with acceptance of dashes (hyphens) within comments.
-# Specifically, after <!--, we accept zero or more of:
-#
-#  1) non-dash
-#  2) one or more dashes not followed by a dash or >
-#  3) one dash followed by >
-#
-# ...ending with two or more dashes followed by >
-#
-#    -  : \x2d
-#    >  : \x3e
-
-#
 WS: ( [\x09\x0a\x0d\x20]+  \
     | <!--  (  [^-]  |  ( -+ [^ - >] ) | ( - > )  )* - - -* > \
     )
 
-# We allow ampersands here
 UNKNOWN: [^<>\x09\x0a\x0d\x20]
 
-# Give ampersand expressions higher priority by occurring later in this file:
-AMP: &[a-z]*;
+TAGSTART: <  ( [?]?[a-zA-Z]+ )?
 
-# Start of tag can look like:
-#
-# <?xml version="...
-# <split:tag ...
-# <
-#
-TAGSTART: <  ( [?]?[a-zA-Z]+(\: [a-zA-Z]+)?  \
-             )?
-
-# End of tag can look like:
-#
-#  >
-#  />
-#  /tagname>
-#  /split:tagname>
-#  ?>
-#
-TAGEND:      (  (/)                         \
-          |  (<?/[a-zA-Z]+(\:[a-zA-Z]+)?)  \
-          |  (\?)                        \
-          )? >
-
-ATTRIBUTE: [a-zA-Z]+ (\: [a-zA-Z]+)? = (  ('[^\x01-\x1f<>']+') | ("[^\x01-\x1f<>"]*") )
-
-DOCTYPE: <!DOCTYPE [^>]* >
+DOCTYPE: <!Z [^>]* >
