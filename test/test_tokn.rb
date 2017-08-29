@@ -487,25 +487,6 @@ END
     verify(tok,script)
   end
 
-  def test_ExpressionPrecedenceIncorrect
-
-    tok =<<-'eos'
-      WS: [\s\t\n]+
-      # Here INT appears after DBL, which will cause double's prefix to be interpreted as an int
-      DBL: \-?([0] | ([1-9]\d*)) . \d+
-      INT: \-?\d
-    eos
-
-    script =<<-'eos'
-5.2
-5
--5.2
--5
-    eos
-
-    verify(tok,script)
-  end
-
   def test_dec
     tok =<<-'eos'
       DIGIT: \d
