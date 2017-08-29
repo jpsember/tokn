@@ -21,7 +21,7 @@ END
   def sampleTokens
     @sampleTokens ||= <<-'END'
 
-WS: (\n | \r | \t | \s)+
+_WS: (\n | \r | \t | \s)+
 _TX: [^\n\r\t\s]+
 _KEYWORD: abc
 NONSPECIAL: ^($TX $KEYWORD $TX) $WS
