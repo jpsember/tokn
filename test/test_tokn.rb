@@ -756,6 +756,20 @@ EOT
     end
   end
 
+  def test_redundant_token
+    script =<<-'EOT'
+MISC: \d+
+ALPHA: abcdef
+BETA: abc
+EOT
+
+    begin
+      Tokn::DFACompiler.from_script(script)
+      raise "expected exception"
+    rescue ToknInternal::ParseException => e
+      assert e.message.include?("Redundant token")
+    end
+  end
 
   # Extract tokens from script
   #
