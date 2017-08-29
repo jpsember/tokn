@@ -8,8 +8,8 @@ class TestQuick < JSTest
   def test_future
     script =<<-'EOT'
 MISC: \d+
-ALPHA: abc
-BETA: abcdef
+ALPHA: abcdef
+BETA: abc
 EOT
 
     begin
@@ -17,7 +17,6 @@ EOT
       raise "expected exception"
     rescue ToknInternal::ParseException => e
       assert e.message.include?("Redundant token")
-      assert e.message.include?("line 2;")
     end
 
   end

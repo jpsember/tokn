@@ -128,6 +128,8 @@ module ToknInternal
       builder.generate_pdf = @generate_pdf
       dfa = builder.nfa_to_dfa
 
+      apply_redundant_token_filter(token_records, dfa)
+
       Tokn::DFA.new(token_records.map{|x| x.name}, dfa)
     end
 
@@ -146,6 +148,32 @@ module ToknInternal
         end
       end
       false
+    end
+
+    # Determine if any tokens are redundant
+    #
+    def apply_redundant_token_filter(token_records, start_state)
+
+      recognized_token_id_set = Set.new
+
+      start_state.reachable_states.each do |state|
+        state.edges.each do |label, dest|
+          next unless dest.final_state
+          token_id = ToknInternal::edge_label_to_token_id(label.elements[0])
+          recognized_token_id_set.add(token_id)
+        end
+      end
+
+      unrecognized = []
+
+      token_records.each do |rec|
+        next if recognized_token_id_set.include? rec.id
+        unrecognized << rec.name
+      end
+
+      return if unrecognized.empty?
+
+      raise ParseException, "Redundant token(s) found: #{unrecognized.join(", ")}"
     end
 
     # Combine the individual NFAs constructed for the token definitions into
