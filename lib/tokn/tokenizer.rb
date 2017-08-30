@@ -6,16 +6,15 @@ class TokenizerException < Exception; end
 #
 class Tokenizer
 
-  attr_accessor :accept_unknown_tokens
+  attr_accessor :accept_unknown_tokens, :history_size
 
   # Construct a tokenizer
   #
   # @param dfa the DFA to use
   # @param string_or_io a string or file to extract tokens from
   # @param skipName if not nil, tokens with this name will be skipped
-  # @param maximum_history_size the maximum number of tokens that can be unread
   #
-  def initialize(dfa, string_or_io, skipName=nil, maximum_history_size=16)
+  def initialize(dfa, string_or_io, skipName=nil)
     @dfa = dfa
     raise ArgumentError if !string_or_io
 
@@ -30,7 +29,7 @@ class Tokenizer
     @column = 0
     @token_history = []
     @history_pointer = 0
-    @maximum_history_size = maximum_history_size
+    @history_size = 8
     @history_slack = 100
     @accept_unknown_tokens = false
 
@@ -294,7 +293,7 @@ class Tokenizer
 
   def add_token_to_history(token)
     @token_history << token
-    if @token_history.size > @maximum_history_size + @history_slack
+    if @token_history.size > @history_size + @history_slack
       @token_history.slice!(0...@history_slack)
       @history_pointer -= @history_slack
     end

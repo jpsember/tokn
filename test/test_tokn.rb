@@ -320,8 +320,10 @@ END
     end
   end
 
+  SAMPLE_TEXT_FILE_NAME = "diskfile.txt"
+
   def build_file
-    f = File.new('diskfile.txt','w')
+    f = File.new(SAMPLE_TEXT_FILE_NAME,'w')
     1000.times{f.write("aa baa bbb ")}
     f.close
   end
@@ -329,7 +331,7 @@ END
   def test_read_from_file
     build_file
     dfa = Tokn::DFACompiler.from_script(TOKEN_SCRIPT2)
-    t = Tokn::Tokenizer.new(dfa,File.open('diskfile.txt','r'),'sep',50)
+    t = Tokn::Tokenizer.new(dfa,File.open(SAMPLE_TEXT_FILE_NAME,'r'),'sep')
     1000.times do
       t.read('tku')
       t.read('tkv')
@@ -341,24 +343,23 @@ END
   def test_unread_from_file_legal
     build_file
     dfa = Tokn::DFACompiler.from_script(TOKEN_SCRIPT2)
-    history_size = 8
     total_tokens = 3000
 
-    t = Tokn::Tokenizer.new(dfa,File.open('diskfile.txt','r'),'sep',history_size)
+    t = Tokn::Tokenizer.new(dfa,File.open(SAMPLE_TEXT_FILE_NAME,'r'),'sep')
+    t.history_size = 8
     500.times{t.read}
-    t.unread(history_size)
-    (total_tokens-500+history_size).times{t.read}
+    t.unread(t.history_size)
+    (total_tokens-500+t.history_size).times{t.read}
   end
 
   def test_unread_from_file_illegal
     build_file
     dfa = Tokn::DFACompiler.from_script(TOKEN_SCRIPT2)
-    history_size = 8
-    t = Tokn::Tokenizer.new(dfa,File.open('diskfile.txt','r'),'sep',history_size)
+    t = Tokn::Tokenizer.new(dfa,File.open(SAMPLE_TEXT_FILE_NAME,'r'),'sep')
     500.times{t.read}
     e = assert_raises Tokn::TokenizerException do
         # Include an amount greater than the slack
-        t.unread(history_size+110)
+        t.unread(t.history_size + 100 + 10)
     assert(e.message.start_with?('Token unavailable'))
     end
   end
