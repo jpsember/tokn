@@ -3,12 +3,12 @@ module Tokn
   #
   class Token
 
-    attr_reader :text, :lineNumber, :column, :id
+    attr_reader :text, :line_number, :column, :id
 
-    def initialize(id, text, lineNumber, column)
+    def initialize(id, text, line_number, column)
       @id = id
       @text = text
-      @lineNumber = lineNumber
+      @line_number = line_number
       @column = column
     end
 
@@ -17,7 +17,7 @@ module Tokn
     end
 
     def to_s
-      s = "(line #{lineNumber}, col #{column})"
+      s = "(line #{line_number}, col #{column})"
       s = s.ljust(17) << ' : ' << text
       s
     end
