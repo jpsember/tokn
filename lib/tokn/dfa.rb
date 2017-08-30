@@ -62,21 +62,20 @@ module Tokn
 
     # Determine the name of a token, given its id.
     # Returns <UNKNOWN> if its id is UNKNOWN_TOKEN, or <EOF> if
-    # the tokenId is nil.  Otherwise, assumes tokenId is 0 ... n-1, where
+    # the token_id is nil.  Otherwise, assumes token_id is 0 ... n-1, where
     # n is the number of token names in the DFA.
     #
-    def token_name(tokenId)
-      if tokenId.nil?
-        nm = "<EOF>"
-      elsif tokenId == UNKNOWN_TOKEN
-        nm = "<UNKNOWN>"
+    def token_name(token_id)
+      if token_id.nil?
+        "<EOF>"
+      elsif token_id == UNKNOWN_TOKEN
+        "<UNKNOWN>"
       else
-        if tokenId < 0 || tokenId >= @token_names.size
-          raise IndexError, "No such token id:#{tokenId}"
+        if token_id < 0 || token_id >= @token_names.size
+          raise IndexError, "No such token id:#{token_id}"
         end
-        nm = @token_names[tokenId]
+        @token_names[token_id]
       end
-      nm
     end
 
     # Get id of token given its name, or nil if no such token found
