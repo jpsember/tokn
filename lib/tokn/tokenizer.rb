@@ -1,6 +1,6 @@
 module Tokn
 
-HISTORY_CAPACITY = 16 
+HISTORY_CAPACITY = 16
 
 class TokenizerException < Exception; end
 
@@ -265,7 +265,7 @@ class Tokenizer
   # Unread one (or more) previously read tokens
   #
   def unread(count = 1)
-    if @history_cursor < count
+    if [@history_cursor,HISTORY_CAPACITY].min < count
       raise TokenizerException, "Token unavailable"
     end
     @history_cursor -= count

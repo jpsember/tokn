@@ -358,7 +358,7 @@ END
     500.times{t.read}
     e = assert_raises Tokn::TokenizerException do
       # Include an amount greater than the slack
-      t.unread(Tokn::HISTORY_CAPACITY * 2 + 10)
+      t.unread(Tokn::HISTORY_CAPACITY + 1)
     assert(e.message.start_with?('Token unavailable'))
     end
   end
@@ -422,19 +422,11 @@ END
       dfa = Tokn::DFACompiler.from_script(SAMPLETOKENS3)
       tok = Tokn::Tokenizer.new(dfa, SAMPLETEXT3)
 
-      tokList = []
       while tok.has_next
         t = tok.read
-        tokList.push(t)
         puts " read: #{dfa.token_name(t.id)} '#{t}'"
       end
 
-      tok.unread(tokList.size)
-
-      tokList.each do |t1|
-        tName = tok.name_of(t1)
-        tok.read(tName)
-      end
     end
   end
 
