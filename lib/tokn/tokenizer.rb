@@ -14,20 +14,17 @@ class Tokenizer
   #
   # @param dfa the DFA to use
   # @param string_or_io a string or file to extract tokens from
-  # @param skipName if not nil, tokens with this name will be skipped
+  # @param skip_name if not nil, tokens with this name will be skipped
   #
-  def initialize(dfa, string_or_io, skipName=nil)
+  def initialize(dfa, string_or_io, skip_name=nil)
+    @accept_unknown_tokens = false
     @dfa = dfa
-    raise ArgumentError if !string_or_io
 
-    @skipTokenId = nil
-    if skipName
-      @skipTokenId = dfa.token_id(skipName)
-      if !@skipTokenId
-        raise ArgumentError, "No token with name "+skipName+" found"
-      end
+    @skip_token_id = nil
+    if skip_name
+      @skip_token_id = dfa.token_id(skip_name) or raise ArgumentError, "No token with name #{skip_name} found"
     end
-    @lineNumber = 0
+    @line_number = 0
     @column = 0
 
     # Token buffer to support peeking / unreading
@@ -37,8 +34,6 @@ class Tokenizer
     # Index within token_history of token to be returned by read() method
     #
     @history_cursor = 0
-
-    @accept_unknown_tokens = false
 
     prepare_input(string_or_io)
   end
@@ -59,7 +54,7 @@ class Tokenizer
         token = peek_aux
         break if token.nil?
 
-        if token.id == @skipTokenId
+        if token.id == @skip_token_id
           advance_cursor_for_token_text(token.text)
         else
           add_token_to_history(token)
@@ -129,7 +124,7 @@ class Tokenizer
     end
 
     best_text = skip_chars(best_length)
-    Token.new(best_id, best_text, 1 + @lineNumber, 1 + @column)
+    Token.new(best_id, best_text, 1 + @line_number, 1 + @column)
   end
 
   def advance_cursor_for_token_text(text)
@@ -137,7 +132,7 @@ class Tokenizer
       c = text[i]
       @column += 1
       if c == "\n"
-        @lineNumber += 1
+        @line_number += 1
         @column = 0
       end
     end
@@ -145,17 +140,17 @@ class Tokenizer
 
   # Read next token
   #
-  # @param tokenName  if not nil, the (string) name of the token expected
+  # @param token_name_or_id  if not nil, the name or id of the expected token
   #
   # @raise TokenizerException if no more tokens,if unrecognized token, or
-  # if token has different than expected name
+  #    if token was different than expected
   #
   def read(token_name_or_id = nil)
 
     # Peek at token first, to place it within the history buffer
     #
-    token = peek()
-    raise TokenizerException,"No more tokens" if !token
+    token = peek
+    raise TokenizerException,"No more tokens" if token.nil?
     raise TokenizerException,"Unknown token #{token}" if !accept_unknown_tokens && token.unknown?
     if token_name_or_id
       unexpected = false
@@ -282,7 +277,7 @@ class Tokenizer
     else
       @input = string_or_io
     end
-    @char_buffer = ''
+    @char_buffer = ""
   end
 
   def peek_char(index)
@@ -307,6 +302,10 @@ class Tokenizer
 
   def add_token_to_history(token)
     @token_history << token
+
+    # Trim history buffer every so often if it's getting full;
+    # retain O(1) amortized performance
+
     if @token_history.size >= HISTORY_CAPACITY * 2
       remove_total = HISTORY_CAPACITY
       @token_history.slice!(0...remove_total)
