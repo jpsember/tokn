@@ -1,12 +1,14 @@
 module Tokn
 
+HISTORY_CAPACITY = 16 
+
 class TokenizerException < Exception; end
 
 # Extracts tokens from a script, given a previously constructed DFA.
 #
 class Tokenizer
 
-  attr_accessor :accept_unknown_tokens, :history_size
+  attr_accessor :accept_unknown_tokens
 
   # Construct a tokenizer
   #
@@ -27,10 +29,15 @@ class Tokenizer
     end
     @lineNumber = 0
     @column = 0
+
+    # Token buffer to support peeking / unreading
+    #
     @token_history = []
-    @history_pointer = 0
-    @history_size = 8
-    @history_slack = 100
+
+    # Index within token_history of token to be returned by read() method
+    #
+    @history_cursor = 0
+
     @accept_unknown_tokens = false
 
     prepare_input(string_or_io)
@@ -42,7 +49,9 @@ class Tokenizer
   # Returns Token, or nil if end of input
   #
   def peek
-    if @history_pointer == @token_history.size
+
+    # If token isn't in the history buffer, read and place it there
+    if @history_cursor == @token_history.size
 
       # repeat until we find a non-skipped token, or run out of text
       while true
@@ -59,9 +68,11 @@ class Tokenizer
       end
     end
 
+    # If token is within history buffer, return it; else, nil (no tokens remain)
+    #
     ret = nil
-    if @history_pointer < @token_history.size
-      ret = @token_history[@history_pointer]
+    if @history_cursor < @token_history.size
+      ret = @token_history[@history_cursor]
     end
 
     ret
@@ -140,6 +151,9 @@ class Tokenizer
   # if token has different than expected name
   #
   def read(token_name_or_id = nil)
+
+    # Peek at token first, to place it within the history buffer
+    #
     token = peek()
     raise TokenizerException,"No more tokens" if !token
     raise TokenizerException,"Unknown token #{token}" if !accept_unknown_tokens && token.unknown?
@@ -153,7 +167,9 @@ class Tokenizer
       raise TokenizerException, "Unexpected token #{token}" if unexpected
     end
 
-    @history_pointer += 1
+    # Advance history cursor to make token read
+    #
+    @history_cursor += 1
 
     advance_cursor_for_token_text(token.text)
     token
@@ -248,13 +264,11 @@ class Tokenizer
 
   # Unread one (or more) previously read tokens
   #
-  # @raise TokenizerException if token is no longer in the history
-  #
   def unread(count = 1)
-    if @history_pointer < count
+    if @history_cursor < count
       raise TokenizerException, "Token unavailable"
     end
-    @history_pointer -= count
+    @history_cursor -= count
   end
 
 
@@ -293,9 +307,10 @@ class Tokenizer
 
   def add_token_to_history(token)
     @token_history << token
-    if @token_history.size > @history_size + @history_slack
-      @token_history.slice!(0...@history_slack)
-      @history_pointer -= @history_slack
+    if @token_history.size >= HISTORY_CAPACITY * 2
+      remove_total = HISTORY_CAPACITY
+      @token_history.slice!(0...remove_total)
+      @history_cursor -= remove_total
     end
   end
 

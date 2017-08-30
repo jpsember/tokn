@@ -81,7 +81,7 @@ END
     tok = build_tokenizer_from_script
 
     tokList = []
-    while tok.has_next
+    Tokn::HISTORY_CAPACITY.times do |i|
       t = tok.read
       tokList.push(t)
     end
@@ -346,10 +346,9 @@ END
     total_tokens = 3000
 
     t = Tokn::Tokenizer.new(dfa,File.open(SAMPLE_TEXT_FILE_NAME,'r'),'sep')
-    t.history_size = 8
     500.times{t.read}
-    t.unread(t.history_size)
-    (total_tokens-500+t.history_size).times{t.read}
+    t.unread(Tokn::HISTORY_CAPACITY)
+    (total_tokens-500+Tokn::HISTORY_CAPACITY).times{t.read}
   end
 
   def test_unread_from_file_illegal
@@ -358,8 +357,8 @@ END
     t = Tokn::Tokenizer.new(dfa,File.open(SAMPLE_TEXT_FILE_NAME,'r'),'sep')
     500.times{t.read}
     e = assert_raises Tokn::TokenizerException do
-        # Include an amount greater than the slack
-        t.unread(t.history_size + 100 + 10)
+      # Include an amount greater than the slack
+      t.unread(Tokn::HISTORY_CAPACITY * 2 + 10)
     assert(e.message.start_with?('Token unavailable'))
     end
   end
