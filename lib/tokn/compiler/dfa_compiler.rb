@@ -54,7 +54,8 @@ module Tokn
         list = [state.final_state]
         ed = []
         state.edges.each do |lbl, dest|
-          edInfo = [lbl.elements, dest.id]
+          elements = self.compile_elements_for_json(lbl.elements)
+          edInfo = [elements, dest.id]
           ed.push(edInfo)
         end
         list.push(ed)
@@ -68,6 +69,10 @@ module Tokn
 
     private
 
+
+    def self.compile_elements_for_json(elements)
+      elements
+    end
 
     def self.get_ordered_state_list(dfa)
       raise ArgumentError, "Bad start state" if dfa.start_state.id != 0
