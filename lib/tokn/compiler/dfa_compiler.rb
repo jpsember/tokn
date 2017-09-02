@@ -55,8 +55,8 @@ module Tokn
         ed = []
         state.edges.each do |lbl, dest|
           elements = self.compile_elements_for_json(lbl.elements)
-          edInfo = [elements, dest.id]
-          ed.push(edInfo)
+          ed << elements
+          ed << dest.id
         end
         list.push(ed)
         state_info.push(list)

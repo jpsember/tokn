@@ -34,8 +34,12 @@ module Tokn
         final_state_flag, edgeList = stateInfo[s.id]
         final_state = (final_state_flag != 0)
         s.final_state = final_state
-        edgeList.each do |edge|
-          label,destState = edge
+        cursor = 0
+        while cursor < edgeList.size
+          label = edgeList[cursor]
+          destState = edgeList[cursor+1]
+          cursor += 2
+
           cr = CodeSet.new()
           cr.elements = DFA::decompile_elements_from_json(label)
           s.addEdge(cr, st[destState])
