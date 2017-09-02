@@ -35,8 +35,8 @@ module ToknInternal
 
     # Replace this set with a copy of another
     #
-    def setTo(otherSet)
-      @elements.replace(otherSet.elements)
+    def setTo(other_code_set)
+      @elements.replace(other_code_set.elements)
     end
 
     # Get hash code; just uses hash code of the contained array
@@ -62,15 +62,15 @@ module ToknInternal
 
       raise RangeError if lower >= upper
 
-      newSet = []
+      new_elements = []
       i = 0
       while i < @elements.size and @elements[i] < lower
-        newSet << @elements[i]
+        new_elements << @elements[i]
         i += 1
       end
 
       if (i & 1) == 0
-        newSet << lower
+        new_elements << lower
       end
 
       while i < @elements.size and @elements[i] <= upper
@@ -78,15 +78,15 @@ module ToknInternal
       end
 
       if (i & 1) == 0
-        newSet << upper
+        new_elements << upper
       end
 
       while i < @elements.size
-        newSet << @elements[i]
+        new_elements << @elements[i]
         i += 1
       end
 
-      @elements = newSet
+      @elements = new_elements
 
     end
 
@@ -94,24 +94,20 @@ module ToknInternal
     # @param lower min value in range
     # @param upper one plus max value in range
     #
-    def remove(lower, upper = nil)
-      if upper.nil?
-        upper = lower + 1
-      end
-
+    def remove(lower, upper)
       if lower >= upper
         raise RangeError
       end
 
-      newSet = []
+      new_elements = []
       i = 0
       while i < @elements.size and @elements[i] < lower
-        newSet << @elements[i]
+        new_elements << @elements[i]
         i += 1
       end
 
       if (i & 1) == 1
-        newSet << lower
+        new_elements << lower
       end
 
       while i < @elements.size and @elements[i] <= upper
@@ -119,15 +115,15 @@ module ToknInternal
       end
 
       if (i & 1) == 1
-        newSet << upper
+        new_elements << upper
       end
 
       while i < @elements.size
-        newSet << @elements[i]
+        new_elements << @elements[i]
         i += 1
       end
 
-      @elements = newSet
+      @elements = new_elements
     end
 
     # Replace this set with itself minus another
@@ -181,57 +177,51 @@ module ToknInternal
 
         lower = @elements[i]
         upper = @elements[i+1]
-        s += CodeSet.dbStr(lower)
+        s += element_to_s(lower)
         if upper != 1+lower
-          s += '..' + CodeSet.dbStr(upper-1)
+          s += '..' + element_to_s(upper-1)
         end
         i += 2
       end
       return s
     end
 
-    # Negate the inclusion of a contiguous range of values
+    # Negate the inclusion of a contiguous range of values [lower..upper)
     #
-    # @param lower min value in range
-    # @param upper one plus max value in range
-    #
-    def negate(lower = 0, upper =  CODEMAX)
-      if lower >= upper
-        raise RangeError
-      end
+    def negate(lower, upper)
+      raise RangeError if lower >= upper
 
-      newSet = []
+      new_elements = []
       i = 0
       while i < @elements.size and @elements[i] <= lower
-        newSet << @elements[i]
+        new_elements << @elements[i]
         i += 1
       end
 
-      if i > 0 and newSet[i-1] == lower
-        newSet.pop
+      if i > 0 and new_elements[i-1] == lower
+        new_elements.pop
       else
-        newSet << lower
+        new_elements << lower
       end
 
       while i < @elements.size and @elements[i] <= upper
-        newSet << @elements[i]
+        new_elements << @elements[i]
         i += 1
       end
 
 
-      if newSet.length > 0 and newSet.last == upper
-        newSet.pop
+      if new_elements.length > 0 and new_elements.last == upper
+        new_elements.pop
       else
-        newSet << upper
+        new_elements << upper
       end
 
       while i < @elements.size
-        newSet << @elements[i]
+        new_elements << @elements[i]
         i += 1
       end
 
-      @elements = newSet
-
+      @elements = new_elements
     end
 
     # Determine how many distinct values are represented by this set
@@ -262,13 +252,14 @@ module ToknInternal
       end
     end
 
+
     private
 
 
     # Get a debug description of a value within a CodeSet, suitable
     # for including within a .dot label
     #
-    def self.dbStr(charCode)
+    def element_to_s(charCode)
       # Unless it corresponds to a non-confusing printable ASCII value,
       # just print its decimal equivalent
       s = charCode.to_s

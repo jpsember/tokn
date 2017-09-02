@@ -10,7 +10,8 @@ class TestCodeSet < JSTest
   end
 
   def remove(lower, upper = nil)
-    @cs.remove(lower,upper)
+    upper ||= (1 + lower)
+    @cs.remove(lower, upper)
   end
 
   def swap
@@ -179,7 +180,7 @@ class TestCodeSet < JSTest
 
     prep
     add 10,22
-    @cs.negate
+    @cs.negate(0, CODEMAX)
     equ '0 10 22 1114112'
 
     prep
@@ -312,7 +313,7 @@ class TestCodeSet < JSTest
   def test_single_value_2
     prep
     add(5)
-    @cs.negate
+    @cs.negate(0, CODEMAX)
     assert_raises ArgumentError do
      @cs.single_value
     end

@@ -319,7 +319,7 @@ module ToknInternal
         end
       end
       if negated && !had_initial_set
-        rs.negate
+        rs.negate(0, CODEMAX)
       end
 
       if rs.empty?
