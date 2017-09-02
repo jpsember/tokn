@@ -71,7 +71,6 @@ module Tokn
 
 
     def self.compile_elements_for_json(elements)
-
       result = []
       (0...elements.length).step(2).each do |index|
         a = elements[index]
@@ -84,7 +83,12 @@ module Tokn
           result << a << b
         end
       end
-      result
+      # If array has only one element, return the element; otherwise, the array
+      if result.size == 1
+        result[0]
+      else
+        result
+      end
     end
 
     def self.get_ordered_state_list(dfa)

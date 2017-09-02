@@ -100,6 +100,11 @@ module Tokn
 
 
     def self.decompile_elements_from_json(elements)
+      # If elements is not an array, wrap it as a single element of an array
+      if !(elements.is_a? Array)
+        elements = [elements]
+      end
+
       result = []
       cursor = 0
       while cursor < elements.length
