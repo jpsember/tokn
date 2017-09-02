@@ -138,12 +138,12 @@ module ToknInternal
 
     # Calculate difference of this set minus another
     def difference(s)
-      combineWith(s, 'd')
+      combine_with(s, 'd')
     end
 
     # Calculate the intersection of this set and another
     def intersect(s)
-      combineWith(s, 'i')
+      combine_with(s, 'i')
     end
 
     # Set this set equal to its intersection with another
@@ -282,21 +282,20 @@ module ToknInternal
       s
     end
 
-    # Combine this range (a) with another (b) according to particular operation
-    # > s  other range (b)
-    # > oper   'i': intersection, a^b
-    #          'd': difference, a-b
-    #          'n': negation, (a & !b) | (!a & b)
+    # Combine this code set (a) with another (b), according to an operation:
     #
-    def combineWith(s, oper)
+    #  'i': intersection, a^b
+    #  'd': difference, a-b
+    #
+    def combine_with(code_set, oper)
       sa = elements
-      sb = s.elements
+      sb = code_set.elements
 
       i = 0
       j = 0
-      c = []
+      combined_elements = []
 
-      wasInside = false
+      was_inside = false
 
       while i < sa.length || j < sb.length
 
@@ -321,16 +320,16 @@ module ToknInternal
         when 'd'
           inside = ((i & 1) == 1) && ((j & 1) == 0)
         else
-          raise Exception, "illegal"
+          raise ArgumentError, "Unsupported operation: #{oper}"
         end
 
-        if inside != wasInside
-          c.push v
-          wasInside = inside
+        if inside != was_inside
+          combined_elements << v
+          was_inside = inside
         end
       end
-      ret = CodeSet.new()
-      ret.elements = c
+      ret = CodeSet.new
+      ret.elements = combined_elements
       ret
     end
 
