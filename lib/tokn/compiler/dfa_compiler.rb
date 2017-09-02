@@ -76,9 +76,13 @@ module Tokn
       (0...elements.length).step(2).each do |index|
         a = elements[index]
         b = elements[index + 1]
-        b = 0 if b == CODEMAX
 
-        result << a << b
+        if b == a + 1
+          result << a.to_f
+        else
+          b = 0 if b == CODEMAX
+          result << a << b
+        end
       end
       result
     end
