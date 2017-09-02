@@ -51,7 +51,7 @@ module Tokn
 
       state_list = self.get_ordered_state_list(dfa)
       state_list.each do |state|
-        list = [state.final_state]
+        list = [state.final_state ? 1 : 0]
         ed = []
         state.edges.each do |lbl, dest|
           elements = self.compile_elements_for_json(lbl.elements)

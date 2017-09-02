@@ -31,7 +31,8 @@ module Tokn
       end
 
       st.each do |s|
-        final_state, edgeList = stateInfo[s.id]
+        final_state_flag, edgeList = stateInfo[s.id]
+        final_state = (final_state_flag != 0)
         s.final_state = final_state
         edgeList.each do |edge|
           label,destState = edge
