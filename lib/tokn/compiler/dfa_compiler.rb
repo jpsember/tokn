@@ -45,35 +45,12 @@ module Tokn
 
       require "json"
 
-      h = {"version" => DFA.version, "tokens" => dfa.token_names}
+      dict = {"version" => DFA.version, "tokens" => dfa.token_names}
 
-      stateSet = dfa.start_state.reachable_states
+      state_info = []
 
-      idToStateMap = {}
-      stateSet.each{ |st| idToStateMap[st.id] = st }
-
-      stateList = []
-
-      nextId = 0
-      idToStateMap.each_pair do |id, st|
-        if nextId != id
-          raise ArgumentError, "unexpected state ids"
-        end
-        nextId += 1
-
-        stateList.push(st)
-      end
-
-      if stateList.size == 0
-        raise ArgumentError, "bad states"
-      end
-
-      if stateList[0] != dfa.start_state
-        raise ArgumentError, "bad start state"
-      end
-
-      stateInfo = []
-      stateList.each do |state|
+      state_list = self.get_ordered_state_list(dfa)
+      state_list.each do |state|
         list = [state.final_state]
         ed = []
         state.edges.each do |lbl, dest|
@@ -81,11 +58,27 @@ module Tokn
           ed.push(edInfo)
         end
         list.push(ed)
-        stateInfo.push(list)
+        state_info.push(list)
       end
-      h["states"] = stateInfo
+      dict["states"] = state_info
 
-      JSON.generate(h)
+      JSON.generate(dict)
+    end
+
+
+    private
+
+
+    def self.get_ordered_state_list(dfa)
+      raise ArgumentError, "Bad start state" if dfa.start_state.id != 0
+      state_list = []
+      id_to_state_map = {}
+      dfa.start_state.reachable_states.each{|st| id_to_state_map[st.id] = st}
+      id_to_state_map.size.times do |id|
+        state = id_to_state_map[id] or raise ArgumentError, "unexpected state ids"
+        state_list << state
+      end
+      state_list
     end
 
   end
