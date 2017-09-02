@@ -280,9 +280,7 @@ module ToknInternal
       code_set = parse_code_set(true)
       if read_if('-')
         u = code_set.single_value
-        abort "Illegal bracket argument" if u.nil?
         v = parse_code_set(true).single_value
-        abort "Illegal bracket argument" if v.nil?
         if v < u
           abort "Illegal range"
         end

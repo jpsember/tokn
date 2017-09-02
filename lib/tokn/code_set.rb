@@ -251,14 +251,14 @@ module ToknInternal
       @elements.empty?
     end
 
-    # Determine if set contains a single value;
-    # returns it if so, otherwise nil
+    # Return the single value represented by the set, or
+    # raise ArgumentError if it doesn't contain exactly one value
     #
     def single_value
       if @elements.length == 2 && @elements[1] - @elements[0] == 1
         @elements[0]
       else
-        nil
+        raise ArgumentError, "CodeSet is not a single value"
       end
     end
 

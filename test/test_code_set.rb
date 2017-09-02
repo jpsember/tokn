@@ -306,29 +306,34 @@ class TestCodeSet < JSTest
   def test_single_value_1
     prep
     add(5)
-    assert !(@cs.single_value.nil?)
+    @cs.single_value
   end
 
   def test_single_value_2
     prep
     add(5)
     @cs.negate
-    assert (@cs.single_value.nil?)
+    assert_raises ArgumentError do
+     @cs.single_value
+    end
   end
 
   def test_single_value_3
     prep
     add(5)
     add(6)
-    assert (@cs.single_value.nil?)
+    assert_raises ArgumentError do
+     @cs.single_value
+    end
   end
 
   def test_single_value_4
     prep
     add(5)
     add(8)
-    assert (@cs.single_value.nil?)
+    assert_raises ArgumentError do
+     @cs.single_value
+    end
   end
-
 
 end
