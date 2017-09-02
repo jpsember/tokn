@@ -71,7 +71,16 @@ module Tokn
 
 
     def self.compile_elements_for_json(elements)
-      elements
+
+      result = []
+      (0...elements.length).step(2).each do |index|
+        a = elements[index]
+        b = elements[index + 1]
+        b = 0 if b == CODEMAX
+
+        result << a << b
+      end
+      result
     end
 
     def self.get_ordered_state_list(dfa)

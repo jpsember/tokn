@@ -95,7 +95,20 @@ module Tokn
 
 
     def self.decompile_elements_from_json(elements)
-      elements
+      result = []
+      exp_length = (elements.length + 1) & ~1
+      (0...exp_length).step(2).each do |index|
+        a = elements[index]
+        if elements.size > (1 + index)
+          b = elements[index + 1]
+          if b == 0
+            b = CODEMAX
+          end
+        else
+        end
+        result << a << b
+      end
+      result
     end
 
   end
