@@ -36,7 +36,7 @@ module Tokn
         edgeList.each do |edge|
           label,destState = edge
           cr = CodeSet.new()
-          cr.elements = label
+          cr.elements = DFA::decompile_elements_from_json(label)
           s.addEdge(cr, st[destState])
         end
       end
@@ -90,6 +90,15 @@ module Tokn
       @token_id_map[token_name]
     end
 
+
+    private
+
+
+    def self.decompile_elements_from_json(elements)
+      elements
+    end
+
   end
+
 
 end  # module Tokn
