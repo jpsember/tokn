@@ -31,13 +31,11 @@ module Tokn
     #    "final" => id of final state
     #  }
     #
-    # Each state has this format:
-    #  [
-    #   [edge0, edge1, ...]
-    #  ]
+    # Each state is a list of edges:
+    #  [edge0, edge1, ...]
     #
-    # Edge:
-    #  [label, destination id (integer)]
+    # Each edge is a list:
+    #  [label, destination id]
     #
     # Labels are arrays of integers, exactly the structure of
     # a CodeSet array.
@@ -56,16 +54,13 @@ module Tokn
           raise "multiple final states" if dict.include? "final"
           dict["final"] = state.id
         end
-        # TODO: we can now remove the outer list, since its only element is an inner list
-        list = []
-        ed = []
+
+        edge_list = []
         state.edges.each do |lbl, dest|
-          elements = self.compile_elements_for_json(lbl.elements)
-          ed << elements
-          ed << dest.id
+          edge_list <<  self.compile_elements_for_json(lbl.elements)
+          edge_list << dest.id
         end
-        list.push(ed)
-        state_info.push(list)
+        state_info << edge_list
       end
       dict["states"] = state_info
 

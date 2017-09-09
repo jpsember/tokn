@@ -32,7 +32,7 @@ module Tokn
       end
 
       st.each do |s|
-        edgeList = stateInfo[s.id][0]
+        edgeList = stateInfo[s.id]
         s.final_state = (s.id == final_state_id)
         cursor = 0
         while cursor < edgeList.size
