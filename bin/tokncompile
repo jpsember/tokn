@@ -11,4 +11,4 @@
 require 'tokn/compiler'
 
 dfa = Tokn::DFACompiler.from_script(ARGF.read)
-puts Tokn::DFACompiler.serialize(dfa)
+puts dfa.to_json
