@@ -253,37 +253,25 @@ module ToknInternal
     end
 
     def to_json
-      result = []
+      json_list = []
       (0...@elements.length).step(2).each do |index|
         a = @elements[index]
         b = @elements[index + 1]
-
         if b == a + 1
-          result << a.to_f
+          json_list << a.to_f
         else
           b = 0 if b == CODEMAX
-          result << a << b
+          json_list << a << b
         end
       end
-      # If array has only one element, return the element; otherwise, the array
-      if result.size == 1
-        result[0]
-      else
-        result
-      end
+      json_list
     end
 
 
     # Construct a CodeSet from a json representation
     #
     def self.from_json(json_representation)
-
-      # If elements is not an array, wrap it as an array with a single element
-      if !(json_representation.is_a? Array)
-        elements = [json_representation]
-      else
-        elements = json_representation
-      end
+      elements = json_representation
 
       code_set = CodeSet.new
 

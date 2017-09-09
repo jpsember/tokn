@@ -52,7 +52,7 @@ module Tokn
           edge_list << lbl.to_json
 
           # Omit the destination id if it's the final state
-          if true || dest.id != final_state_id
+          if dest.id != final_state_id
             edge_list << dest.id
           end
         end
@@ -89,7 +89,7 @@ module Tokn
         while cursor < state_edge_list.size
           label = state_edge_list[cursor]
           cursor += 1
-          if cursor == state_edge_list.size
+          if cursor == state_edge_list.size or !(state_edge_list[cursor].is_a? Integer)
             destination_state = final_state_id
           else
             destination_state = state_edge_list[cursor]
