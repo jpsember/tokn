@@ -48,14 +48,28 @@ module Tokn
 
       state_list.each do |state|
         edge_list = []
-        state.edges.each do |lbl, dest|
-          edge_list << lbl.to_json
 
-          # Omit the destination id if it's the final state
-          if dest.id != final_state_id
-            edge_list << dest.id
+        # If there's an edge to a final state, put it last;
+        # there should be at most one
+
+        edge_to_final_state = nil
+        state.edges.each do |edge|
+          lbl, dest = edge
+          if dest.id == final_state_id
+            raise "multiple edges to final state" if edge_to_final_state
+            edge_to_final_state = edge
+            next
           end
+          edge_list << lbl.to_json
+          edge_list << dest.id
         end
+
+        # If there was an edge to a final state, add it; but exclude the final state
+        if edge_to_final_state
+          lbl, _ = edge_to_final_state
+          edge_list << lbl.to_json
+        end
+
         state_info << edge_list
       end
 
@@ -84,14 +98,14 @@ module Tokn
 
       states_array.each do |s|
         state_edge_list = json_states[s.id]
+        max_cursor = state_edge_list.size
         s.final_state = (s.id == final_state_id)
         cursor = 0
-        while cursor < state_edge_list.size
+        while cursor < max_cursor
           label = state_edge_list[cursor]
           cursor += 1
-          if cursor == state_edge_list.size or !(state_edge_list[cursor].is_a? Integer)
-            destination_state = final_state_id
-          else
+          destination_state = final_state_id
+          if cursor < max_cursor
             destination_state = state_edge_list[cursor]
             cursor += 1
           end
