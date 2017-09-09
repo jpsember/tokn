@@ -264,14 +264,22 @@ module ToknInternal
           json_list << a << b
         end
       end
-      json_list
+      # Flatten list of single element to the element
+      if json_list.size == 1
+        json_list[0]
+      else
+        json_list
+      end
     end
-
 
     # Construct a CodeSet from a json representation
     #
     def self.from_json(json_representation)
-      elements = json_representation
+      if json_representation.is_a? Array
+        elements = json_representation
+      else
+        elements = [json_representation]
+      end
 
       code_set = CodeSet.new
 
