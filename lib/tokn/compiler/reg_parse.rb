@@ -502,7 +502,7 @@ module ToknInternal
 
       nfa_end.final_state = true
 
-      builder = DFABuilder.new(nfa_start)
+      builder = NFAToDFA.new(nfa_start)
       builder.with_filter = false
       dfa_start_state = builder.nfa_to_dfa
 

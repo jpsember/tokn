@@ -141,7 +141,7 @@ class DFACompiler
 
     combined = combine_token_nfas(token_records)
 
-    builder = DFABuilder.new(combined)
+    builder = NFAToDFA.new(combined)
     builder.generate_pdf = @generate_pdf
     dfa = builder.nfa_to_dfa
 

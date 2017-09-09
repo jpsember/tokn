@@ -47,7 +47,7 @@ END
     s = x.start_state
     x.endState.final_state = true
     s.reverseNFA()
-    builder = DFABuilder.new(s)
+    builder = NFAToDFA.new(s)
     builder.with_filter = false
     s_dfa = builder.nfa_to_dfa
     TestSnapshot.new.perform do
@@ -63,7 +63,7 @@ END
       puts s.build_dot_file("nfa")
     end
 
-    builder = DFABuilder.new(s)
+    builder = NFAToDFA.new(s)
     builder.with_filter = false
     dfa = builder.nfa_to_dfa
 

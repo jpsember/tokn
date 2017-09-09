@@ -13,7 +13,7 @@ module ToknInternal
   # sets (e.g., unicode, which ranges from 0..0x10ffff.  See RangePartition.rb
   # for more details.
   #
-  class DFABuilder
+  class NFAToDFA
 
     attr_reader :start_state
     attr_accessor :with_filter
@@ -205,6 +205,6 @@ module ToknInternal
       end
     end
 
-  end # class DFABuilder
+  end # class NFAToDFA
 
 end  # module ToknInternal
