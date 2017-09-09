@@ -4,6 +4,9 @@ module Tokn
   #
   class DFACompiler
 
+    # TODO: No instances of this class are every constructed, and it has no instance methods...
+    #       do we still want this to be a class?
+
     include ToknInternal
 
     # Compile a Tokenizer DFA from a token definition script.
@@ -57,7 +60,7 @@ module Tokn
 
         edge_list = []
         state.edges.each do |lbl, dest|
-          edge_list << self.compile_elements_for_json(lbl.elements)
+          edge_list << lbl.to_json
           edge_list << dest.id
         end
         state_info << edge_list
@@ -70,27 +73,6 @@ module Tokn
 
     private
 
-
-    def self.compile_elements_for_json(elements)
-      result = []
-      (0...elements.length).step(2).each do |index|
-        a = elements[index]
-        b = elements[index + 1]
-
-        if b == a + 1
-          result << a.to_f
-        else
-          b = 0 if b == CODEMAX
-          result << a << b
-        end
-      end
-      # If array has only one element, return the element; otherwise, the array
-      if result.size == 1
-        result[0]
-      else
-        result
-      end
-    end
 
     def self.get_ordered_state_list(dfa)
       raise ArgumentError, "Bad start state" if dfa.start_state.id != 0

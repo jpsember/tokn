@@ -252,6 +252,60 @@ module ToknInternal
       end
     end
 
+    def to_json
+      result = []
+      (0...@elements.length).step(2).each do |index|
+        a = @elements[index]
+        b = @elements[index + 1]
+
+        if b == a + 1
+          result << a.to_f
+        else
+          b = 0 if b == CODEMAX
+          result << a << b
+        end
+      end
+      # If array has only one element, return the element; otherwise, the array
+      if result.size == 1
+        result[0]
+      else
+        result
+      end
+    end
+
+
+    # Construct a CodeSet from a json representation
+    #
+    def self.from_json(elements)
+
+      # If elements is not an array, wrap it as an array with a single element
+      if !(elements.is_a? Array)
+        elements = [elements]
+      end
+
+      code_set = CodeSet.new
+      result = code_set.elements
+
+      cursor = 0
+      while cursor < elements.length
+        a = elements[cursor]
+        cursor += 1
+        if a.is_a? Integer
+          b = elements[cursor]
+          cursor += 1
+          if b == 0
+            b = CODEMAX
+          end
+        else
+          a = a.to_i
+          b = a + 1
+        end
+        result << a << b
+      end
+
+      code_set
+    end
+
 
     private
 
@@ -322,38 +376,6 @@ module ToknInternal
       ret = CodeSet.new
       ret.elements = combined_elements
       ret
-    end
-
-    # Construct a CodeSet from a json representation
-    #
-    def self.from_json(elements)
-
-      # If elements is not an array, wrap it as an array with a single element
-      if !(elements.is_a? Array)
-        elements = [elements]
-      end
-
-      code_set = CodeSet.new
-      result = code_set.elements
-
-      cursor = 0
-      while cursor < elements.length
-        a = elements[cursor]
-        cursor += 1
-        if a.is_a? Integer
-          b = elements[cursor]
-          cursor += 1
-          if b == 0
-            b = CODEMAX
-          end
-        else
-          a = a.to_i
-          b = a + 1
-        end
-        result << a << b
-      end
-
-      code_set
     end
 
   end
