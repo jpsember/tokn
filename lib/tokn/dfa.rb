@@ -37,24 +37,27 @@ module Tokn
       dict = {}
       dict["version"] = DFA.version
       dict["tokens"] = @token_names
-
       state_info = []
+      dict["states"] = state_info
 
       state_list = get_ordered_state_list
-      state_list.each do |state|
-        if state.final_state
-          raise "multiple final states" if dict.include? "final"
-          dict["final"] = state.id
-        end
+      final_states = state_list.select{|state| state.final_state}
+      raise "bad final states" unless final_states.size == 1
+      final_state_id = final_states[0].id
+      dict["final"] = final_state_id
 
+      state_list.each do |state|
         edge_list = []
         state.edges.each do |lbl, dest|
           edge_list << lbl.to_json
-          edge_list << dest.id
+
+          # Omit the destination id if it's the final state
+          if true || dest.id != final_state_id
+            edge_list << dest.id
+          end
         end
         state_info << edge_list
       end
-      dict["states"] = state_info
 
       JSON.generate(dict)
     end
@@ -85,9 +88,13 @@ module Tokn
         cursor = 0
         while cursor < state_edge_list.size
           label = state_edge_list[cursor]
-          destination_state = state_edge_list[cursor+1]
-          cursor += 2
-
+          cursor += 1
+          if cursor == state_edge_list.size
+            destination_state = final_state_id
+          else
+            destination_state = state_edge_list[cursor]
+            cursor += 1
+          end
           s.addEdge(CodeSet.from_json(label), states_array[destination_state])
         end
       end
