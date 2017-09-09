@@ -38,13 +38,13 @@ module Tokn
       dict["version"] = DFA.version
       dict["tokens"] = @token_names
       state_info = []
-      dict["states"] = state_info
 
       state_list = get_ordered_state_list
       final_states = state_list.select{|state| state.final_state}
       raise "bad final states" unless final_states.size == 1
       final_state_id = final_states[0].id
       dict["final"] = final_state_id
+      dict["states"] = state_info
 
       state_list.each do |state|
         edge_list = []
