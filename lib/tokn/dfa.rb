@@ -24,6 +24,7 @@ module Tokn
 
       tNames = h["tokens"]
       stateInfo = h["states"]
+      final_state_id = h["final"] or raise "missing final state"
 
       st = []
       stateInfo.each_with_index do |_,i|
@@ -31,9 +32,8 @@ module Tokn
       end
 
       st.each do |s|
-        final_state_flag, edgeList = stateInfo[s.id]
-        final_state = (final_state_flag != 0)
-        s.final_state = final_state
+        edgeList = stateInfo[s.id][0]
+        s.final_state = (s.id == final_state_id)
         cursor = 0
         while cursor < edgeList.size
           label = edgeList[cursor]

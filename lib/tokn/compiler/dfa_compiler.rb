@@ -28,10 +28,11 @@ module Tokn
     #    "version" => version number (float)
     #    "tokens" => array of token names (strings)
     #    "states" => array of states, ordered by id (0,1,..)
+    #    "final" => id of final state
     #  }
     #
     # Each state has this format:
-    #  [ final_state (boolean),
+    #  [
     #   [edge0, edge1, ...]
     #  ]
     #
@@ -51,7 +52,12 @@ module Tokn
 
       state_list = self.get_ordered_state_list(dfa)
       state_list.each do |state|
-        list = [state.final_state ? 1 : 0]
+        if state.final_state
+          raise "multiple final states" if dict.include? "final"
+          dict["final"] = state.id
+        end
+        # TODO: we can now remove the outer list, since its only element is an inner list
+        list = []
         ed = []
         state.edges.each do |lbl, dest|
           elements = self.compile_elements_for_json(lbl.elements)
