@@ -40,9 +40,7 @@ module Tokn
           destination_state = state_edge_list[cursor+1]
           cursor += 2
 
-          cr = CodeSet.new()
-          cr.elements = DFA::decompile_elements_from_json(label)
-          s.addEdge(cr, states_array[destination_state])
+          s.addEdge(CodeSet.from_json(label), states_array[destination_state])
         end
       end
 
@@ -97,32 +95,6 @@ module Tokn
 
     private
 
-
-    def self.decompile_elements_from_json(elements)
-      # If elements is not an array, wrap it as a single element of an array
-      if !(elements.is_a? Array)
-        elements = [elements]
-      end
-
-      result = []
-      cursor = 0
-      while cursor < elements.length
-        a = elements[cursor]
-        cursor += 1
-        if a.is_a? Integer
-          b = elements[cursor]
-          cursor += 1
-          if b == 0
-            b = CODEMAX
-          end
-        else
-          a = a.to_i
-          b = a + 1
-        end
-        result << a << b
-      end
-      result
-    end
 
   end
 

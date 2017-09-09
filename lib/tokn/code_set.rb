@@ -324,6 +324,38 @@ module ToknInternal
       ret
     end
 
+    # Construct a CodeSet from a json representation
+    #
+    def self.from_json(elements)
+
+      # If elements is not an array, wrap it as an array with a single element
+      if !(elements.is_a? Array)
+        elements = [elements]
+      end
+
+      code_set = CodeSet.new
+      result = code_set.elements
+
+      cursor = 0
+      while cursor < elements.length
+        a = elements[cursor]
+        cursor += 1
+        if a.is_a? Integer
+          b = elements[cursor]
+          cursor += 1
+          if b == 0
+            b = CODEMAX
+          end
+        else
+          a = a.to_i
+          b = a + 1
+        end
+        result << a << b
+      end
+
+      code_set
+    end
+
   end
 
 end
