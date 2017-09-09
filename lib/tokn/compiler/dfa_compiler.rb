@@ -57,7 +57,7 @@ module Tokn
 
         edge_list = []
         state.edges.each do |lbl, dest|
-          edge_list <<  self.compile_elements_for_json(lbl.elements)
+          edge_list << self.compile_elements_for_json(lbl.elements)
           edge_list << dest.id
         end
         state_info << edge_list

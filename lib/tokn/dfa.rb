@@ -13,41 +13,40 @@ module Tokn
 
     # Compile a Tokenizer DFA from a JSON string
     #
-    def self.from_json(jsonStr)
+    def self.from_json(json_str)
       require "json"
-      h = JSON.parse(jsonStr)
+      h = JSON.parse(json_str)
       version = h["version"]
 
       if !version || version.floor != DFA.version.floor
         raise ArgumentError,"Bad or missing version number: #{version}, expected #{DFA.version}"
       end
 
-      tNames = h["tokens"]
-      stateInfo = h["states"]
+      token_names = h["tokens"]
+      json_states = h["states"]
       final_state_id = h["final"] or raise "missing final state"
 
-      st = []
-      stateInfo.each_with_index do |_,i|
-        st.push(State.new(i))
+      states_array = []
+      json_states.size.times do |i|
+        states_array.push(State.new(i))
       end
 
-      st.each do |s|
-        edgeList = stateInfo[s.id]
+      states_array.each do |s|
+        state_edge_list = json_states[s.id]
         s.final_state = (s.id == final_state_id)
         cursor = 0
-        while cursor < edgeList.size
-          label = edgeList[cursor]
-          destState = edgeList[cursor+1]
+        while cursor < state_edge_list.size
+          label = state_edge_list[cursor]
+          destination_state = state_edge_list[cursor+1]
           cursor += 2
 
           cr = CodeSet.new()
           cr.elements = DFA::decompile_elements_from_json(label)
-          s.addEdge(cr, st[destState])
+          s.addEdge(cr, states_array[destination_state])
         end
       end
 
-      DFA.new(tNames, st[0])
-
+      DFA.new(token_names, states_array[0])
     end
 
     attr_reader :start_state, :token_names
