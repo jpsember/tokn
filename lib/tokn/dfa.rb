@@ -23,14 +23,12 @@ module Tokn
     #    "final" => id of final state
     #  }
     #
-    # Each state is a list of edges:
-    #  [edge0, edge1, ...]
+    # Each state is a list of edge info:
+    #  [code_set1, dest_id1, code_set2, destination_id2, ...]
     #
-    # Each edge is a list:
-    #  [label, destination id]
+    # The last destination_id is optional.  If missing, it is the final state.
     #
-    # Labels are arrays of integers, exactly the structure of
-    # a CodeSet array.
+    # The code set is the json representation of a CodeSet.
     #
     def to_json
 
