@@ -71,8 +71,8 @@ END
     oldToNewMap[dfa]
   end
 
-  def test_TokenDefParser
-    parser = TokenDefParser.new
+  def test_DFACompiler
+    parser = Tokn::DFACompiler.new
     parser.parse(TOKEN_SCRIPT2)
   end
 
