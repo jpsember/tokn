@@ -1,0 +1,15 @@
+
+Total states: 6
+
+Text: 'runabc abcrun run abc'
+
+Parsed:
+
+IDENTIFIER  : runabc
+WS          :  
+IDENTIFIER  : abcrun
+WS          :  
+COMMAND     : run
+WS          :  
+IDENTIFIER  : abc
+

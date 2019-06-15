@@ -12,7 +12,7 @@ class TestFilter < JSTest
       total_edges += state.edges.size
     end
 
-    assert_equal(11, total_edges)
+    assert_equal(14, total_edges)
   end
 
   def test_Filter
@@ -22,11 +22,13 @@ class TestFilter < JSTest
       dfa = Tokn::DFACompiler.from_script(TOKEN_SCRIPT)
     end
 
-    text = "abcabcdef"
+    text = "abc abcdef def"
     tok = Tokn::Tokenizer.new(dfa, text)
 
     tok.read("SPECIFIC")
-    tok.read("SPECIFIC")
+    tok.read("WS")
+    tok.read("GENERAL")
+    tok.read("WS")
     tok.read("GENERAL")
 
     assert(!tok.has_next)
@@ -34,6 +36,7 @@ class TestFilter < JSTest
 
   TOKEN_SCRIPT =<<-'END'
 
+WS: \0x20
 GENERAL: [a-z]+
 SPECIFIC: abc
 

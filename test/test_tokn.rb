@@ -732,8 +732,9 @@ EOT
   def test_redundant_token
     script =<<-'EOT'
 MISC: \d+
-ALPHA: abcdef
-BETA: abc
+# This token is redundant, because it is subsumed by the following one:
+ALPHA: abcd
+BETA: abc[a-z]
 EOT
 
     begin

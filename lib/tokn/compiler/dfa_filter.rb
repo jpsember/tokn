@@ -63,7 +63,6 @@ module ToknInternal
         end
       end
 
-      remove_useless_edges
     end
 
 
@@ -102,35 +101,6 @@ module ToknInternal
       @node_distances[state.id] || INF_DISTANCE
     end
 
-    def remove_useless_edges
-      @state_list.each do |state_u|
-
-        state_u_distance = node_distance(state_u)
-
-        remove_list = []
-        state_u.edges.each_with_index do |edge,edge_index|
-          _, state_v = edge
-          next if state_v.final_state
-
-          value_v = node_value(state_v)
-
-          if (value_v >= 0 && value_v < state_u_distance)
-            puts " source distance #{state_u.name}:#{state_u_distance} exceeds dest token value #{state_v.name}:#{value_v}" if @verbose
-            remove_list << edge_index
-          end
-        end
-
-        next if remove_list.empty?
-
-        @modified = true
-
-        # Remove the useless edges in reverse order, since indices change as we remove them
-        remove_list.reverse.each { |x| state_u.remove_edge(x)}
-
-      end
-    end
-
   end # class Filter
-
 
 end  # module ToknInternal

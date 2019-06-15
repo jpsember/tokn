@@ -1,0 +1,11 @@
+
+Total states: 6
+
+Text: 'abc abd'
+
+Parsed:
+
+SPECIFIC    : abc
+WS          :  
+GENERAL     : abd
+

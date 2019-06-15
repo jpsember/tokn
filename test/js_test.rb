@@ -37,10 +37,14 @@ class IOOutputCapture < StringIO
     self.content_buffer.putc(value)
   end
 
-  def write(str)
+  def write(*str)
+    str.each{|x| self.syswrite(x)}
+  end
+
+  def syswrite(str)
     print_interleave_transition
     @actual_output.write(str) if self.echo
-    self.content_buffer.write(str)
+    self.content_buffer.syswrite(str)
   end
 
   def flush
