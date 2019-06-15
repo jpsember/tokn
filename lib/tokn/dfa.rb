@@ -8,7 +8,7 @@ module Tokn
   class DFA
 
     def self.version
-      3.0
+      4.0
     end
 
     include ToknInternal
