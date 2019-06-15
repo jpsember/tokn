@@ -258,7 +258,7 @@ module ToknInternal
         a = @elements[index]
         b = @elements[index + 1]
         if b == a + 1
-          json_list << a
+          json_list << a.to_f
         else
           b = 0 if b == CODEMAX
           json_list << a << b
