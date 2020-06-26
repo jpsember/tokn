@@ -1,0 +1,9 @@
+WS:     [\f\r\s\t\n]+
+
+IDENTIFIER: [a-zA-Z_][a-zA-Z_0-9]*
+
+PREFIX: a
+
+# This higher priority token has a lower priority one as a prefix
+#
+EXTENDED: aab

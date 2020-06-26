@@ -1,0 +1,10 @@
+WS 1 1  
+PREFIX 1 2 a
+WS 1 3  
+IDENTIFIER 1 4 aa
+WS 1 6  
+EXTENDED 1 7 aab
+WS 1 10  
+IDENTIFIER 1 11 aabb
+WS 1 15 
+
